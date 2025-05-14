@@ -1,12 +1,16 @@
 {
     "compilerOptions": {
+      "module": "esnext",
+      "moduleResolution": "node", // Ensure this is set to 'node'
       "target": "es5",
-      "module": "es6",
-      "strict": true,
-      "jsx": "react",
+      "jsx": "react-jsx",
       "esModuleInterop": true,
       "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true
+      "strict": true,
+      "baseUrl": "./",
+      "paths": {
+        // Add any necessary custom path mappings here
+      }
     },
     "include": ["src"]
   }
