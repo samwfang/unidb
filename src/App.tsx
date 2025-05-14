@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import React, { useState, useEffect } from 'react';
 import MasterTable from './MasterTable.js'
 import {
   Box,
@@ -309,7 +310,7 @@ function App() {
         >
           <Box>
             <Image
-              size="100px"
+              sizes="100px"
               fallbackSrc="https://via.placeholder.com/150"
               src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
               width="100%"

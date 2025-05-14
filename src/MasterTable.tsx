@@ -1,17 +1,26 @@
-// InfiniteAccordion.js
 import React, { useState, useEffect } from 'react';
 import { Box, Accordion, Button, Flex, Text } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 
+// Define a type for the data items
+export interface UniversityData {
+  id: number;
+  name: string;
+  location: string;
+  studentFacultyRatio: string;
+  icon: string;
+  content: string;
+}
+
 const PAGE_SIZE = 10; // Number of items per page
 
-const InfiniteAccordion = () => {
-  const [data, setData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
+const InfiniteAccordion: React.FC = () => {
+  const [data, setData] = useState<UniversityData[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(0);
 
   // Simulate fetching data
   const fetchData = () => {
-    const simulatedData = Array.from({ length: 100 }, (_, i) => ({
+    const simulatedData: UniversityData[] = Array.from({ length: 100 }, (_, i) => ({
       id: i + 1,
       name: `University ${i + 1}`,
       location: `Location ${i + 1}`,
