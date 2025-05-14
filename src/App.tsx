@@ -1,6 +1,7 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import MasterTable from './MasterTable'
+import UGradGradToggle from './UGradGradToggle';
 import {
   Box,
   Image,
@@ -34,6 +35,15 @@ import {
 
 
 function App() {
+
+  // whether table will prioritize undergraduate or graduate information
+  const [mode, setMode] = useState<'grad' | 'undergrad'>('undergrad');
+
+  const undergradGradToggle = () => {
+    setMode((prevMode) => (prevMode === 'undergrad' ? 'grad' : 'undergrad'));
+    console.log(mode)
+  };
+
   return (
     <div className="App">
       <Flex
@@ -56,10 +66,22 @@ function App() {
         <Badge variant="subtle" colorScheme="pink" ml={1}>
           BETA
         </Badge>
+        <UGradGradToggle mode={mode} onToggle={undergradGradToggle} />
       </Flex>
       <Text color="gray.500">The Visual Editor for Chakra UI</Text>
     </Flex>
+
+
+
+
+
+
+
     <MasterTable />
+
+
+
+
     <Grid p={10} gap={6} templateColumns="repeat(auto-fit, minmax(350px, 1fr))">
       <Stack>
         <Box

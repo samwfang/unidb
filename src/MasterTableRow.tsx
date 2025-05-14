@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image } from '@chakra-ui/react';
 import MTExpandedEntry from './MTExpandedEntry';
 import { UniversityData } from './MasterTable'; // Adjust the path as necessary
@@ -8,9 +8,8 @@ interface MasterTableRowProps {
   item: UniversityData;
 }
 
-// ForwardRefExoticComponent is used to type components that use forwardRef
-const MasterTableRow = forwardRef<HTMLDivElement, MasterTableRowProps>(({ item }, ref) => (
-  <AccordionItem ref={ref}>
+const MasterTableRow: React.FC<MasterTableRowProps> = ({ item }) => (
+  <AccordionItem>
     <AccordionButton>
       <Grid templateColumns="50px 1fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
         {/* Logo for University */}
@@ -37,8 +36,8 @@ const MasterTableRow = forwardRef<HTMLDivElement, MasterTableRowProps>(({ item }
     </AccordionButton>
 
     {/* This is the Expanded Entry, what you see when the user clicks each entry in the table */}
-    <MTExpandedEntry content={item.content} />
+    <MTExpandedEntry content={item.undergrad_content} />
   </AccordionItem>
-));
+);
 
 export default MasterTableRow;

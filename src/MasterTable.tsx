@@ -9,7 +9,8 @@ export interface UniversityData {
   location: string;
   studentFacultyRatio: string;
   icon: string;
-  content: string;
+  undergrad_content: string;
+  grad_content: string;
 }
 
 const PAGE_SIZE = 10; // Number of items per page
@@ -26,7 +27,8 @@ const InfiniteAccordion: React.FC = () => {
       location: `Location ${i + 1}`,
       studentFacultyRatio: `${10 + (i % 5)}:1`,
       icon: 'FaUniversity', // Example icon name from DB
-      content: `Detailed content for university ${i + 1}`,
+      undergrad_content: `Undergrad School Blah Blah Blah for University ${i + 1}`,
+      grad_content: `Graduate School Blah Blah Blah for University ${i + 1}`
     }));
     setData(simulatedData);
   };
