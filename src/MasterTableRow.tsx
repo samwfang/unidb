@@ -1,32 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image } from '@chakra-ui/react';
 import MTExpandedEntry from './MTExpandedEntry';
-import { UniversityData } from './MasterTable'; // Adjust the path as necessary
+import { UniversityData, UndergradContent, GradContent, Content} from './MasterTable'; // Adjust the path as necessary
 import { ModeType } from './App';
 // Define the props interface for MasterTableRow
 interface MasterTableRowProps {
   item: UniversityData;
   mode: ModeType;
-  onExpand: (id: number, type: ModeType) => Promise<string>;
+  toggleMode: () => void;
+  onExpand: (id: number) => Promise<Content>;
 }
 
-const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, onExpand }) => {
+const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode, onExpand }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   //Remove Content when Mode Change
   useEffect(() => {
-    item.content = undefined;
     if (isExpanded) {
       handleExpand();
     }
   }, [mode]);
 
   const handleExpand = async () => {
-    setIsExpanded(true);
-    setIsLoading(true);
-    item.content = await onExpand(item.id, mode);
-    setIsLoading(false);
+    if (!isExpanded) {
+      setIsLoading(true);
+      try {
+        const content  = await onExpand(item.id);
+        item.content = content;
+        setIsExpanded(true);
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   return (
@@ -57,7 +63,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, onExpand })
     </AccordionButton>
 
     {/* This is the Expanded Entry, what you see when the user clicks each entry in the table */}
-    <MTExpandedEntry content={item.content} isLoading={isLoading} />
+    <MTExpandedEntry mode={mode} content={item.content} isLoading={isLoading} />
   </AccordionItem>
   )
 };

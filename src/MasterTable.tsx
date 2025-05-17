@@ -10,16 +10,30 @@ export interface UniversityData {
   location: string;
   studentFacultyRatio: string;
   icon: string;
-  content?: string;
+  content?: Content;
+}
+
+export interface Content {
+  undergrad_content?: UndergradContent;
+  grad_content?: GradContent;
+};
+
+export interface UndergradContent {
+  content: string;
+};
+
+export interface GradContent {
+  content: string;
 }
 
 export interface MasterTableProps {
   mode: ModeType;
+  toggleMode: () => void;
 };
 
 const PAGE_SIZE = 10; // Number of items per page
 
-const MasterTable: React.FC<MasterTableProps> = ({ mode }) => {
+const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
   const [data, setData] = useState<UniversityData[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalItems, setTotalItems] = useState<number>(0);
@@ -54,7 +68,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode }) => {
     }
   };
 
-  const fetchContent = async (id: number, type: ModeType): Promise<string> => {
+  const fetchExpandedEntryContent = async (id: number): Promise<{
+    undergrad_content: UndergradContent;
+    grad_content: GradContent;
+  }> => {
     // In a real implementation, this would be an actual API call:
     /*
     const response = await fetch(`/api/universities/${id}/content?type=${type}`);
@@ -65,14 +82,17 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode }) => {
 
     // Simulation - matches your existing data structure
     return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(
-          type == ModeType.Undergrad
-            ? `Undergrad School Blah Blah Blah for University ${id}`
-            : `Graduate School Blah Blah Blah for University ${id}`
-        );
-      }, 500); // Simulate network delay
-    });
+    setTimeout(() => {
+      resolve({
+        undergrad_content: {
+          content: `Undergrad School Blah Blah Blah for University ${id}`
+        },
+        grad_content: {
+          content: `Graduate School Blah Blah Blah for University ${id}`
+        }
+      });
+    }, 500);
+  });
   };
 
   useEffect(() => {
@@ -98,7 +118,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode }) => {
     <Box maxW="800px" mx="auto" mt="8">
       <Accordion allowToggle>
         {data.map((item) => (
-          <MasterTableRow key={item.id} item={item} mode={mode} onExpand={fetchContent}/>
+          <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent}/>
         ))}
       </Accordion>
       <Flex justifyContent="space-between" mt="4">

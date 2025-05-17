@@ -83,7 +83,7 @@ function App() {
 
 
 
-    <MasterTable mode={mode}/>
+    <MasterTable mode={mode} toggleMode={undergradGradToggle}/>
 
 
 
