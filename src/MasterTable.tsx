@@ -120,9 +120,19 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
     }
   };
 
-
   return (
+    
     <Box maxW="800px" mx="auto" mt="8">
+      <Flex justifyContent="flex-end" mb={4}>
+        <Button 
+          onClick={() => {setExpandedIndex([])}}
+          isDisabled={Array.isArray(expandedIndex) ? !expandedIndex.length : true}
+          variant="outline"
+        >
+          Collapse All
+        </Button>
+      </Flex>
+
       <Accordion 
       allowMultiple
       index={expandedIndex}
