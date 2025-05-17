@@ -13,15 +13,18 @@ export interface UniversityData {
   content?: Content;
 }
 
+//Content to Render on Entry Expansion
 export interface Content {
   undergrad_content?: UndergradContent;
   grad_content?: GradContent;
 };
 
+//Content for Undergrad
 export interface UndergradContent {
   content: string;
 };
 
+//Content for Grad
 export interface GradContent {
   content: string;
 }
@@ -39,9 +42,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const [expandedIndex, setExpandedIndex] = useState<number | number[]>([]);
+
   // Simulate API call for paginated data
   const fetchPageData = async (page: number) => {
     setIsLoading(true);
+    //reset to collapsed state
+    setExpandedIndex([]);
     try {
       // In a real app, this would be an actual API call like:
       // const response = await fetch(`/api/universities?page=${page}&limit=${PAGE_SIZE}`);
@@ -116,7 +123,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
 
   return (
     <Box maxW="800px" mx="auto" mt="8">
-      <Accordion allowToggle>
+      <Accordion 
+      allowMultiple
+      index={expandedIndex}
+      onChange={(index) => setExpandedIndex(index)}>
         {data.map((item) => (
           <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent}/>
         ))}
