@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Accordion, Button, Flex, Text } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
+import { ModeType } from './App';
 
 // Define a type for the data items
 export interface UniversityData {
@@ -9,13 +10,17 @@ export interface UniversityData {
   location: string;
   studentFacultyRatio: string;
   icon: string;
-  undergrad_content: string;
-  grad_content: string;
+  undergrad_content?: string;
+  grad_content?: string;
 }
+
+export interface MasterTableProps {
+  mode: ModeType;
+};
 
 const PAGE_SIZE = 10; // Number of items per page
 
-const InfiniteAccordion: React.FC = () => {
+const MasterTable: React.FC<MasterTableProps> = ({ mode }) => {
   const [data, setData] = useState<UniversityData[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalItems, setTotalItems] = useState<number>(0);
@@ -34,15 +39,12 @@ const InfiniteAccordion: React.FC = () => {
         const globalIndex = page * PAGE_SIZE + i;
         return {
           id: globalIndex + 1,
-          name: `University ${globalIndex + 1}`,
+          name: `The University of the Number ${globalIndex + 1}`,
           location: `Location ${globalIndex + 1}`,
           studentFacultyRatio: `${10 + (globalIndex % 5)}:1`,
           icon: 'FaUniversity',
-          undergrad_content: `Undergrad content for University ${globalIndex + 1}`,
-          grad_content: `Graduate content for University ${globalIndex + 1}`
         };
       });
-      
       // Simulate total count (1000 in your case)
       const simulatedTotal = 1000;
       
@@ -51,6 +53,27 @@ const InfiniteAccordion: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchContent = async (id: number, type: ModeType): Promise<string> => {
+    // In a real implementation, this would be an actual API call:
+    /*
+    const response = await fetch(`/api/universities/${id}/content?type=${type}`);
+    if (!response.ok) throw new Error('Failed to fetch content');
+    const data = await response.json();
+    return data.content;
+    */
+
+    // Simulation - matches your existing data structure
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(
+          type == ModeType.Undergrad
+            ? `Undergrad School Blah Blah Blah for University ${id}`
+            : `Graduate School Blah Blah Blah for University ${id}`
+        );
+      }, 500); // Simulate network delay
+    });
   };
 
   useEffect(() => {
@@ -76,7 +99,7 @@ const InfiniteAccordion: React.FC = () => {
     <Box maxW="800px" mx="auto" mt="8">
       <Accordion allowToggle>
         {data.map((item) => (
-          <MasterTableRow key={item.id} item={item} />
+          <MasterTableRow key={item.id} item={item} mode={mode} onExpand={fetchContent}/>
         ))}
       </Accordion>
       <Flex justifyContent="space-between" mt="4">
@@ -94,4 +117,4 @@ const InfiniteAccordion: React.FC = () => {
   );
 };
 
-export default InfiniteAccordion;
+export default MasterTable;

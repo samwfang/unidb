@@ -1,14 +1,15 @@
 import React from 'react';
+import { ModeType } from './App';
 
 interface ModeToggleProps {
-  mode: 'grad' | 'undergrad';
+  mode: ModeType;
   onToggle: () => void;
 }
 
-const ModeToggle: React.FC<ModeToggleProps> = ({ mode, onToggle }) => {
+const ModeToggle: React.FC<ModeToggleProps> = ({mode, onToggle }) => {
   return (
     <button onClick={onToggle}>
-      Switch to {mode === 'undergrad' ? 'Grad' : 'Undergrad'} Mode
+      Switch Mode To {mode == ModeType.Undergrad ? 'Graduate' : 'Undergraduate'}
     </button>
   );
 };

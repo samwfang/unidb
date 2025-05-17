@@ -33,14 +33,20 @@ import {
   ChevronRightIcon
 } from '@chakra-ui/icons'
 
+  export enum ModeType {
+    Undergrad = 'undergrad',
+    Grad = 'grad',
+    Law = 'law'
+  }
+
 
 function App() {
 
   // whether table will prioritize undergraduate or graduate information
-  const [mode, setMode] = useState<'grad' | 'undergrad'>('undergrad');
+  const [mode, setMode] = useState<ModeType>(ModeType.Undergrad);
 
   const undergradGradToggle = () => {
-    setMode((prevMode) => (prevMode === 'undergrad' ? 'grad' : 'undergrad'));
+    setMode((prevMode) => (prevMode === ModeType.Undergrad ? ModeType.Grad : ModeType.Undergrad));
     console.log(mode)
   };
 
@@ -77,7 +83,7 @@ function App() {
 
 
 
-    <MasterTable />
+    <MasterTable mode={mode}/>
 
 
 

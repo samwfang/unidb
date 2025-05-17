@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image } from '@chakra-ui/react';
 import MTExpandedEntry from './MTExpandedEntry';
 import { UniversityData } from './MasterTable'; // Adjust the path as necessary
-
+import { ModeType } from './App';
 // Define the props interface for MasterTableRow
 interface MasterTableRowProps {
   item: UniversityData;
+  mode: ModeType;
+  onExpand: (id: number, type: ModeType) => Promise<string>;
 }
 
-const MasterTableRow: React.FC<MasterTableRowProps> = ({ item }) => (
+const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, onExpand }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleExpand = async () => {
+    if (!item.undergrad_content) {
+      setIsLoading(true);
+      await onExpand(item.id, mode);
+      setIsLoading(false);
+    }
+  };
+
+  return (
   <AccordionItem>
     <AccordionButton>
       <Grid templateColumns="50px 1fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
@@ -25,7 +38,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item }) => (
         {/* University Name */}
         <GridItem>
           <Box flex="1" textAlign="left">
-            {item.name}
+            <b>{item.name}</b>
           </Box>
         </GridItem>
 
@@ -38,6 +51,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item }) => (
     {/* This is the Expanded Entry, what you see when the user clicks each entry in the table */}
     <MTExpandedEntry content={item.undergrad_content} />
   </AccordionItem>
-);
+  )
+};
 
 export default MasterTableRow;
