@@ -12,18 +12,26 @@ interface MasterTableRowProps {
 
 const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, onExpand }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  //Remove Content when Mode Change
+  useEffect(() => {
+    item.content = undefined;
+    if (isExpanded) {
+      handleExpand();
+    }
+  }, [mode]);
 
   const handleExpand = async () => {
-    if (!item.undergrad_content) {
-      setIsLoading(true);
-      await onExpand(item.id, mode);
-      setIsLoading(false);
-    }
+    setIsExpanded(true);
+    setIsLoading(true);
+    item.content = await onExpand(item.id, mode);
+    setIsLoading(false);
   };
 
   return (
   <AccordionItem>
-    <AccordionButton>
+    <AccordionButton onClick={handleExpand}>
       <Grid templateColumns="50px 1fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
         {/* Logo for University */}
         <GridItem>
@@ -49,7 +57,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, onExpand })
     </AccordionButton>
 
     {/* This is the Expanded Entry, what you see when the user clicks each entry in the table */}
-    <MTExpandedEntry content={item.undergrad_content} />
+    <MTExpandedEntry content={item.content} isLoading={isLoading} />
   </AccordionItem>
   )
 };

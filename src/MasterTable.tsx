@@ -10,8 +10,7 @@ export interface UniversityData {
   location: string;
   studentFacultyRatio: string;
   icon: string;
-  undergrad_content?: string;
-  grad_content?: string;
+  content?: string;
 }
 
 export interface MasterTableProps {
