@@ -23,7 +23,9 @@ export interface Content {
 export interface UndergradContent {
    general_content: {
     total_students: string;
+    total_student_percentile: string;
     graduation_rate: string;
+    graduation_rate_percentile: string;
     average_class_size: string;
   };
   dept_contents?: UGradDeptContent[];
@@ -116,12 +118,20 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
         undergrad_content: {
           general_content: {
             total_students: '35,500',
+            total_student_percentile: '70',
             graduation_rate: '95%',
+            graduation_rate_percentile: '95',
             average_class_size: '550'
           },
           dept_contents: [
             { department_name: "Computer Science", content: `CS department info for University ${id}` },
-            { department_name: "Biology", content: `Biology department info for University ${id}` }
+            { department_name: "Biology", content: `Biology department info for University ${id}` },
+            { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
+            { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
+            { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
+           { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
+           { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
+           { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` }
           ]
         },
         grad_content: {
@@ -160,7 +170,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
   //TODO: Add "Favorited" Functionality
   return (
     
-    <Box maxW="800px" mx="auto" mt="8">
+    <Box maxW="900px" mx="auto" mt="8">
       <Flex justifyContent="flex-end" mb={4}>
         <Button 
           onClick={() => {setExpandedIndex([])}}
