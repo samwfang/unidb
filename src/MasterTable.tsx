@@ -3,7 +3,7 @@ import { Box, Accordion, Button, Flex, Text } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { ModeType } from './App';
 
-// Define a type for the data items
+// Top level entry for University Data
 export interface UniversityData {
   id: number;
   name: string;
@@ -21,13 +21,27 @@ export interface Content {
 
 //Content for Undergrad
 export interface UndergradContent {
+  general_content: string;
+  dept_contents?: UGradDeptContent[];
+};
+
+//Content for each Department in the Undergrad Program
+export interface UGradDeptContent {
+  department_name: string;
   content: string;
 };
 
 //Content for Grad
 export interface GradContent {
-  content: string;
+  general_content: string;
+  dept_contents?: GradDeptContent[];
 }
+
+//Content for each Department in the Grad Program
+export interface GradDeptContent {
+  department_name: string;
+  content: string;
+};
 
 export interface MasterTableProps {
   mode: ModeType;
@@ -92,10 +106,18 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
     setTimeout(() => {
       resolve({
         undergrad_content: {
-          content: `Undergrad School Blah Blah Blah for University ${id}`
+          general_content: `Undergrad School Blah Blah Blah for University ${id}`,
+          dept_contents: [
+            { department_name: "Computer Science", content: `CS department info for University ${id}` },
+            { department_name: "Biology", content: `Biology department info for University ${id}` }
+          ]
         },
         grad_content: {
-          content: `Graduate School Blah Blah Blah for University ${id}`
+          general_content: `Graduate School Blah Blah Blah for University ${id}`,
+           dept_contents: [
+            { department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
+            { department_name: "Business", content: `MBA program info for University ${id}` }
+          ]
         }
       });
     }, 500);
@@ -119,7 +141,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
-
+  //TODO: Add "Favorited" Functionality
   return (
     
     <Box maxW="800px" mx="auto" mt="8">
