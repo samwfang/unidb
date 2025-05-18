@@ -21,7 +21,11 @@ export interface Content {
 
 //Content for Undergrad
 export interface UndergradContent {
-  general_content: string;
+   general_content: {
+    total_students: string;
+    graduation_rate: string;
+    average_class_size: string;
+  };
   dept_contents?: UGradDeptContent[];
 };
 
@@ -33,7 +37,11 @@ export interface UGradDeptContent {
 
 //Content for Grad
 export interface GradContent {
-  general_content: string;
+   general_content: {
+    total_students: string;
+    graduation_rate: string;
+    average_class_size: string;
+  };
   dept_contents?: GradDeptContent[];
 }
 
@@ -106,14 +114,22 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
     setTimeout(() => {
       resolve({
         undergrad_content: {
-          general_content: `Undergrad School Blah Blah Blah for University ${id}`,
+          general_content: {
+            total_students: '35,500',
+            graduation_rate: '95%',
+            average_class_size: '550'
+          },
           dept_contents: [
             { department_name: "Computer Science", content: `CS department info for University ${id}` },
             { department_name: "Biology", content: `Biology department info for University ${id}` }
           ]
         },
         grad_content: {
-          general_content: `Graduate School Blah Blah Blah for University ${id}`,
+          general_content: {
+            total_students: '5,500',
+            graduation_rate: '92%',
+            average_class_size: '51'
+          },
            dept_contents: [
             { department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
             { department_name: "Business", content: `MBA program info for University ${id}` }

@@ -1,7 +1,7 @@
 import React from 'react';
-import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box } from '@chakra-ui/react';
+import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text} from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
-import { Content } from './MasterTable';
+import { Content, UndergradContent, GradContent } from './MasterTable';
 import { ModeType } from './App';
 
 interface MTExpandedEntryProps {
@@ -16,10 +16,49 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   const deptContents = mode === ModeType.Undergrad 
     ? content?.undergrad_content?.dept_contents
     : content?.grad_content?.dept_contents;
+  
+  const generalContent = mode === ModeType.Undergrad 
+    ? content?.undergrad_content
+    : content?.grad_content;
 
-  const generalContent = mode === ModeType.Undergrad
-    ? content?.undergrad_content?.general_content
-    : content?.grad_content?.general_content;
+  //Rendering For Undergrad "General" Tab
+    const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
+      mode === ModeType.Undergrad ? (
+      /* Render for Undergraduate Content */
+      <Box p={4}>
+        <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+          
+            <Box>
+              <Text fontWeight="bold">Total Students:</Text>
+              <Text> {general?.general_content.total_students} </Text>
+            </Box>
+
+            <Box>
+              <Text fontWeight="bold">Graduation Rate:</Text>
+              <Text> {general?.general_content.graduation_rate} </Text>
+            </Box>
+
+        </Grid>
+      </Box>
+      ):(
+        // Render for Graduate Content
+        <Box p={4}>
+        <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+
+            <Box>
+              <Text fontWeight="bold">Total Students:</Text>
+              <Text> {general?.general_content.total_students} </Text>
+            </Box>
+
+            <Box>
+              <Text fontWeight="bold">Graduation Rate:</Text>
+              <Text> {general?.general_content.graduation_rate} </Text>
+            </Box>
+
+        </Grid>
+      </Box>
+      )
+    );
 
    return (
     <AccordionPanel pb={4}>
@@ -35,7 +74,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
         {/* Content for Each Department */}
         <TabPanels>
           <TabPanel>
-            <Box p={4}>{generalContent || "No general content available"}</Box>
+            <Box p={4}>{renderGeneralContent(generalContent) || "No general content available"}</Box>
           </TabPanel>
           {deptContents?.map((dept, index) => (
             <TabPanel key={index}>
