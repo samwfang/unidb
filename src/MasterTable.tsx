@@ -33,6 +33,7 @@ export interface UndergradContent {
 
 //Content for each Department in the Undergrad Program
 export interface UGradDeptContent {
+  cip: string,
   department_name: string;
   content: string;
 };
@@ -124,14 +125,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
             average_class_size: '550'
           },
           dept_contents: [
-            { department_name: "Computer Science", content: `CS department info for University ${id}` },
-            { department_name: "Biology", content: `Biology department info for University ${id}` },
-            { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
-            { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
-            { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
-           { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
-           { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` },
-           { department_name: "Agriculture, Mathematics, and Combustible Physics", content: `ASasc department info for University ${id}` }
+            { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${id}` },
+            { cip: "2601", department_name: "Biology", content: `Biology department info for University ${id}` },
+            { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${id}` }
           ]
         },
         grad_content: {
