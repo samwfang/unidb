@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text} from '@chakra-ui/react';
+import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select} from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { Content, UndergradContent, GradContent } from './MasterTable';
 import { ModeType } from './App';
@@ -23,22 +23,38 @@ interface MTExpandedEntryProps {
 }
 
 const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoading }) => {
+  const TOP_NUM_DEPTS = 5;
 
-  const [selectedOtherDept, setSelectedOtherDept] = useState<number | null>(null);
-
-
-  if (isLoading) return <AccordionPanel pb={4}>Loading...</AccordionPanel>;
 
   const deptContents = mode === ModeType.Undergrad 
     ? content?.undergrad_content?.dept_contents
     : content?.grad_content?.dept_contents;
   
+  //All Departments offered by University (if none, then [])
+  const availableDepts = deptContents || [];
+  //Initial Departments Shown on Front Page. Up to TOP_NUM_DEPTS can be shown at once
+  const initialDeptSelections = availableDepts.slice(0, TOP_NUM_DEPTS).map(dept => dept.department_name);
+  //Array to store the deparments currently selected by the user
+  const [selectedDepts, setSelectedDepts] = useState<string[]>(initialDeptSelections);
+  
   const generalContent = mode === ModeType.Undergrad 
     ? content?.undergrad_content
     : content?.grad_content;
+  
+  // When user changes department tab content, update the selected department array
+  const handleDeptSelection = (index: number, departmentName: string) => {
+    const updatedSelections = [...selectedDepts];
+    updatedSelections[index] = departmentName;
+    setSelectedDepts(updatedSelections);
+  };
 
-  const TOP_NUM_DEPTS = 5;
-  // Split departments into first 5 and others
+  // Initial setup to fill dropdown selects with the first few departments (Default Tabs)
+  React.useEffect(() => {
+    setSelectedDepts(initialDeptSelections);
+  }, [deptContents]);
+  
+  if (isLoading) return <AccordionPanel pb={4}>Loading...</AccordionPanel>;
+  // TODELETE: Split departments into first 5 and others
   const topDepts = deptContents?.slice(0, TOP_NUM_DEPTS) || [];
   const otherDepts = deptContents?.slice(TOP_NUM_DEPTS) || [];
     
@@ -81,10 +97,12 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
       <Tabs variant="enclosed">
           <TabList flexWrap="wrap">
             <Tab>General</Tab>
-            {topDepts.map((dept, index) => (
-              <Tab key={index} whiteSpace="nowrap">{dept.department_name}</Tab>
-            ))}
-            {otherDepts.length > 0 && <Tab whiteSpace="nowrap">Other</Tab>}
+            {/* Render Tabs with names of Selected Departments*/}
+            {selectedDepts.map((deptName, index) => (
+            <Tab key={index} whiteSpace="nowrap">
+              {deptName || "Set Department"}
+            </Tab>
+          ))}
           </TabList>
         
         <TabPanels>
@@ -92,38 +110,31 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
             <Box p={4}>{renderGeneralContent(generalContent) || "No general content available"}</Box>
           </TabPanel>
           
-          {/* Only render panels for top departments */}
-          {topDepts.map((dept, index) => (
+           {selectedDepts.map((selectedDept, index) => (
             <TabPanel key={index}>
-              <DepartmentContent content={dept.content} />
-            </TabPanel>
-          ))}
-          
-          {/* Other departments panel */}
-          {otherDepts.length > 0 && (
-            <TabPanel>
               <Box p={4}>
-                <select 
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setSelectedOtherDept(value === "" ? null : parseInt(value));
-                  }}
-                  className="department-select"
-                  value={selectedOtherDept === null ? "" : selectedOtherDept.toString()}
+                <Select
+                  value={selectedDept || ""}
+                  onChange={(e) => handleDeptSelection(index, e.target.value)}
                 >
                   <option value="">Select a department</option>
-                  {otherDepts.map((dept, index) => (
-                    <option key={index} value={index}>
+                  {deptContents?.map((dept, deptIndex) => (
+                    <option key={deptIndex} value={dept.department_name}>
                       {dept.department_name}
                     </option>
                   ))}
-                </select>
-                {selectedOtherDept !== null && (
-                  <DepartmentContent content={otherDepts[selectedOtherDept].content} />
+                </Select>
+
+                {selectedDept !== null && (
+                  <DepartmentContent
+                    content={
+                      deptContents?.find(dept => dept.department_name === selectedDept)?.content || "No content available"
+                    }
+                  />
                 )}
               </Box>
             </TabPanel>
-          )}
+          ))}
         </TabPanels>
       </Tabs>
     </AccordionPanel>
