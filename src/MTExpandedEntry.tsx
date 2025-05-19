@@ -23,7 +23,7 @@ interface MTExpandedEntryProps {
 }
 
 const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoading }) => {
-  const TOP_NUM_DEPTS = 5;
+  const TOP_NUM_DEPTS = 4;
 
 
   const deptContents = mode === ModeType.Undergrad 
@@ -33,7 +33,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   //All Departments offered by University (if none, then [])
   const availableDepts = deptContents || [];
   //Initial Departments Shown on Front Page. Up to TOP_NUM_DEPTS can be shown at once
-  const initialDeptSelections = availableDepts.slice(0, TOP_NUM_DEPTS).map(dept => dept.department_name);
+  const initialDeptSelections = [...availableDepts.slice(0, TOP_NUM_DEPTS).map(dept => dept.department_name), "",];
   //Array to store the deparments currently selected by the user
   const [selectedDepts, setSelectedDepts] = useState<string[]>(initialDeptSelections);
   
@@ -54,9 +54,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   }, [deptContents]);
   
   if (isLoading) return <AccordionPanel pb={4}>Loading...</AccordionPanel>;
-  // TODELETE: Split departments into first 5 and others
-  const topDepts = deptContents?.slice(0, TOP_NUM_DEPTS) || [];
-  const otherDepts = deptContents?.slice(TOP_NUM_DEPTS) || [];
+
     
 
   //Rendering For Undergrad "General" Tab
@@ -96,11 +94,11 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
     <AccordionPanel pb={4}>
       <Tabs variant="enclosed">
           <TabList flexWrap="wrap">
-            <Tab>General</Tab>
+            <Tab><b>General</b></Tab>
             {/* Render Tabs with names of Selected Departments*/}
             {selectedDepts.map((deptName, index) => (
             <Tab key={index} whiteSpace="nowrap">
-              {deptName || "Set Department"}
+              {deptName || <i>New Tab</i>}
             </Tab>
           ))}
           </TabList>
@@ -113,6 +111,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
            {selectedDepts.map((selectedDept, index) => (
             <TabPanel key={index}>
               <Box p={4}>
+                <Text> Modify department for which to display information on this tab. </Text>
                 <Select
                   value={selectedDept || ""}
                   onChange={(e) => handleDeptSelection(index, e.target.value)}
