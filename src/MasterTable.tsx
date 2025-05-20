@@ -173,8 +173,14 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
   };
   //TODO: Add "Favorited" Functionality
   return (
-    
-    <Box maxW="900px" mx="auto" mt="8">
+    <Box maxW="900px" mx="auto" mt="8"
+      bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
+      backdropFilter="blur(16px)"  // Applies the frosted glass effect
+      borderRadius="lg"            // Rounds the corners of the box
+      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
+      border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
+      p={6}
+    >
       <Flex justifyContent="flex-end" mb={4}>
         <Button 
           onClick={() => {setExpandedIndex([])}}
@@ -192,11 +198,26 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
 
       <Accordion 
       allowMultiple
+      borderRadius="lg"
       index={expandedIndex}
-      onChange={(index) => setExpandedIndex(index)}>
+      onChange={(index) => setExpandedIndex(index)}
+      sx={{
+        '& > div': {
+          borderRadius: 'lg', // Individual item curvature
+          overflow: 'hidden', // Ensures child content respects the border radius
+          '&:first-of-type': {
+            borderTopRadius: 'lg' // Special case for first item
+          },
+          '&:last-of-type': {
+            borderBottomRadius: 'lg' // Special case for last item
+          }
+        }
+      }}
+      >
         {data.map((item) => (
           <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent}/>
         ))}
+     
       </Accordion>
       <Flex justifyContent="space-between" mt="4">
         <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}

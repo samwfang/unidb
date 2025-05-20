@@ -37,7 +37,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode,
 
   return (
   <AccordionItem 
-    _odd={{ bg: "gray.50"}}  // Light grey for odd items
+    _odd={{ bg: "rgba(255, 255, 255, 0.2)"}}  // Light grey for odd items
     _even={{ bg: 'white' }}    // White for even items
   >
     <AccordionButton 

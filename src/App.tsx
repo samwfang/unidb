@@ -52,6 +52,10 @@ function App() {
 
   return (
     <div className="App">
+    <Box minH="100vh" 
+      bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, teal.50, teal.100)"} // Chakra's gradient syntax
+      p={4} // Optional padding for the entire page
+    >
       <Flex
       display="flex"
       flexDirection="column"
@@ -389,6 +393,7 @@ function App() {
         </Box>
       </Box>
     </Grid>
+    </Box>
     </div>
   );
 }
