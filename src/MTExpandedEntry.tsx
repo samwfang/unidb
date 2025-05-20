@@ -120,7 +120,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
     );
 
    return (
-    <AccordionPanel pb={4}>
+    <AccordionPanel pb={4} bg="white">
       <Tabs index={activeTabIndex} onChange={setActiveTabIndex}>
           <TabList flexWrap="wrap">
             <Tab _selected={{
@@ -178,20 +178,24 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
            {selectedDepts.map((selectedDept, index) => (
             <TabPanel key={index}>
               <Box p={4}>
-                <Text> Modify department for which to display information on this tab. </Text>
-                <Select
-                  value={selectedDept || ""}
-                  onChange={(e) => handleDeptSelection(index, e.target.value)}
-                >
-                  <option value="">Select a department</option>
-                  {deptContents?.map((dept, deptIndex) => (
-                    <option key={deptIndex} value={dept.department_name}>
-                      {dept.department_name}
-                    </option>
-                  ))}
-                </Select>
-
-                {selectedDept !== null && (
+                {selectedDept === "" ? (
+                  // Show Dropdown to select Department on New Tab
+                  <Box>
+                    <Text> Select a department to display information on this tab. </Text>
+                    <Select
+                      value={selectedDept || ""}
+                      onChange={(e) => handleDeptSelection(index, e.target.value)}
+                    >
+                      <option value="">Select a department</option>
+                      {deptContents?.map((dept, deptIndex) => (
+                        <option key={deptIndex} value={dept.department_name}>
+                          {dept.department_name}
+                        </option>
+                      ))}
+                    </Select>
+                  </Box>
+                ) : (
+                  // Display Department Content if a department is selected
                   <DepartmentContent
                     content={
                       deptContents?.find(dept => dept.department_name === selectedDept)?.content || "No content available"
