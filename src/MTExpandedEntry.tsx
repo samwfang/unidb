@@ -23,7 +23,10 @@ interface MTExpandedEntryProps {
 }
 
 const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoading }) => {
-  const TOP_NUM_DEPTS = 4;
+  //Number of Top Departments to Display by Default
+  const TOP_NUM_DEPTS = 5;
+  //Maximum Number of Tabs User Can Create
+  const MAX_TABS = 20;
 
 
   const deptContents = mode === ModeType.Undergrad 
@@ -54,6 +57,22 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   }, [deptContents]);
   
   if (isLoading) return <AccordionPanel pb={4}>Loading...</AccordionPanel>;
+
+
+  //Handle Tab CLosing and Opening
+  const handleCloseTab = (index: number) => {
+    if (selectedDepts.length > 1) { // Keep at least one tab
+      const updatedSelections = [...selectedDepts];
+      updatedSelections.splice(index, 1);
+      setSelectedDepts(updatedSelections);
+    }
+  };
+
+  const handleAddTab = () => {
+    if (selectedDepts.length < MAX_TABS) {
+      setSelectedDepts([...selectedDepts, ""]);
+    }
+  };
 
     
 
@@ -92,12 +111,20 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
 
    return (
     <AccordionPanel pb={4}>
-      <Tabs variant="enclosed">
+      <Tabs>
           <TabList flexWrap="wrap">
-            <Tab><b>General</b></Tab>
+            <Tab _selected={{
+            color: mode === 'undergrad' ? "#FF4500" : "green.500", // Change text color
+            borderBottom: '2px solid', // Ensure there is an underline
+            borderColor: mode === 'undergrad' ? "#FF4500" : "green.500", // Change underline color
+          }}><b>General</b></Tab>
             {/* Render Tabs with names of Selected Departments*/}
             {selectedDepts.map((deptName, index) => (
-            <Tab key={index} whiteSpace="nowrap">
+            <Tab key={index} whiteSpace="nowrap" _selected={{
+            color: mode === 'undergrad' ? "#FF4500" : "green.500", // Change text color
+            borderBottom: '2px solid', // Ensure there is an underline
+            borderColor: mode === 'undergrad' ? "#FF4500" : "green.500", // Change underline color
+          }}>
               {deptName || <i>New Tab</i>}
             </Tab>
           ))}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Accordion, Button, Flex, Text } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { ModeType } from './App';
+import {useSearchParams} from 'react-router-dom';
 
 // Top level entry for University Data
 export interface UniversityData {
@@ -62,12 +63,19 @@ export interface MasterTableProps {
 const PAGE_SIZE = 10; // Number of items per page
 
 const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<UniversityData[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  //Stores Expanded Indecies 
   const [expandedIndex, setExpandedIndex] = useState<number | number[]>([]);
+
+// Get initial state from URL
+  const initialPage = parseInt(searchParams.get('page') || '0', 10);
+  const initialExpanded = searchParams.get('expanded')?.split(',').map(Number) || [];
+  
+  
 
   // Simulate API call for paginated data
   const fetchPageData = async (page: number) => {
@@ -171,7 +179,12 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
         <Button 
           onClick={() => {setExpandedIndex([])}}
           isDisabled={Array.isArray(expandedIndex) ? !expandedIndex.length : true}
-          variant="outline"
+          bg = {mode === 'undergrad' ? "#FF5700" : "green.500"}
+          color = "white"
+          _hover={{
+            bg: mode === 'undergrad' ? "orange.500" : "green.600", 
+            color: 'white',
+          }}
         >
           Collapse All
         </Button>
@@ -186,13 +199,25 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
         ))}
       </Accordion>
       <Flex justifyContent="space-between" mt="4">
-        <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}>
+        <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}
+          bg = {mode === 'undergrad' ? "#FF5700" : "green.500"}
+          color = "white"
+          _hover={{
+            bg: mode === 'undergrad' ? "orange.500" : "green.600", 
+            color: 'white',
+          }}>
           Back
         </Button>
         <Text>
           Page {currentPage + 1} of {Math.ceil(totalItems / PAGE_SIZE)}
         </Text>
-        <Button onClick={nextPage} isDisabled={(currentPage + 1) * PAGE_SIZE >= totalItems || isLoading}>
+        <Button onClick={nextPage} isDisabled={(currentPage + 1) * PAGE_SIZE >= totalItems || isLoading}
+          bg = {mode === 'undergrad' ? "#FF5700" : "green.500"}
+          color = "white"
+          _hover={{
+            bg: mode === 'undergrad' ? "orange.500" : "green.600", 
+            color: 'white',
+          }}>
           Next
         </Button>
       </Flex>
