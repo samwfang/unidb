@@ -179,10 +179,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
         <Button 
           onClick={() => {setExpandedIndex([])}}
           isDisabled={Array.isArray(expandedIndex) ? !expandedIndex.length : true}
-          bg = {mode === 'undergrad' ? "#FF5700" : "green.500"}
+          bg = {mode === 'undergrad' ? "blue.500" : "green.500"}
           color = "white"
           _hover={{
-            bg: mode === 'undergrad' ? "orange.500" : "green.600", 
+            bg: mode === 'undergrad' ? "blue.600" : "green.600", 
             color: 'white',
           }}
         >
@@ -200,10 +200,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
       </Accordion>
       <Flex justifyContent="space-between" mt="4">
         <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}
-          bg = {mode === 'undergrad' ? "#FF5700" : "green.500"}
+          bg = {mode === 'undergrad' ? "blue.500" : "green.500"}
           color = "white"
           _hover={{
-            bg: mode === 'undergrad' ? "orange.500" : "green.600", 
+            bg: mode === 'undergrad' ? "blue.600" : "green.600", 
             color: 'white',
           }}>
           Back
@@ -212,10 +212,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
           Page {currentPage + 1} of {Math.ceil(totalItems / PAGE_SIZE)}
         </Text>
         <Button onClick={nextPage} isDisabled={(currentPage + 1) * PAGE_SIZE >= totalItems || isLoading}
-          bg = {mode === 'undergrad' ? "#FF5700" : "green.500"}
+          bg = {mode === 'undergrad' ? "blue.500" : "green.500"}
           color = "white"
           _hover={{
-            bg: mode === 'undergrad' ? "orange.500" : "green.600", 
+            bg: mode === 'undergrad' ? "blue.600" : "green.600", 
             color: 'white',
           }}>
           Next

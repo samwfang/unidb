@@ -43,7 +43,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode,
     <AccordionButton 
     onClick={handleExpand}
     borderRadius="md" 
-    _expanded={{ bg: mode === 'undergrad' ? "#FF5700" : "green.500", color: 'white' }}
+    _expanded={{ bg: mode === 'undergrad' ? "#00274c" : "green.800", color: 'white' }}
     >
       <Grid templateColumns="50px 1fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
         {/* Logo for University */}

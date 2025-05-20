@@ -36,7 +36,8 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   
   //All Departments offered by University (if none, then [])
   const availableDepts = deptContents || [];
-  //Initial Departments Shown on Front Page. Up to TOP_NUM_DEPTS can be shown at once
+  //Initial Departments Shown on Front Page. Up to TOP_NUM_DEPTS can be shown at once. These are simply filled by 
+  // the top items in DeptContent[] (in API they should be sorted by #visitors)
   const initialDeptSelections = [...availableDepts.slice(0, TOP_NUM_DEPTS).map(dept => dept.department_name), "",];
   //Array to store the deparments currently selected by the user
   const [selectedDepts, setSelectedDepts] = useState<string[]>(initialDeptSelections);
@@ -124,9 +125,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
       <Tabs index={activeTabIndex} onChange={setActiveTabIndex}>
           <TabList flexWrap="wrap">
             <Tab _selected={{
-            color: mode === 'undergrad' ? "#FF4500" : "green.500", // Change text color
+            color: mode === 'undergrad' ? "blue.500" : "green.500", // Change text color
             borderBottom: '2px solid', // Ensure there is an underline
-            borderColor: mode === 'undergrad' ? "#FF4500" : "green.500", // Change underline color
+            borderColor: mode === 'undergrad' ? "blue.500" : "green.500", // Change underline color
           }}><b>General</b></Tab>
           {/* Render Tabs with names of Selected Departments*/}
           {selectedDepts.map((deptName, index) => (
@@ -134,9 +135,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
               <Tab
                 whiteSpace="nowrap"
                 _selected={{
-                  color: mode === 'undergrad' ? "#FF4500" : "green.500",
+                  color: mode === 'undergrad' ? "blue.500" : "green.500",
                   borderBottom: '2px solid',
-                  borderColor: mode === 'undergrad' ? "#FF4500" : "green.500",
+                  borderColor: mode === 'undergrad' ? "blue.500" : "green.500",
                 }}
               >
                 {deptName || <i>New Tab</i>}
