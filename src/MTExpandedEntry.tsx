@@ -6,6 +6,7 @@ import { ModeType } from './App';
 import DepartmentContent from './MTDepartmentContent';
 import GraduationRateWidget from './MasterTableWidgets/GraduationRateWidget';
 import TotalStudentsWidget from './MasterTableWidgets/TotalStudentsWidget';
+import { Tooltip } from '@chakra-ui/react';
 
 /*
 Expanded Entries: Rendering The Graphics Which Show when User Clicks An Entry in the Master Table
@@ -39,6 +40,8 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   const initialDeptSelections = [...availableDepts.slice(0, TOP_NUM_DEPTS).map(dept => dept.department_name), "",];
   //Array to store the deparments currently selected by the user
   const [selectedDepts, setSelectedDepts] = useState<string[]>(initialDeptSelections);
+  //Current Active Tab
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   
   const generalContent = mode === ModeType.Undergrad 
     ? content?.undergrad_content
@@ -61,10 +64,17 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
 
   //Handle Tab CLosing and Opening
   const handleCloseTab = (index: number) => {
-    if (selectedDepts.length > 1) { // Keep at least one tab
-      const updatedSelections = [...selectedDepts];
-      updatedSelections.splice(index, 1);
-      setSelectedDepts(updatedSelections);
+    const updatedSelections = [...selectedDepts];
+    updatedSelections.splice(index, 1);
+    setSelectedDepts(updatedSelections);
+
+    // Adjust active tab index
+    if (activeTabIndex > index) {
+      // Only decrement if the active tab is after the closed tab
+      setActiveTabIndex((prev) => Math.max(0, prev - 1));
+    } else if (activeTabIndex === index && updatedSelections.length > 0) {
+      // If the currently active tab is closed, make sure to stay on a valid tab
+      setActiveTabIndex((prev) => Math.max(0, prev === updatedSelections.length ? prev - 1 : prev));
     }
   };
 
@@ -111,23 +121,53 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
 
    return (
     <AccordionPanel pb={4}>
-      <Tabs>
+      <Tabs index={activeTabIndex} onChange={setActiveTabIndex}>
           <TabList flexWrap="wrap">
             <Tab _selected={{
             color: mode === 'undergrad' ? "#FF4500" : "green.500", // Change text color
             borderBottom: '2px solid', // Ensure there is an underline
             borderColor: mode === 'undergrad' ? "#FF4500" : "green.500", // Change underline color
           }}><b>General</b></Tab>
-            {/* Render Tabs with names of Selected Departments*/}
-            {selectedDepts.map((deptName, index) => (
-            <Tab key={index} whiteSpace="nowrap" _selected={{
-            color: mode === 'undergrad' ? "#FF4500" : "green.500", // Change text color
-            borderBottom: '2px solid', // Ensure there is an underline
-            borderColor: mode === 'undergrad' ? "#FF4500" : "green.500", // Change underline color
-          }}>
-              {deptName || <i>New Tab</i>}
-            </Tab>
+          {/* Render Tabs with names of Selected Departments*/}
+          {selectedDepts.map((deptName, index) => (
+            <Box display="flex" alignItems="center" key={index}>
+              <Tab
+                whiteSpace="nowrap"
+                _selected={{
+                  color: mode === 'undergrad' ? "#FF4500" : "green.500",
+                  borderBottom: '2px solid',
+                  borderColor: mode === 'undergrad' ? "#FF4500" : "green.500",
+                }}
+              >
+                {deptName || <i>New Tab</i>}
+              </Tab>
+              {/* Close Button Outside of Tab Clickable Area */}
+              <Box
+                as="span"
+                ml={2}
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  handleCloseTab(index);
+                }}
+                _hover={{ color: "red.500" }}
+                cursor="pointer"
+              >
+                ×
+              </Box>
+            </Box>
           ))}
+          {/* Allow User to Add New Tab If Not At Maximum */}
+          {selectedDepts.length < MAX_TABS ? (
+            <Tab onClick={handleAddTab} _hover={{ bg: "gray.100" }}>
+              +
+            </Tab>
+          ) : (
+            <Tooltip label="Maximum tabs reached" placement="top" hasArrow>
+              <Tab isDisabled _hover={{ cursor: "not-allowed" }}>
+                +
+              </Tab>
+            </Tooltip>
+          )}
           </TabList>
         
         <TabPanels>
