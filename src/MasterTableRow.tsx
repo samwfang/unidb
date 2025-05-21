@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image } from '@chakra-ui/react';
+import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image, Icon} from '@chakra-ui/react';
 import MTExpandedEntry from './MTExpandedEntry';
 import { UniversityData, UndergradContent, GradContent, Content} from './MasterTable'; // Adjust the path as necessary
 import { ModeType } from './App';
+import { FaUniversity } from 'react-icons/fa';
+
 // Define the props interface for MasterTableRow
 interface MasterTableRowProps {
   item: UniversityData;
@@ -38,34 +40,41 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode,
   return (
   <AccordionItem 
     _odd={{ bg: "rgba(255, 255, 255, 0.2)", backdropFilter: "blur(16px)" }}  // Light grey for odd items
-    _even={{ bg: 'white' }}    // White for even items
+    _even={{ bg: 'white' }}
+    minH={{ base: "50px", md: "60px" }}   // White for even items
   >
     <AccordionButton 
     onClick={handleExpand}
     borderRadius="md" 
     _expanded={{ bg: mode === 'undergrad' ? "#00274c" : "green.800", color: 'white' }}
+    minH={{ base: "50px", md: "60px" }}
     >
-      <Grid templateColumns="50px 1.5fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
+      <Grid templateColumns="50px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
         {/* Logo for University */}
-        <GridItem>
-          <Image
-            src={`/logos/${item.icon}`} // Adjust the path based on where you store your images
-            alt={`${item.name} logo`}
-            boxSize="40px"
-            objectFit="contain"
-          />
+        <GridItem textAlign="center">
+          {item.icon ? (
+            <Image
+              src={`/logos/${item.icon}`}
+              alt={`${item.name} logo`}
+              boxSize="40px"
+              objectFit="contain"
+              fallback={<Icon as={FaUniversity as React.ComponentType} boxSize="20px" color={mode === 'undergrad' ? "blue.500" : "green.500"}/>} // Fallback icon if image fails
+            />
+          ) : (
+            <Icon as={FaUniversity as React.ComponentType} boxSize="20px" color={mode === 'undergrad' ? "blue.500" : "green.500"} /> // Default icon if no icon is provided
+          )}
         </GridItem>
 
         {/* University Name */}
-        <GridItem>
-          <Box flex="1" textAlign="left">
-            <b>{item.name}</b>
+        <GridItem textAlign="center">
+          <Box flex="1" textAlign="left" fontWeight="bold">
+            {item.name}
           </Box>
         </GridItem>
 
         {/* Other Columns */}
-        <GridItem>{item.location}</GridItem>
-        <GridItem>{item.studentFacultyRatio}</GridItem>
+        <GridItem textAlign="center">{item.location}</GridItem>
+        <GridItem textAlign="center">{item.studentFacultyRatio}</GridItem>
       </Grid>
     </AccordionButton>
 

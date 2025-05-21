@@ -73,9 +73,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
     if (activeTabIndex > index) {
       // Only decrement if the active tab is after the closed tab
       setActiveTabIndex((prev) => Math.max(0, prev - 1));
-    } else if (activeTabIndex === index && updatedSelections.length > 0) {
+    } else if (activeTabIndex === index) {
       // If the currently active tab is closed, make sure to stay on a valid tab
-      setActiveTabIndex((prev) => Math.max(0, prev === updatedSelections.length ? prev - 1 : prev));
+      setActiveTabIndex((prev) => Math.max(0, prev));
     }
   };
 
@@ -137,7 +137,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
                 _selected={{
                   color: mode === 'undergrad' ? "blue.500" : "green.500",
                   borderBottom: '2px solid',
-                  borderColor: mode === 'undergrad' ? "blue.500" : "green.500",
+                  borderColor: mode === 'undergrad' ? "#blue.500" : "green.500",
                 }}
               >
                 {deptName || <i>New Tab</i>}
