@@ -37,7 +37,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode,
 
   return (
   <AccordionItem 
-    _odd={{ bg: "rgba(255, 255, 255, 0.2)"}}  // Light grey for odd items
+    _odd={{ bg: "rgba(255, 255, 255, 0.2)", backdropFilter: "blur(16px)" }}  // Light grey for odd items
     _even={{ bg: 'white' }}    // White for even items
   >
     <AccordionButton 
@@ -45,7 +45,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode,
     borderRadius="md" 
     _expanded={{ bg: mode === 'undergrad' ? "#00274c" : "green.800", color: 'white' }}
     >
-      <Grid templateColumns="50px 1fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
+      <Grid templateColumns="50px 1.5fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
         {/* Logo for University */}
         <GridItem>
           <Image
