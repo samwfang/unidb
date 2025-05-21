@@ -65,22 +65,29 @@ function App() {
       mt={4}
     >
       <Flex
-        display="flex"
-        flexDirection="row"
-        alignItems="flex-start"
-        justifyContent="flex-start"
-      >
-        <Text fontSize="3xl" fontWeight="bold">
-          The University Database
-        </Text>
-        <Badge variant="subtle" colorScheme="pink" ml={1}>
-          BETA
-        </Badge>
-        <UGradGradToggle mode={mode} onToggle={undergradGradToggle} />
-      </Flex>
-      <Text color="gray.500">The Visual Editor for Chakra UI</Text>
-    </Flex>
-
+            width="100%"
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+            px={4}
+            position="relative"
+          >
+            <Flex alignItems="center">
+              <Text fontSize="3xl" fontWeight="bold">
+                The University Database
+              </Text>
+              <Badge variant="subtle" colorScheme="pink" ml={1}>
+                BETA
+              </Badge>
+            </Flex>
+            <Box position="absolute" right="100px">
+              <UGradGradToggle mode={mode} onToggle={undergradGradToggle} />
+            </Box>
+          </Flex>
+          <Text color="gray.500">
+            A One-Stop Shop for University and Faculty Information
+          </Text>
+        </Flex>
 
 
 
