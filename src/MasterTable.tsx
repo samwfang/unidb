@@ -58,11 +58,11 @@ export interface GradDeptContent {
 export interface MasterTableProps {
   mode: ModeType;
   toggleMode: () => void;
+  pageSize: number;
 };
 
-const PAGE_SIZE = 10; // Number of items per page
 
-const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
+const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 10 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<UniversityData[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -75,7 +75,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
   const initialPage = parseInt(searchParams.get('page') || '0', 10);
   const initialExpanded = searchParams.get('expanded')?.split(',').map(Number) || [];
   
-  
+
 
   // Simulate API call for paginated data
   const fetchPageData = async (page: number) => {
@@ -88,8 +88,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
       // const { data, total } = await response.json();
       
       // Simulated API response
-      const simulatedData: UniversityData[] = Array.from({ length: PAGE_SIZE }, (_, i) => {
-        const globalIndex = page * PAGE_SIZE + i;
+      const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
+        const globalIndex = page * pageSize  + i;
         return {
           id: globalIndex + 1,
           name: `The University of the Number ${globalIndex + 1}`,
@@ -154,14 +154,15 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
   });
   };
 
+  // Refetch page data when either new page is loaded, or size of each page is altered (could be inefficient but IDGAF ;))
   useEffect(() => {
     fetchPageData(currentPage);
-  }, [currentPage]);
+  }, [currentPage, pageSize]);
 
 
 
   const nextPage = () => {
-    if ((currentPage + 1) * PAGE_SIZE < totalItems) {
+    if ((currentPage + 1) * pageSize  < totalItems) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
@@ -173,7 +174,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
   };
   //TODO: Add "Favorited" Functionality
   return (
-    <Box maxW="900px" mx="auto" mt="8"
+    <Box maxW="1000px" mx="auto" mt="8"
       bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
       backdropFilter="blur(16px)"  // Applies the frosted glass effect
       borderRadius="lg"            // Rounds the corners of the box
@@ -230,9 +231,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode }) => {
           Back
         </Button>
         <Text>
-          Page {currentPage + 1} of {Math.ceil(totalItems / PAGE_SIZE)}
+          Page {currentPage + 1} of {Math.ceil(totalItems / pageSize )}
         </Text>
-        <Button onClick={nextPage} isDisabled={(currentPage + 1) * PAGE_SIZE >= totalItems || isLoading}
+        <Button onClick={nextPage} isDisabled={(currentPage + 1) * pageSize  >= totalItems || isLoading}
           bg = {mode === 'undergrad' ? "blue.500" : "green.500"}
           color = "white"
           _hover={{

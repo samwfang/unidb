@@ -2,6 +2,7 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 import MasterTable from './MasterTable'
 import UGradGradToggle from './UGradGradToggle';
+import { MTControlPanel } from './MTControlPanel';
 import {
   Box,
   Image,
@@ -24,7 +25,8 @@ import {
   InputRightElement,
   Flex,
   Tag,
-  Heading
+  Heading,
+  Select
 } from '@chakra-ui/react'
 import {
   StarIcon,
@@ -44,18 +46,25 @@ function App() {
 
   // whether table will prioritize undergraduate or graduate information
   const [mode, setMode] = useState<ModeType>(ModeType.Undergrad);
+  // number of entries mastertable shows
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const undergradGradToggle = () => {
     setMode((prevMode) => (prevMode === ModeType.Undergrad ? ModeType.Grad : ModeType.Undergrad));
     console.log(mode)
   };
 
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(parseInt(e.target.value, 10));
+  };
+
   return (
     <div className="App">
     <Box minH="100vh" 
       bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, teal.50, teal.100)"} // Chakra's gradient syntax
-      p={4} // Optional padding for the entire page
+      p={4}
     >
+      {/* Top Header */}
       <Flex
       display="flex"
       flexDirection="column"
@@ -65,36 +74,44 @@ function App() {
       mt={4}
     >
       <Flex
-            width="100%"
-            flexDirection="row"
-            justifyContent="center"
-            alignItems="center"
-            px={4}
-            position="relative"
-          >
-            <Flex alignItems="center">
-              <Text fontSize="3xl" fontWeight="bold">
-                The University Database
-              </Text>
-              <Badge variant="subtle" colorScheme="pink" ml={1}>
-                BETA
-              </Badge>
-            </Flex>
-            <Box position="absolute" right="100px">
-              <UGradGradToggle mode={mode} onToggle={undergradGradToggle} />
-            </Box>
-          </Flex>
-          <Text color="gray.500">
-            A One-Stop Shop for University and Faculty Information
+        width="100%"
+        flexDirection="row"
+        justifyContent="center"
+        alignItems="center"
+        px={4}
+        position="relative"
+      >
+        <Flex alignItems="center">
+          <Text fontSize="3xl" fontWeight="bold">
+            The University Database
           </Text>
+          <Badge variant="subtle" colorScheme="pink" ml={1}>
+            ALPHA
+          </Badge>
         </Flex>
+        <Box position="absolute" right="100px">
+          <UGradGradToggle mode={mode} onToggle={undergradGradToggle} />
+        </Box>
+      </Flex>
+      <Text color="gray.500">
+        A One-Stop Shop for University and Faculty Information
+      </Text>
+    </Flex>
 
+    {/* Master Table and Control Panel */}
+    <Flex direction={{ base: "column", md: "row" }} gap={2} mt={6} maxW="1300px" mx="auto">
+        <MTControlPanel 
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+          mode={mode}
+          onModeChange={undergradGradToggle}
+        />
 
-
-
-
-
-    <MasterTable mode={mode} toggleMode={undergradGradToggle}/>
+        {/* MasterTable - updated to use pageSize prop */}
+        <Box flex={1}>
+          <MasterTable mode={mode} toggleMode={undergradGradToggle} pageSize={pageSize} />
+        </Box>
+      </Flex>
 
 
 

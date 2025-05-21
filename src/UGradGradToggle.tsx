@@ -11,8 +11,8 @@ const ModeToggle: React.FC<ModeToggleProps> = ({ mode, onToggle }) => {
   const isUndergrad = mode === ModeType.Undergrad;
 
   return (
-    <Box display="flex" alignItems="center">
-      <Text mr={2}>{isUndergrad ? 'Undergraduate Mode' : 'Graduate Mode'}</Text>
+    <Box display="flex" alignItems="right">
+      <Text mr={2}>{isUndergrad ? 'Undergraduate' : 'Graduate'}</Text>
       <Switch
         isChecked={!isUndergrad}
         onChange={onToggle}
