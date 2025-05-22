@@ -15,7 +15,7 @@ Displays the Control Panel on the Left of the Master Table, to allow for Filteri
 export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange }: MTControlPanelProps) => {
   return (
     <Box 
-      w={{ base: "100%", md: "200px" }}
+      w={{ base: "100%", md: "220px" }}
       mx="auto" mt="8"
       bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
       backdropFilter="blur(16px)"  // Applies the frosted glass effect

@@ -7,6 +7,7 @@ import DepartmentContent from './MTDepartmentContent';
 import GraduationRateWidget from './MasterTableWidgets/GraduationRateWidget';
 import TotalStudentsWidget from './MasterTableWidgets/TotalStudentsWidget';
 import { Tooltip } from '@chakra-ui/react';
+import { cipToClassificationName, groupDepartmentsByCIP } from './helpers/DepartmentHelper';
 
 /*
 Expanded Entries: Rendering The Graphics Which Show when User Clicks An Entry in the Master Table
@@ -57,16 +58,6 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
     : content?.grad_content;
   
   // Helper function to group departments by the first two digits of their CIP
-  const groupDepartmentsByCIP = (departments: UGradDeptContent[] | GradDeptContent[]) => {
-    return departments.reduce((groups, dept) => {
-      const cipPrefix = dept.cip.substring(0, 2);
-      if (!groups[cipPrefix]) {
-        groups[cipPrefix] = [];
-      }
-      groups[cipPrefix].push(dept);
-      return groups;
-    }, {} as Record<string, (UGradDeptContent | GradDeptContent)[]>);
-  };
   
   // When user changes department tab content, update the selected department array
   const handleDeptSelection = (index: number, departmentName: string) => {
@@ -159,7 +150,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
             <Box key={columnIndex}>
               {columnGroups.map(([cip, depts]) => (
                 <Box key={cip} mb={4}>
-                  <Text fontWeight="bold" mb={2}>CIP {cip}</Text>
+                  <Text fontWeight="bold" mb={2}>{cipToClassificationName(cip)}</Text>
                   <List>
                     {depts.map((dept, i) => (
                       <ListItem
