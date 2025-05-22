@@ -74,7 +74,8 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode,
 
         {/* Other Columns */}
         <GridItem textAlign="center">{item.location}</GridItem>
-        <GridItem textAlign="center">{item.studentFacultyRatio}</GridItem>
+        <GridItem textAlign="center">{item.content?.undergrad_content?.general_content.graduation_rate}</GridItem>
+        <GridItem textAlign="center">{item.location}</GridItem>
       </Grid>
     </AccordionButton>
 
