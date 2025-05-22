@@ -51,6 +51,7 @@ export interface GradContent {
 
 //Content for each Department in the Grad Program
 export interface GradDeptContent {
+  cip: string,
   department_name: string;
   content: string;
 };
@@ -145,8 +146,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
             average_class_size: '51'
           },
            dept_contents: [
-            { department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
-            { department_name: "Business", content: `MBA program info for University ${id}` }
+            {  cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
+            {  cip: "0607", department_name: "Business", content: `MBA program info for University ${id}` }
           ]
         }
       });

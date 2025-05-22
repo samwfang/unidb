@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select, Input, List, ListItem} from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
-import { Content, UndergradContent, GradContent } from './MasterTable';
+import { Content, UndergradContent, UGradDeptContent, GradDeptContent, GradContent } from './MasterTable';
 import { ModeType } from './App';
 import DepartmentContent from './MTDepartmentContent';
 import GraduationRateWidget from './MasterTableWidgets/GraduationRateWidget';
@@ -44,18 +44,29 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   //Current Active Tab
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  // State for filtering the department list
+  // What user types in search bar
   const [inputValue, setInputValue] = useState("");
 
-  // Filtered department options based on user input
+  //Filter Departments based on user input into search bar
   const filteredDepts = availableDepts.filter(dept =>
     dept.department_name.toLowerCase().includes(inputValue.toLowerCase())
   );
   
-  
   const generalContent = mode === ModeType.Undergrad 
     ? content?.undergrad_content
     : content?.grad_content;
+  
+  // Helper function to group departments by the first two digits of their CIP
+  const groupDepartmentsByCIP = (departments: UGradDeptContent[] | GradDeptContent[]) => {
+    return departments.reduce((groups, dept) => {
+      const cipPrefix = dept.cip.substring(0, 2);
+      if (!groups[cipPrefix]) {
+        groups[cipPrefix] = [];
+      }
+      groups[cipPrefix].push(dept);
+      return groups;
+    }, {} as Record<string, (UGradDeptContent | GradDeptContent)[]>);
+  };
   
   // When user changes department tab content, update the selected department array
   const handleDeptSelection = (index: number, departmentName: string) => {
@@ -129,6 +140,48 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
       )
     );
 
+    //Render Departments by Group in New Tab
+    const renderFilteredGroupedDepartments = () => {
+      const groupedDepartments = groupDepartmentsByCIP(filteredDepts);
+
+      const groupedEntries = Object.entries(groupedDepartments);
+
+      // Calculate halfway point for splitting into two columns
+      const midpoint = Math.ceil(groupedEntries.length / 2);
+
+      // Split groups into two roughly equal parts
+      const firstColumnGroups = groupedEntries.slice(0, midpoint);
+      const secondColumnGroups = groupedEntries.slice(midpoint);
+
+      return (
+        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+          {[firstColumnGroups, secondColumnGroups].map((columnGroups, columnIndex) => (
+            <Box key={columnIndex}>
+              {columnGroups.map(([cip, depts]) => (
+                <Box key={cip} mb={4}>
+                  <Text fontWeight="bold" mb={2}>CIP {cip}</Text>
+                  <List>
+                    {depts.map((dept, i) => (
+                      <ListItem
+                        key={i}
+                        onClick={() => {
+                          handleDeptSelection(activeTabIndex - 1, dept.department_name);
+                        }}
+                        cursor="pointer"
+                        _hover={{ bg: "gray.100" }}
+                      >
+                        {dept.department_name}
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              ))}
+            </Box>
+          ))}
+        </Grid>
+      );
+    };
+
    return (
     <AccordionPanel pb={4} bg="white">
       <Tabs index={activeTabIndex} onChange={setActiveTabIndex}>
@@ -197,21 +250,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
                       onChange={(e) => setInputValue(e.target.value)}
                       placeholder="Type to search..."
                     />
-                    <List>
-                      {filteredDepts.map((dept, i) => (
-                        <ListItem
-                          key={i}
-                          onClick={() => {
-                            handleDeptSelection(index, dept.department_name);
-                            setInputValue(""); // Clear input after selection
-                          }}
-                          cursor="pointer"
-                          _hover={{ bg: "gray.100" }}
-                        >
-                          {dept.department_name}
-                        </ListItem>
-                      ))}
-                    </List>
+                    {renderFilteredGroupedDepartments()}
                   </Box>
                 ) : (
                   // Display Department Content if a department is selected
