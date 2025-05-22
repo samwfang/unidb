@@ -9,6 +9,9 @@ interface MTControlPanelProps {
   onModeChange: () => void;
 }
 
+/*
+Displays the Control Panel on the Left of the Master Table, to allow for Filtering and Searching
+*/
 export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange }: MTControlPanelProps) => {
   return (
     <Box 
@@ -42,7 +45,9 @@ export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange 
           <Text fontSize="sm" fontWeight="semibold" mb={2}>
             View Mode
           </Text>
-          <UGradGradToggle mode={mode} onToggle={onModeChange} />
+          <Box>
+            <UGradGradToggle mode={mode} onToggle={onModeChange} />
+          </Box>
         </Box>
       </Stack>
     </Box>

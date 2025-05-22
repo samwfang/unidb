@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select} from '@chakra-ui/react';
+import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select, Input, List, ListItem} from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { Content, UndergradContent, GradContent } from './MasterTable';
 import { ModeType } from './App';
@@ -43,6 +43,15 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   const [selectedDepts, setSelectedDepts] = useState<string[]>(initialDeptSelections);
   //Current Active Tab
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+
+  // State for filtering the department list
+  const [inputValue, setInputValue] = useState("");
+
+  // Filtered department options based on user input
+  const filteredDepts = availableDepts.filter(dept =>
+    dept.department_name.toLowerCase().includes(inputValue.toLowerCase())
+  );
+  
   
   const generalContent = mode === ModeType.Undergrad 
     ? content?.undergrad_content
@@ -180,20 +189,29 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
             <TabPanel key={index}>
               <Box p={4}>
                 {selectedDept === "" ? (
-                  // Show Dropdown to select Department on New Tab
+                  // Show Input for autocomplete selection
                   <Box>
-                    <Text> Select a department to display information on this tab. </Text>
-                    <Select
-                      value={selectedDept || ""}
-                      onChange={(e) => handleDeptSelection(index, e.target.value)}
-                    >
-                      <option value="">Select a department</option>
-                      {deptContents?.map((dept, deptIndex) => (
-                        <option key={deptIndex} value={dept.department_name}>
+                    <Text>Select a department to display information on this tab.</Text>
+                    <Input
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder="Type to search..."
+                    />
+                    <List>
+                      {filteredDepts.map((dept, i) => (
+                        <ListItem
+                          key={i}
+                          onClick={() => {
+                            handleDeptSelection(index, dept.department_name);
+                            setInputValue(""); // Clear input after selection
+                          }}
+                          cursor="pointer"
+                          _hover={{ bg: "gray.100" }}
+                        >
                           {dept.department_name}
-                        </option>
+                        </ListItem>
                       ))}
-                    </Select>
+                    </List>
                   </Box>
                 ) : (
                   // Display Department Content if a department is selected
