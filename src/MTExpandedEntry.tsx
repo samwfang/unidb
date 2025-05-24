@@ -22,9 +22,10 @@ interface MTExpandedEntryProps {
   mode: ModeType;
   content?: Content;
   isLoading?: boolean;
+  isExpanded: boolean;
 }
 
-const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoading }) => {
+const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoading, isExpanded }) => {
   //Number of Top Departments to Display by Default
   const TOP_NUM_DEPTS = 5;
   //Maximum Number of Tabs User Can Create
@@ -175,7 +176,8 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
 
    return (
     <AccordionPanel pb={4} bg="white">
-      <Tabs index={activeTabIndex} onChange={setActiveTabIndex}>
+      {isExpanded && (
+        <Tabs index={activeTabIndex} isLazy onChange={setActiveTabIndex}>
           <TabList flexWrap="wrap">
             <Tab _selected={{
             color: mode === 'undergrad' ? "blue.500" : "green.500", // Change text color
@@ -256,6 +258,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
           ))}
         </TabPanels>
       </Tabs>
+      )}
     </AccordionPanel>
   );
 };

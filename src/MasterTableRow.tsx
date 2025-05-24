@@ -28,8 +28,8 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode,
     if (!isExpanded) {
       setIsLoading(true);
       try {
-        const content  = await onExpand(item.id);
-        item.content = content;
+        //const content  = await onExpand(item.id);
+        //item.content = content;
         setIsExpanded(true);
       } finally {
         setIsLoading(false);
@@ -80,7 +80,8 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode,
     </AccordionButton>
 
     {/* This is the Expanded Entry, what you see when the user clicks each entry in the table */}
-    <MTExpandedEntry mode={mode} content={item.content} isLoading={isLoading} />
+
+    <MTExpandedEntry mode={mode} content={item.content} isLoading={isLoading} isExpanded={isExpanded} />
   </AccordionItem>
   )
 };

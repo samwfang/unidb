@@ -97,6 +97,33 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           location: `Location ${globalIndex + 1}`,
           studentFacultyRatio: `${10 + (globalIndex % 5)}:1`,
           icon: 'FaUniversity',
+          content: {
+            undergrad_content: {
+              general_content: {
+                total_students: '35,500',
+                total_student_percentile: '70',
+                graduation_rate: '95%',
+                graduation_rate_percentile: '95',
+                average_class_size: '550'
+              },
+              dept_contents: [
+                { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${globalIndex + 1}` },
+                { cip: "2601", department_name: "Biology", content: `Biology department info for University ${globalIndex + 1}` },
+                { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${globalIndex + 1}` }
+              ]
+            },
+            grad_content: {
+              general_content: {
+                total_students: '5,500',
+                graduation_rate: '92%',
+                average_class_size: '51'
+              },
+              dept_contents: [
+                {  cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${globalIndex + 1}` },
+                {  cip: "0607", department_name: "Business", content: `MBA program info for University ${globalIndex + 1}` }
+              ]
+            }
+          }
         };
       });
       // Simulate total count (1000 in your case)
