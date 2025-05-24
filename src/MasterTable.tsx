@@ -73,7 +73,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   //Stores Expanded Indecies 
   const [expandedIndex, setExpandedIndex] = useState<number | number[]>([]);
 
-   //Page Input for Going to Custom Page
+   //What is in Page Input Input Box
   const [pageInput, setPageInput] = useState<string>("1");
 
   //Tooltip for Invalid Page
@@ -210,6 +210,11 @@ const fetchPageData = async (page: number) => {
   }, [pageSize, currentPage]);
 
 
+  // Change Page Input to Show Current Page
+  useEffect(() => {
+    setPageInput(((currentPage + 1).toString()))
+  }, [currentPage]);
+
 
   const nextPage = () => {
     if ((currentPage + 1) * pageSize  < totalItems) {
@@ -312,9 +317,7 @@ const fetchPageData = async (page: number) => {
         </Button>
         
         <Flex alignItems="center">
-          <Text mx={2}>
-            Page {currentPage + 1} of {Math.ceil(totalItems / pageSize)}
-          </Text>
+          
           {/* Tooltip only shows if ShowInvalidPageTooltip is true, shows if user inputs a bad page number */}
           <Tooltip
           isOpen={showInvalidPageTooltip}
@@ -324,13 +327,16 @@ const fetchPageData = async (page: number) => {
           bg="red.500"
           color="white"
         >
-          <Input
+          <Text mx={2}>
+            Page <Input
             value={pageInput}
             onChange={handlePageInputChange}
             width="60px"
             textAlign="center"
             mr={2}
-          />
+          /> of {Math.ceil(totalItems / pageSize)}
+          </Text>
+          
         </Tooltip>
           <Button onClick={goToPage} isDisabled={isLoading}
             bg={mode === 'undergrad' ? "blue.500" : "green.500"}
