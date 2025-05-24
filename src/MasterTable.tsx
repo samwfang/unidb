@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { ModeType } from './App';
-import {useSearchParams} from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 // Top level entry for University Data
 export interface UniversityData {
@@ -22,7 +22,7 @@ export interface Content {
 
 //Content for Undergrad
 export interface UndergradContent {
-   general_content: {
+  general_content: {
     total_students: string;
     total_student_percentile: string;
     graduation_rate: string;
@@ -41,7 +41,7 @@ export interface UGradDeptContent {
 
 //Content for Grad
 export interface GradContent {
-   general_content: {
+  general_content: {
     total_students: string;
     graduation_rate: string;
     average_class_size: string;
@@ -73,7 +73,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   //Stores Expanded Indecies 
   const [expandedIndex, setExpandedIndex] = useState<number | number[]>([]);
 
-   //What is in Page Input Input Box
+  //What is in Page Input Input Box
   const [pageInput, setPageInput] = useState<string>("1");
 
   //Tooltip for Invalid Page
@@ -82,68 +82,68 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   // Get initial state from URL
   const initialPage = parseInt(searchParams.get('page') || '0', 10);
   const initialExpanded = searchParams.get('expanded')?.split(',').map(Number) || [];
-  
+
   // Estimate the height required for each row. This might need adjustment based on your actual design.
   const rowHeightEstimate = 61; // Example pixel height per item
   const calculatedMinHeight = pageSize * rowHeightEstimate;
 
 
   // Simulate API call for paginated data
-const fetchPageData = async (page: number) => {
-  setIsLoading(true);
-  setExpandedIndex([]); // Reset expanded indices
+  const fetchPageData = async (page: number) => {
+    setIsLoading(true);
+    setExpandedIndex([]); // Reset expanded indices
 
-  try {
-    // Simulate a network delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      // Simulate a network delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Simulated API response
-    const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
-      const globalIndex = page * pageSize + i;
-      return {
-        id: globalIndex + 1,
-        name: `The University of the Number ${globalIndex + 1}`,
-        location: `Location ${globalIndex + 1}`,
-        studentFacultyRatio: `${10 + (globalIndex % 5)}:1`,
-        icon: 'FaUniversity',
-        content: {
-          undergrad_content: {
-            general_content: {
-              total_students: '35,500',
-              total_student_percentile: '70',
-              graduation_rate: '95%',
-              graduation_rate_percentile: '95',
-              average_class_size: '550'
+      // Simulated API response
+      const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
+        const globalIndex = page * pageSize + i;
+        return {
+          id: globalIndex + 1,
+          name: `The University of the Number ${globalIndex + 1}`,
+          location: `Location ${globalIndex + 1}`,
+          studentFacultyRatio: `${10 + (globalIndex % 5)}:1`,
+          icon: 'FaUniversity',
+          content: {
+            undergrad_content: {
+              general_content: {
+                total_students: '35,500',
+                total_student_percentile: '70',
+                graduation_rate: '95%',
+                graduation_rate_percentile: '95',
+                average_class_size: '550'
+              },
+              dept_contents: [
+                { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${globalIndex + 1}` },
+                { cip: "2601", department_name: "Biology", content: `Biology department info for University ${globalIndex + 1}` },
+                { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${globalIndex + 1}` }
+              ]
             },
-            dept_contents: [
-              { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${globalIndex + 1}` },
-              { cip: "2601", department_name: "Biology", content: `Biology department info for University ${globalIndex + 1}` },
-              { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${globalIndex + 1}` }
-            ]
-          },
-          grad_content: {
-            general_content: {
-              total_students: '5,500',
-              graduation_rate: '92%',
-              average_class_size: '51'
-            },
-            dept_contents: [
-              { cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${globalIndex + 1}` },
-              { cip: "0607", department_name: "Business", content: `MBA program info for University ${globalIndex + 1}` }
-            ]
+            grad_content: {
+              general_content: {
+                total_students: '5,500',
+                graduation_rate: '92%',
+                average_class_size: '51'
+              },
+              dept_contents: [
+                { cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${globalIndex + 1}` },
+                { cip: "0607", department_name: "Business", content: `MBA program info for University ${globalIndex + 1}` }
+              ]
+            }
           }
-        }
-      };
-    });
+        };
+      });
 
-    const simulatedTotal = 1000; // Total number of items in the dataset
+      const simulatedTotal = 1000; // Total number of items in the dataset
 
-    setData(simulatedData);
-    setTotalItems(simulatedTotal);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      setData(simulatedData);
+      setTotalItems(simulatedTotal);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchExpandedEntryContent = async (id: number): Promise<{
     undergrad_content: UndergradContent;
@@ -159,36 +159,36 @@ const fetchPageData = async (page: number) => {
 
     // Simulation - matches your existing data structure
     return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        undergrad_content: {
-          general_content: {
-            total_students: '35,500',
-            total_student_percentile: '70',
-            graduation_rate: '95%',
-            graduation_rate_percentile: '95',
-            average_class_size: '550'
+      setTimeout(() => {
+        resolve({
+          undergrad_content: {
+            general_content: {
+              total_students: '35,500',
+              total_student_percentile: '70',
+              graduation_rate: '95%',
+              graduation_rate_percentile: '95',
+              average_class_size: '550'
+            },
+            dept_contents: [
+              { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${id}` },
+              { cip: "2601", department_name: "Biology", content: `Biology department info for University ${id}` },
+              { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${id}` }
+            ]
           },
-          dept_contents: [
-            { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${id}` },
-            { cip: "2601", department_name: "Biology", content: `Biology department info for University ${id}` },
-            { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${id}` }
-          ]
-        },
-        grad_content: {
-          general_content: {
-            total_students: '5,500',
-            graduation_rate: '92%',
-            average_class_size: '51'
-          },
-           dept_contents: [
-            {  cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
-            {  cip: "0607", department_name: "Business", content: `MBA program info for University ${id}` }
-          ]
-        }
-      });
-    }, 500);
-  });
+          grad_content: {
+            general_content: {
+              total_students: '5,500',
+              graduation_rate: '92%',
+              average_class_size: '51'
+            },
+            dept_contents: [
+              { cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
+              { cip: "0607", department_name: "Business", content: `MBA program info for University ${id}` }
+            ]
+          }
+        });
+      }, 500);
+    });
   };
 
   // Refetch page data when either new page is loaded, or size of each page is altered (could be inefficient but IDGAF ;))
@@ -217,7 +217,7 @@ const fetchPageData = async (page: number) => {
 
 
   const nextPage = () => {
-    if ((currentPage + 1) * pageSize  < totalItems) {
+    if ((currentPage + 1) * pageSize < totalItems) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
@@ -256,13 +256,13 @@ const fetchPageData = async (page: number) => {
       p={6}
     >
       <Flex justifyContent="flex-end" mb={4}>
-        <Button 
-          onClick={() => {setExpandedIndex([])}}
+        <Button
+          onClick={() => { setExpandedIndex([]) }}
           isDisabled={Array.isArray(expandedIndex) ? !expandedIndex.length : true}
-          bg = {mode === 'undergrad' ? "blue.500" : "green.500"}
-          color = "white"
+          bg={mode === 'undergrad' ? "blue.500" : "green.500"}
+          color="white"
           _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "green.600", 
+            bg: mode === 'undergrad' ? "blue.600" : "green.600",
             color: 'white',
           }}
         >
@@ -270,17 +270,17 @@ const fetchPageData = async (page: number) => {
         </Button>
       </Flex>
 
-       <Box minH={`${calculatedMinHeight}px`}> {/* Add minimum height for this box */}
+      <Box minH={`${calculatedMinHeight}px`}> {/* Add minimum height for this box */}
         {isLoading ? ( // Show spinner when loading
           <Flex justifyContent="center" alignItems="center" minH="100px">
-            <Spinner 
-              size="xl" 
-              color={mode === 'undergrad' ? "blue.500" : "green.500"} 
+            <Spinner
+              size="xl"
+              color={mode === 'undergrad' ? "blue.500" : "green.500"}
               thickness='4px'
             />
           </Flex>
         ) : (
-          <Accordion 
+          <Accordion
             allowMultiple
             borderRadius="lg"
             index={expandedIndex}
@@ -299,61 +299,61 @@ const fetchPageData = async (page: number) => {
             }}
           >
             {data.map((item) => (
-              <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent}/>
+              <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
             ))}
           </Accordion>
         )}
       </Box>
-      
-       <Flex justifyContent="space-between" alignItems="center" mt="4">
+
+      <Flex justifyContent="space-between" alignItems="center" mt="4">
         <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}
           bg={mode === 'undergrad' ? "blue.500" : "green.500"}
           color="white"
           _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "green.600", 
+            bg: mode === 'undergrad' ? "blue.600" : "green.600",
             color: 'white',
           }}>
           Back
         </Button>
-        
+
         <Flex alignItems="center">
-          
+
           {/* Tooltip only shows if ShowInvalidPageTooltip is true, shows if user inputs a bad page number */}
           <Tooltip
-          isOpen={showInvalidPageTooltip}
-          label={`Please enter a valid page number between 1 and ${Math.ceil(totalItems / pageSize)}`}
-          placement="top"
-          hasArrow
-          bg="red.500"
-          color="white"
-        >
-          <Text mx={2}>
-            Page <Input
-            value={pageInput}
-            onChange={handlePageInputChange}
-            width="60px"
-            textAlign="center"
-            mr={2}
-          /> of {Math.ceil(totalItems / pageSize)}
-          </Text>
-          
-        </Tooltip>
+            isOpen={showInvalidPageTooltip}
+            label={`Please enter a valid page number between 1 and ${Math.ceil(totalItems / pageSize)}`}
+            placement="top"
+            hasArrow
+            bg="red.500"
+            color="white"
+          >
+            <Text mx={2}>
+              Page <Input
+                value={pageInput}
+                onChange={handlePageInputChange}
+                width="60px"
+                textAlign="center"
+                mr={2}
+              /> of {Math.ceil(totalItems / pageSize)}
+            </Text>
+
+          </Tooltip>
           <Button onClick={goToPage} isDisabled={isLoading}
             bg={mode === 'undergrad' ? "blue.500" : "green.500"}
             color="white"
             _hover={{
-              bg: mode === 'undergrad' ? "blue.600" : "green.600", 
+              bg: mode === 'undergrad' ? "blue.600" : "green.600",
               color: 'white',
             }}>
             Go
           </Button>
         </Flex>
-        
+
         <Button onClick={nextPage} isDisabled={(currentPage + 1) * pageSize >= totalItems || isLoading}
           bg={mode === 'undergrad' ? "blue.500" : "green.500"}
           color="white"
           _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "green.600", 
+            bg: mode === 'undergrad' ? "blue.600" : "green.600",
             color: 'white',
           }}>
           Next
