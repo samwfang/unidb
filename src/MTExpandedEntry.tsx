@@ -150,7 +150,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
             <Box key={columnIndex}>
               {columnGroups.map(([cip, depts]) => (
                 <Box key={cip} mb={4}>
-                  <Text fontWeight="bold" mb={2}>{cipToClassificationName(cip)}</Text>
+                  <Text fontWeight="bold" mt={2} mb={2}>{cipToClassificationName(cip)}</Text>
                   <List>
                     {depts.map((dept, i) => (
                       <ListItem
