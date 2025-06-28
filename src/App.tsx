@@ -1,6 +1,7 @@
 import './App.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MasterTable from './MasterTable'
+import TopHeader from './components/TopHeader';
 import UGradGradToggle from './UGradGradToggle';
 import { MTControlPanel } from './MTControlPanel';
 import FrontPageInfo from './FrontPageInfo';
@@ -36,6 +37,7 @@ import {
   ChevronRightIcon
 } from '@chakra-ui/icons'
 
+
 export enum ModeType {
   Undergrad = 'undergrad',
   Grad = 'grad',
@@ -49,6 +51,23 @@ function App() {
   const [mode, setMode] = useState<ModeType>(ModeType.Undergrad);
   // number of entries mastertable shows
   const [pageSize, setPageSize] = useState<number>(10);
+  //set whether to show the top header or not
+  const [showHeader, setShowHeader] = useState<boolean>(false);
+  const frontPageInfoRef = useRef<HTMLDivElement>(null);
+
+  //handle showing or removing the front header based on user scroll location
+  useEffect(() => {
+    const handleScroll = () => {
+      if (frontPageInfoRef.current) {
+        // Show header after scrolling past 50% of FrontPageInfo height
+        const threshold = frontPageInfoRef.current.offsetHeight * 0.5;
+        setShowHeader(window.scrollY > threshold);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const undergradGradToggle = () => {
     setMode((prevMode) => (prevMode === ModeType.Undergrad ? ModeType.Grad : ModeType.Undergrad));
@@ -61,45 +80,18 @@ function App() {
 
   return (
     <div className="App">
+      {/* Gradient Background to make it look nice and spiffy! */}
       <Box minH="100vh"
         bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, teal.50, teal.100)"} // Chakra's gradient syntax
         p={4}
       >
-        {/* Top Header */}
-        <Flex
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="space-around"
-          textAlign="center"
-          mt={4}
-        >
-          <Flex
-            width="100%"
-            flexDirection="row"
-            justifyContent="center"
-            alignItems="center"
-            px={4}
-            position="relative"
-          >
-            <Flex alignItems="center">
-              <Text fontSize="3xl" fontWeight="bold">
-                The University Database
-              </Text>
-              <Badge variant="subtle" colorScheme="pink" ml={1}>
-                ALPHA
-              </Badge>
-            </Flex>
-            <Box position="absolute" right="100px">
-              <UGradGradToggle mode={mode} onToggle={undergradGradToggle} />
-            </Box>
-          </Flex>
-          <Text color="gray.500">
-            A One-Stop Shop for University and Faculty Information
-          </Text>
-        </Flex>
-
-        <Flex maxW="1000px" alignItems="center" mx="auto">
+        {/* Top Header: Only Display when ShowHeader == True */}
+        <TopHeader 
+          mode={mode} 
+          showHeader={showHeader} 
+          onToggle={undergradGradToggle} 
+        />
+        <Flex maxW="1000px" alignItems="center" mx="auto" ref={frontPageInfoRef}>
           <FrontPageInfo mode={mode} onModeChange={undergradGradToggle}/>
         </Flex>
         {/* Master Table and Control Panel */}
