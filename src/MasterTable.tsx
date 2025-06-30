@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip } from '@chakra-ui/react';
+import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem } from '@chakra-ui/react';
+import { Popover, PopoverTrigger, PopoverContent, PopoverBody } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { ModeType } from './App';
 import { useSearchParams } from 'react-router-dom';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 
 // Top level entry for University Data
 export interface UniversityData {
@@ -145,51 +147,30 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     }
   };
 
-  // const fetchExpandedEntryContent = async (id: number): Promise<{
-  //   undergrad_content: UndergradContent;
-  //   grad_content: GradContent;
-  // }> => {
-  //   // In a real implementation, this would be an actual API call:
-  //   /*
-  //   const response = await fetch(`/api/universities/${id}/content?type=${type}`);
-  //   if (!response.ok) throw new Error('Failed to fetch content');
-  //   const data = await response.json();
-  //   return data.content;
-  //   */
+  //This function is currently not being used
+  const fetchExpandedEntryContent = async (id: number): Promise<{
+    undergrad_content?: UndergradContent;
+    grad_content?: GradContent;
+  }> => {
+    // In a real implementation, this would be an actual API call:
+    /*
+    const response = await fetch(`/api/universities/${id}/content?type=${type}`);
+    if (!response.ok) throw new Error('Failed to fetch content');
+    const data = await response.json();
+    return data.content;
+    */
 
-  //   // Simulation - matches your existing data structure
-  //   return new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       resolve({
-  //         undergrad_content: {
-  //           general_content: {
-  //             total_students: '35,500',
-  //             total_student_percentile: '70',
-  //             graduation_rate: '95%',
-  //             graduation_rate_percentile: '95',
-  //             average_class_size: '550'
-  //           },
-  //           dept_contents: [
-  //             { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${id}` },
-  //             { cip: "2601", department_name: "Biology", content: `Biology department info for University ${id}` },
-  //             { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${id}` }
-  //           ]
-  //         },
-  //         grad_content: {
-  //           general_content: {
-  //             total_students: '5,500',
-  //             graduation_rate: '92%',
-  //             average_class_size: '51'
-  //           },
-  //           dept_contents: [
-  //             { cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
-  //             { cip: "0607", department_name: "Business", content: `MBA program info for University ${id}` }
-  //           ]
-  //         }
-  //       });
-  //     }, 500);
-  //   });
-  // };
+    // Simulation - matches your existing data structure
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+
+          // In the future, if content is too much and page loads too slow, we can try to utilize this function
+          // to load content for only one entry
+        });
+      }, 500);
+    });
+  };
 
   // Refetch page data when either new page is loaded, or size of each page is altered (could be inefficient but IDGAF ;))
   useEffect(() => {
@@ -280,28 +261,103 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
             />
           </Flex>
         ) : (
-          <Accordion
-            allowMultiple
-            borderRadius="lg"
-            index={expandedIndex}
-            onChange={(index) => setExpandedIndex(index)}
-            sx={{
-              '& > div': {
-                borderRadius: 'lg',
-                overflow: 'hidden',
-                '&:first-of-type': {
-                  borderTopRadius: 'lg'
-                },
-                '&:last-of-type': {
-                  borderBottomRadius: 'lg'
+          <>
+            {/* Column Headers */}
+            <Grid templateColumns="50px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center" mb={2} px={4}>
+              <GridItem textAlign="center"></GridItem>
+              <GridItem textAlign="left">
+                <Popover>
+                  {({ isOpen }) => (
+                    <>
+                      <PopoverTrigger>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          fontWeight="bold"
+                          rightIcon={<ChevronDownIcon />}
+                          bg= {isOpen ? "gray.100" : "transparent"}
+                          borderColor="gray.200"
+                          _hover={{ bg: 'gray.100' }}
+                          zIndex={isOpen ? "popover" : "auto"}
+                        >
+                          University
+                        </Button>
+                      </PopoverTrigger>
+                      {isOpen && (
+                        <Box
+                          position="fixed"
+                          top={0}
+                          left={0}
+                          right={0}
+                          bottom={0}
+                          borderRadius="lg"
+                          bg="rgba(0, 0, 0, 0.6)" // Solid dark overlay
+                          zIndex="overlay"
+                        />
+                      )}
+                      <PopoverContent zIndex="popover">
+                        <PopoverBody>
+                          Sorted alphabetically by university name
+                        </PopoverBody>
+                      </PopoverContent>
+                    </>
+                  )}
+                </Popover>
+              </GridItem>
+
+              <GridItem textAlign="center">
+                <Popover>
+                  <PopoverTrigger>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      fontWeight="bold"
+                      rightIcon={<ChevronDownIcon />}
+                      bg="transparent"
+                      borderColor="gray.200"
+                      _hover={{ bg: 'gray.100' }}
+                    >
+                      Location
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <PopoverBody>
+                      University location information
+                    </PopoverBody>
+                  </PopoverContent>
+                </Popover>
+              </GridItem>
+              <GridItem textAlign="center" fontWeight="bold">
+                {mode === 'undergrad' ? 'Grad Rate' : 'Avg Class Size'}
+              </GridItem>
+              <GridItem textAlign="center" fontWeight="bold">
+                {mode === 'undergrad' ? 'Student-Faculty Ratio' : 'Graduation Rate'}
+              </GridItem>
+            </Grid>
+
+            <Accordion
+              allowMultiple
+              borderRadius="lg"
+              index={expandedIndex}
+              onChange={(index) => setExpandedIndex(index)}
+              sx={{
+                '& > div': {
+                  borderRadius: 'lg',
+                  overflow: 'hidden',
+                  '&:first-of-type': {
+                    borderTopRadius: 'lg'
+                  },
+                  '&:last-of-type': {
+                    borderBottomRadius: 'lg'
+                  }
                 }
-              }
-            }}
-          >
-            {data.map((item) => (
-              <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} />
-            ))}
-          </Accordion>
+              }}
+            >
+              {data.map((item) => (
+                <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
+              ))}
+            </Accordion>
+          </>
         )}
       </Box>
 
