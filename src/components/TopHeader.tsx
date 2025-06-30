@@ -15,7 +15,7 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
             top={0}
             left={0}
             right={0}
-            zIndex={1000}
+            zIndex={10000}
             opacity={showHeader ? 1 : 0}
             transition="opacity 0.3s ease"
             pointerEvents={showHeader ? 'auto' : 'none'}
