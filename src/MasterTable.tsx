@@ -229,8 +229,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   //TODO: Add "Favorited" Functionality
   return (
     <Box maxW="1000px" mx="auto" mt="8"
+      position = "relative"
       bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
-      backdropFilter="blur(16px)"  // Applies the frosted glass effect
+      //backdropFilter="blur(16px)"  // Applies the frosted glass effect
       borderRadius="lg"            // Rounds the corners of the box
       boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
       border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
@@ -275,7 +276,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           size="sm"
                           fontWeight="bold"
                           rightIcon={<ChevronDownIcon />}
-                          bg= {isOpen ? "gray.100" : "transparent"}
+                          bg={isOpen ? "gray.100" : "transparent"}
                           borderColor="gray.200"
                           _hover={{ bg: 'gray.100' }}
                           zIndex={isOpen ? "popover" : "auto"}
@@ -285,14 +286,15 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                       </PopoverTrigger>
                       {isOpen && (
                         <Box
-                          position="fixed"
+                          position="absolute"
                           top={0}
                           left={0}
                           right={0}
                           bottom={0}
-                          borderRadius="lg"
-                          bg="rgba(0, 0, 0, 0.6)" // Solid dark overlay
+                          backdropFilter=" blur(12px)"
+                          bg="rgba(0, 0, 0, 0.1)"
                           zIndex="overlay"
+                          borderRadius="lg"
                         />
                       )}
                       <PopoverContent zIndex="popover">
