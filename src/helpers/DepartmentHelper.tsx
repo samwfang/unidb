@@ -1,4 +1,59 @@
-import { GradDeptContent, UGradDeptContent } from "../MasterTable";
+import { GradContent, GradDeptContent, UGradDeptContent, UndergradContent, UniversityData } from "../MasterTable";
+
+
+// Column Types
+
+export enum ColumnType {
+  TotalStudents = "total_students",
+  GraduationRate = "graduation_rate",
+  AverageClassSize = "average_class_size",
+}
+
+export const ColumnDisplayNames: Record<ColumnType, string> = {
+  [ColumnType.TotalStudents]: "Total Students",
+  [ColumnType.GraduationRate]: "Graduation Rate",
+  [ColumnType.AverageClassSize]: "Average Class Size",
+  // Add more display names as needed
+};
+
+// Return String for Column Display Name
+export const getColumnDisplayName = (columnType: ColumnType): string => {
+  return ColumnDisplayNames[columnType] || "Unknown";
+};
+
+// Returns The Right Data For A Row Depending on Type of Column Selected in ColumnType
+export const getColumnData = (
+  item: UniversityData,
+  columnType: ColumnType,
+  mode: 'undergrad' | 'grad'
+): string => {
+  let content: UndergradContent | GradContent | undefined;
+  if (mode === 'undergrad') {
+    content = item.content?.undergrad_content;
+  } else {
+    content = item.content?.grad_content;
+  }
+
+  switch (columnType) {
+    case ColumnType.TotalStudents:
+      return content?.general_content.total_students || 'N/A';
+    case ColumnType.GraduationRate:
+      return content?.general_content.graduation_rate || 'N/A';
+    case ColumnType.AverageClassSize:
+      return content?.general_content.average_class_size || 'N/A';
+    default:
+      return 'N/A';
+  }
+};
+
+
+
+
+
+
+
+// CIP Helpers
+
 
 // Group Departments by the first two digits of their CIP
 export const groupDepartmentsByCIP = (departments: UGradDeptContent[] | GradDeptContent[]) => {
@@ -12,6 +67,7 @@ export const groupDepartmentsByCIP = (departments: UGradDeptContent[] | GradDept
     }, {} as Record<string, (UGradDeptContent | GradDeptContent)[]>);
   };
 
+// Function to get Department type from CIP label
 const CIP_TO_CLASSIFICATION: Record<string, string> = {
   "01": "Agricultural/Animal/Plant/Vet Science",
   "03": "Natural Resources & Conservation",

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem } from '@chakra-ui/react';
-import { Popover, PopoverTrigger, PopoverContent, PopoverBody } from '@chakra-ui/react';
+import { Popover, PopoverTrigger, PopoverContent, PopoverBody , Portal} from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { ModeType } from './App';
 import { useSearchParams } from 'react-router-dom';
@@ -297,11 +297,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           borderRadius="lg"
                         />
                       )}
+                      <Portal>
                       <PopoverContent zIndex="popover">
                         <PopoverBody>
                           Sorted alphabetically by university name
                         </PopoverBody>
                       </PopoverContent>
+                      </Portal>
                     </>
                   )}
                 </Popover>
