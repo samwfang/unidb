@@ -145,51 +145,51 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     }
   };
 
-  const fetchExpandedEntryContent = async (id: number): Promise<{
-    undergrad_content: UndergradContent;
-    grad_content: GradContent;
-  }> => {
-    // In a real implementation, this would be an actual API call:
-    /*
-    const response = await fetch(`/api/universities/${id}/content?type=${type}`);
-    if (!response.ok) throw new Error('Failed to fetch content');
-    const data = await response.json();
-    return data.content;
-    */
+  // const fetchExpandedEntryContent = async (id: number): Promise<{
+  //   undergrad_content: UndergradContent;
+  //   grad_content: GradContent;
+  // }> => {
+  //   // In a real implementation, this would be an actual API call:
+  //   /*
+  //   const response = await fetch(`/api/universities/${id}/content?type=${type}`);
+  //   if (!response.ok) throw new Error('Failed to fetch content');
+  //   const data = await response.json();
+  //   return data.content;
+  //   */
 
-    // Simulation - matches your existing data structure
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          undergrad_content: {
-            general_content: {
-              total_students: '35,500',
-              total_student_percentile: '70',
-              graduation_rate: '95%',
-              graduation_rate_percentile: '95',
-              average_class_size: '550'
-            },
-            dept_contents: [
-              { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${id}` },
-              { cip: "2601", department_name: "Biology", content: `Biology department info for University ${id}` },
-              { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${id}` }
-            ]
-          },
-          grad_content: {
-            general_content: {
-              total_students: '5,500',
-              graduation_rate: '92%',
-              average_class_size: '51'
-            },
-            dept_contents: [
-              { cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
-              { cip: "0607", department_name: "Business", content: `MBA program info for University ${id}` }
-            ]
-          }
-        });
-      }, 500);
-    });
-  };
+  //   // Simulation - matches your existing data structure
+  //   return new Promise((resolve) => {
+  //     setTimeout(() => {
+  //       resolve({
+  //         undergrad_content: {
+  //           general_content: {
+  //             total_students: '35,500',
+  //             total_student_percentile: '70',
+  //             graduation_rate: '95%',
+  //             graduation_rate_percentile: '95',
+  //             average_class_size: '550'
+  //           },
+  //           dept_contents: [
+  //             { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${id}` },
+  //             { cip: "2601", department_name: "Biology", content: `Biology department info for University ${id}` },
+  //             { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${id}` }
+  //           ]
+  //         },
+  //         grad_content: {
+  //           general_content: {
+  //             total_students: '5,500',
+  //             graduation_rate: '92%',
+  //             average_class_size: '51'
+  //           },
+  //           dept_contents: [
+  //             { cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${id}` },
+  //             { cip: "0607", department_name: "Business", content: `MBA program info for University ${id}` }
+  //           ]
+  //         }
+  //       });
+  //     }, 500);
+  //   });
+  // };
 
   // Refetch page data when either new page is loaded, or size of each page is altered (could be inefficient but IDGAF ;))
   useEffect(() => {
@@ -299,7 +299,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
             }}
           >
             {data.map((item) => (
-              <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
+              <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} />
             ))}
           </Accordion>
         )}

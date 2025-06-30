@@ -10,10 +10,9 @@ interface MasterTableRowProps {
   item: UniversityData;
   mode: ModeType;
   toggleMode: () => void;
-  onExpand: (id: number) => Promise<Content>;
 }
 
-const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode, onExpand }) => {
+const MasterTableRow: React.FC<MasterTableRowProps> = ({ item, mode, toggleMode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 

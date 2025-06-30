@@ -60,7 +60,7 @@ function App() {
     const handleScroll = () => {
       if (frontPageInfoRef.current) {
         // Show header after scrolling past 50% of FrontPageInfo height
-        const threshold = frontPageInfoRef.current.offsetHeight * 0.5;
+        const threshold = frontPageInfoRef.current.offsetHeight * 0.1;
         setShowHeader(window.scrollY > threshold);
       }
     };
@@ -91,6 +91,7 @@ function App() {
           showHeader={showHeader} 
           onToggle={undergradGradToggle} 
         />
+
         <Flex maxW="1000px" alignItems="center" mx="auto" ref={frontPageInfoRef}>
           <FrontPageInfo mode={mode} onModeChange={undergradGradToggle}/>
         </Flex>
