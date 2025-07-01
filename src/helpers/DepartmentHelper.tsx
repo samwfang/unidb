@@ -2,12 +2,21 @@ import { GradContent, GradDeptContent, UGradDeptContent, UndergradContent, Unive
 
 
 // Column Types
+// To Add a new Column Type: Add to Enum, Add
 
 export enum ColumnType {
   TotalStudents = "total_students",
   GraduationRate = "graduation_rate",
   AverageClassSize = "average_class_size",
 }
+
+export enum ExtraSortType {
+  Alphabetical = "a-z",
+  ReverseAlphabetical = "z-a",
+}
+
+// types for sorting include all columns alongside other extra options
+export type SortType = ColumnType | ExtraSortType;
 
 export const ColumnDisplayNames: Record<ColumnType, string> = {
   [ColumnType.TotalStudents]: "Total Students",

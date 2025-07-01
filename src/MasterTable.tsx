@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem } from '@chakra-ui/react';
-import { Popover, PopoverTrigger, PopoverContent, PopoverBody , Portal} from '@chakra-ui/react';
+import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem, Menu, FormControl, Select } from '@chakra-ui/react';
+import { Popover, PopoverTrigger, PopoverContent, PopoverBody, Portal } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { ModeType } from './App';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDownIcon } from '@chakra-ui/icons';
+import ReactSelect, { SingleValue } from 'react-select';
+import { ColumnType, ExtraSortType, SortType } from './helpers/DepartmentHelper';
 
 // Top level entry for University Data
 export interface UniversityData {
@@ -89,9 +91,16 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const rowHeightEstimate = 61; // Example pixel height per item
   const calculatedMinHeight = pageSize * rowHeightEstimate;
 
+  //Selected Column Options
+  const [selectedNameSortingOption, setSelectedNameSortingOption] = useState<SingleValue<{ value: string; label: string }>>(null);
+
+  //Current Parameter With Which To Sort Page Data With
+  const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
+
 
   // Simulate API call for paginated data
-  const fetchPageData = async (page: number) => {
+  // In Real API Call, I will also need to return data based on sortingParameter!
+  const fetchPageData = async (page: number, sortingParameter: SortType) => {
     setIsLoading(true);
     setExpandedIndex([]); // Reset expanded indices
 
@@ -172,10 +181,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     });
   };
 
-  // Refetch page data when either new page is loaded, or size of each page is altered (could be inefficient but IDGAF ;))
+  // REFETCH PAGE DATA WHEN:
+  // -New page is loaded
+  // -Size of each page is altered (could be inefficient but IDGAF ;))
+  // -Sorting Parameter Changes
   useEffect(() => {
-    fetchPageData(currentPage);
-  }, [currentPage, pageSize]);
+    fetchPageData(currentPage, sortingParam);
+  }, [currentPage, pageSize, sortingParam]);
 
 
   // Track previous page size
@@ -196,6 +208,24 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     setPageInput(((currentPage + 1).toString()))
   }, [currentPage]);
 
+  //HARDCODED UNIVERSITY NAME SORTING OPTION
+
+  // Change Preliminary Sorting Option Selected Under the University Name Popup (Hardcoded)
+  const onUniversityNameSelectChange = (option: SingleValue<{ value: string; label: string }>) => {
+    setSelectedNameSortingOption(option);
+  };
+
+  const applyAlphabeticalSort = () => {
+    if (selectedNameSortingOption) {
+      // Trust that you will always use a valid SortType as the value of a Sort Option
+      setSortingParam(selectedNameSortingOption.value as SortType)
+      console.log('Selected option:', sortingParam);
+    } else {
+      console.log('No option selected.');
+    }
+  };
+
+  // TABLE PAGINATION
 
   const nextPage = () => {
     if ((currentPage + 1) * pageSize < totalItems) {
@@ -229,7 +259,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   //TODO: Add "Favorited" Functionality
   return (
     <Box maxW="1000px" mx="auto" mt="8"
-      position = "relative"
+      position="relative"
       bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
       //backdropFilter="blur(16px)"  // Applies the frosted glass effect
       borderRadius="lg"            // Rounds the corners of the box
@@ -281,7 +311,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           _hover={{ bg: 'gray.100' }}
                           zIndex={isOpen ? "popover" : "auto"}
                         >
-                          University
+                          University Name
                         </Button>
                       </PopoverTrigger>
                       {isOpen && (
@@ -291,18 +321,58 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           left={0}
                           right={0}
                           bottom={0}
-                          backdropFilter=" blur(12px)"
+                          backdropFilter="blur(12px)"
                           bg="rgba(0, 0, 0, 0.1)"
                           zIndex="overlay"
                           borderRadius="lg"
+                          pointerEvents="none"
                         />
                       )}
                       <Portal>
-                      <PopoverContent zIndex="popover">
-                        <PopoverBody>
-                          Sorted alphabetically by university name
-                        </PopoverBody>
-                      </PopoverContent>
+                        <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
+                          boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
+                          <PopoverBody p={4} >
+                              <Text fontSize="xl" fontWeight="bold"> University Name</Text>
+                            <Text>The most common name for each university.</Text>
+                            <Text fontWeight="bold"> Sort By: </Text>
+                            {isOpen && (
+                            <FormControl mt={2}>
+                              <ReactSelect
+                                value={selectedNameSortingOption}
+                                options={[
+                                  { value: ExtraSortType.Alphabetical, label: 'Alphabetical A-Z' },
+                                  { value: ExtraSortType.ReverseAlphabetical, label: 'Alphabetical Z-A' }
+                                ]}
+                                placeholder="Select sort option"
+                                styles={{
+                                  control: (base) => ({
+                                    ...base,
+                                    backgroundColor: 'gray.50',
+                                    borderColor: '#E2E8F0',
+                                    _hover: { borderColor: '#CBD5E0' }
+                                  }),
+                                  option: (base) => ({
+                                    ...base,
+                                    backgroundColor: 'white',
+                                    color: 'black',
+                                    _hover: { backgroundColor: '#F7FAFC' }
+                                  })
+                                }}
+                                onChange={onUniversityNameSelectChange} 
+                              />
+                            </FormControl>
+                            )}
+                            <Button
+                              mt={4}
+                              colorScheme="blue"
+                              size="sm"
+                              onClick={applyAlphabeticalSort}
+                            >
+                              Apply Sort
+                            </Button>
+                            
+                          </PopoverBody>
+                        </PopoverContent>
                       </Portal>
                     </>
                   )}
