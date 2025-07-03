@@ -240,6 +240,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     }
   };
 
+  // SORTING AND COLUMN CHANGE OPERATIONS FOR OTHER COLUMNS
+
+  const handleApplySort = (sortOption: string) => {
+    // Update your table sorting logic here
+    console.log("Applying sort:", sortOption);
+};
+
   // TABLE PAGINATION
 
   const nextPage = () => {
@@ -395,13 +402,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               </GridItem>
 
               <GridItem textAlign="center">
-                  <ColumnPopover departmentName={"Computer Science"} columnType={columnTypes[0]} onNameChange={()=>{}}/>
+                  <ColumnPopover departmentName={"Computer Science"} columnType={columnTypes[0]} onNameChange={()=>{}} onApply={handleApplySort}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                  <ColumnPopover departmentName={"Ethnic, Cultural Minority, Gender, and Group Studies"} columnType={columnTypes[1]} onNameChange={()=>{}}/>
+                  <ColumnPopover departmentName={"Ethnic, Cultural Minority, Gender, and Group Studies"} columnType={columnTypes[1]} onNameChange={()=>{}} onApply={handleApplySort}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                  <ColumnPopover departmentName={null} columnType={columnTypes[2]} onNameChange={()=>{}}/>
+                  <ColumnPopover departmentName={null} columnType={columnTypes[2]} onNameChange={()=>{}} onApply={handleApplySort}/>
               </GridItem>
             </Grid>
 

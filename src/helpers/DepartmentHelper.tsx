@@ -132,7 +132,7 @@ export const groupDepartmentsByCIP = (departments: UGradDeptContent[] | GradDept
   };
 
 // Function to get Department type from CIP label
-const CIP_TO_CLASSIFICATION: Record<string, string> = {
+export const CIP_TO_CLASSIFICATION: Record<string, string> = {
   "01": "Agricultural/Animal/Plant/Vet Science",
   "03": "Natural Resources & Conservation",
   "04": "Architecture & Related Services",
