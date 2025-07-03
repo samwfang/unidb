@@ -4,6 +4,7 @@ import { Button, Popover, PopoverTrigger, PopoverContent, PopoverBody, Menu, Men
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { CIP_TO_CLASSIFICATION, ColumnType, ExtraSortType, SortType, getColumnDescription, getColumnDisplayName, cipToClassificationName } from 'src/helpers/DepartmentHelper';
 import ReactSelect from 'react-select';
+import DepartmentSelector from './DepartmentSelector';
 
 
 interface ColumnPopoverProps {
@@ -16,6 +17,9 @@ interface ColumnPopoverProps {
 const ColumnPopover: React.FC<ColumnPopoverProps> = ({ departmentName, columnType, onNameChange , onApply }) => {
 
     const [sortOption, setSortOption] = useState<string>("greatest"); 
+    const [currentField, setCurrentField] = useState<string>("General");
+    const [currentCID, setCurrentCID] = useState<string>("");
+    const [currentDepartment, setCurrentDepartment] = useState<string>("");
     const [modifiedContent, setModifiedContent] = useState<boolean>(false);
 
     // Generate classification options from CIP_TO_CLASSIFICATION
@@ -96,59 +100,9 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ departmentName, columnTyp
                                 {isOpen && (
                                     <Box position="relative" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
                                         <Text fontWeight="bold"> Select Department: </Text>
-                                        <Popover>
-                                            <PopoverTrigger>
-                                                <Button
-                                                    width="100%"
-                                                    justifyContent="flex-start"
-                                                    textAlign="left"
-                                                    whiteSpace="normal"
-                                                    height="auto"
-                                                    minHeight="40px"
-                                                    py={2}
-                                                    fontSize="xs"
-                                                    fontWeight="semibold"
-                                                    color={departmentName == "General" ? "gray.600" : "white"}
-                                                    bg={departmentName == "General" ? "gray.100" : "purple.500"}
-                                                    borderRadius="md"
-                                                    mb={1}
-                                                    border="1px solid"
-                                                    borderColor="gray.200"
-                                                >
-                                                    {departmentName}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent bg="gray.100" border="1px solid" borderColor="purple" borderRadius="lg"
-                            boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" width="400px">
-                                                <PopoverBody>
-                                                    <Text fontWeight="bold"> Select Field: </Text>
-                                                    <FormControl mt={2}>
-                                                        <ReactSelect
-                                                            options={[
-
-                                                                { value: "general", label: 'General' },
-                                                                ...classificationOptions
-                                                            ]}
-                                                            placeholder="Select sort option"
-                                                            styles={{
-                                                                control: (base) => ({
-                                                                    ...base,
-                                                                    backgroundColor: 'gray.50',
-                                                                    borderColor: '#E2E8F0',
-                                                                    _hover: { borderColor: '#CBD5E0' }
-                                                                }),
-                                                                option: (base) => ({
-                                                                    ...base,
-                                                                    backgroundColor: 'white',
-                                                                    color: 'black',
-                                                                    _hover: { backgroundColor: '#F7FAFC' }
-                                                                })
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                </PopoverBody>
-                                            </PopoverContent>
-                                        </Popover>
+                                         <Box position="relative" zIndex="popover">
+                        <DepartmentSelector departmentName={departmentName} onNameChange={onNameChange}/>
+                    </Box>
                                         <Text fontWeight="bold"> Sort By: </Text>
                                         <FormControl mt={2}>
                                             <ReactSelect
