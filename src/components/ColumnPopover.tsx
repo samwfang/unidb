@@ -185,7 +185,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ departmentName, columnTyp
                                         colorScheme="blue"
                                         size="sm"
                                     >
-                                        {modifiedContent ? "Apply and Sort By" : "Sort By Current"}
+                                        {modifiedContent ? "Apply and Sort By" : "Sort By Column"}
                                     </Button>
                                     <Button
                                         flex={1}
