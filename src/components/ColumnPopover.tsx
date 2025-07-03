@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button, Popover, PopoverTrigger, PopoverContent, PopoverBody, Menu, MenuButton, MenuList, MenuItem, Portal, Text, FormControl, Box} from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { ColumnType, ExtraSortType, SortType, getColumnDisplayName } from 'src/helpers/DepartmentHelper';
+import { ColumnType, ExtraSortType, SortType, getColumnDescription, getColumnDisplayName } from 'src/helpers/DepartmentHelper';
 import ReactSelect from 'react-select';
 
 
@@ -74,6 +74,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ departmentName, columnTyp
                             boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
                             <PopoverBody p={4} >
                                 <Text fontSize="xl" fontWeight="bold"> {getColumnDisplayName(columnType)}</Text>
+                                <Text> {getColumnDescription(columnType)} </Text>
                                 <Text fontWeight="bold"> Sort By: </Text>
                                 {isOpen && (
                                     <FormControl mt={2}>

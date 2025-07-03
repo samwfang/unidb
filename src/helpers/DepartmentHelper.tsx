@@ -8,7 +8,7 @@ export enum ColumnType {
   Location = "location",
   TotalStudents = "total_students",
   GraduationRate = "graduation_rate",
-  AverageClassSize = "average_class_size",
+  StudentFacultyRatio = "average_class_size",
 }
 
 export enum ExtraSortType {
@@ -22,24 +22,29 @@ export type SortType = ColumnType | ExtraSortType;
 interface ColumnMetadata {
   displayName: string;
   departmentSpecificAllowed: boolean;
+  description: string;
 }
 
 export const ColumnMetadataMap: Record<ColumnType, ColumnMetadata> = {
   [ColumnType.Location]: {
     displayName: "Location",
-    departmentSpecificAllowed: false
+    departmentSpecificAllowed: false,
+    description: "The geographical location of this institution."
   },
   [ColumnType.TotalStudents]: {
     displayName: "Total Students",
-    departmentSpecificAllowed: true
+    departmentSpecificAllowed: true,
+    description: "The number of students at this institution or department."
   },
   [ColumnType.GraduationRate]: {
     displayName: "Graduation Rate",
-    departmentSpecificAllowed: true
+    departmentSpecificAllowed: true,
+    description: "The graduation rate of students at this institution or department."
   },
-  [ColumnType.AverageClassSize]: {
-    displayName: "Average Class Size",
-    departmentSpecificAllowed: true
+  [ColumnType.StudentFacultyRatio]: {
+    displayName: "Student Faculty Ratio",
+    departmentSpecificAllowed: true,
+    description: "The ratio of students to faculty members at this institution or department."
   },
   // ... other columns
 };
@@ -52,6 +57,10 @@ export const getColumnDisplayName = (columnType: ColumnType): string => {
 
 export const canBeDepartmentColumn = (columnType: ColumnType): boolean => {
   return ColumnMetadataMap[columnType]?.departmentSpecificAllowed || false;
+};
+
+export const getColumnDescription = (columnType: ColumnType): string => {
+  return ColumnMetadataMap[columnType]?.description || "";
 };
 
 // Returns The Right Data For A Row Depending on Type of Column Selected in ColumnType
@@ -80,7 +89,7 @@ export const getColumnData = (
         return dept.total_students || 'No Info';
       case ColumnType.GraduationRate:
         return dept.graduation_rate || 'No Info';
-      case ColumnType.AverageClassSize:
+      case ColumnType.StudentFacultyRatio:
         return dept.average_class_size || 'No Info';
       default:
         return 'Error'; // Some columns like Location can't be department-specific
@@ -94,7 +103,7 @@ export const getColumnData = (
       return content?.general_content.total_students || 'N/A';
     case ColumnType.GraduationRate:
       return content?.general_content.graduation_rate || 'N/A';
-    case ColumnType.AverageClassSize:
+    case ColumnType.StudentFacultyRatio:
       return content?.general_content.average_class_size || 'N/A';
     default:
       return 'N/A';
