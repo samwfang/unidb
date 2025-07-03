@@ -5,6 +5,7 @@ import { GradContent, GradDeptContent, UGradDeptContent, UndergradContent, Unive
 // To Add a new Column Type: Add to Enum, Add
 
 export enum ColumnType {
+  Location = "location",
   TotalStudents = "total_students",
   GraduationRate = "graduation_rate",
   AverageClassSize = "average_class_size",
@@ -18,23 +19,47 @@ export enum ExtraSortType {
 // types for sorting include all columns alongside other extra options
 export type SortType = ColumnType | ExtraSortType;
 
-export const ColumnDisplayNames: Record<ColumnType, string> = {
-  [ColumnType.TotalStudents]: "Total Students",
-  [ColumnType.GraduationRate]: "Graduation Rate",
-  [ColumnType.AverageClassSize]: "Average Class Size",
-  // Add more display names as needed
+interface ColumnMetadata {
+  displayName: string;
+  departmentSpecificAllowed: boolean;
+}
+
+export const ColumnMetadataMap: Record<ColumnType, ColumnMetadata> = {
+  [ColumnType.Location]: {
+    displayName: "Location",
+    departmentSpecificAllowed: false
+  },
+  [ColumnType.TotalStudents]: {
+    displayName: "Total Students",
+    departmentSpecificAllowed: true
+  },
+  [ColumnType.GraduationRate]: {
+    displayName: "Graduation Rate",
+    departmentSpecificAllowed: true
+  },
+  [ColumnType.AverageClassSize]: {
+    displayName: "Average Class Size",
+    departmentSpecificAllowed: true
+  },
+  // ... other columns
 };
+
 
 // Return String for Column Display Name
 export const getColumnDisplayName = (columnType: ColumnType): string => {
-  return ColumnDisplayNames[columnType] || "Unknown";
+  return ColumnMetadataMap[columnType]?.displayName || "Unknown";
+};
+
+export const canBeDepartmentColumn = (columnType: ColumnType): boolean => {
+  return ColumnMetadataMap[columnType]?.departmentSpecificAllowed || false;
 };
 
 // Returns The Right Data For A Row Depending on Type of Column Selected in ColumnType
 export const getColumnData = (
   item: UniversityData,
   columnType: ColumnType,
-  mode: 'undergrad' | 'grad'
+  mode: 'undergrad' | 'grad',
+  departmentCip?: string
 ): string => {
   let content: UndergradContent | GradContent | undefined;
   if (mode === 'undergrad') {
@@ -43,7 +68,28 @@ export const getColumnData = (
     content = item.content?.grad_content;
   }
 
+  if (departmentCip) {
+    //Find Department Based on Department CIP
+    const dept = content?.dept_contents?.find(d => d.cip === departmentCip);
+
+    //If Department not there for this university, say "No Info"
+    if (!dept) return 'No Info';
+
+    switch (columnType) {
+      case ColumnType.TotalStudents:
+        return dept.total_students || 'No Info';
+      case ColumnType.GraduationRate:
+        return dept.graduation_rate || 'No Info';
+      case ColumnType.AverageClassSize:
+        return dept.average_class_size || 'No Info';
+      default:
+        return 'Error'; // Some columns like Location can't be department-specific
+    }
+  }
+
   switch (columnType) {
+    case ColumnType.Location:
+      return item.location || 'N/A';
     case ColumnType.TotalStudents:
       return content?.general_content.total_students || 'N/A';
     case ColumnType.GraduationRate:
@@ -131,3 +177,16 @@ const CIP_TO_CLASSIFICATION: Record<string, string> = {
 export const cipToClassificationName = (cipPrefix: string) => {
   return CIP_TO_CLASSIFICATION[cipPrefix] || "Unknown CIP Code";
 }
+
+
+// Retrieving Department Information in General from Universities
+
+
+export const getAllDepartments = (universities: UniversityData[]) => {
+  const departments = new Set<string>();
+  universities.forEach(u => {
+    u.content?.undergrad_content?.dept_contents?.forEach(d => departments.add(d.cip));
+    u.content?.grad_content?.dept_contents?.forEach(d => departments.add(d.cip));
+  });
+  return Array.from(departments);
+};

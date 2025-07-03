@@ -7,6 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import ReactSelect, { SingleValue } from 'react-select';
 import { ColumnType, ExtraSortType, SortType } from './helpers/DepartmentHelper';
+import ColumnPopover from './components/ColumnPopover';
 
 // Top level entry for University Data
 export interface UniversityData {
@@ -41,6 +42,11 @@ export interface UGradDeptContent {
   cip: string,
   department_name: string;
   content: string;
+  total_students?: string;
+  total_student_percentile?: string;
+  graduation_rate?: string;
+  graduation_rate_percentile?: string;
+  average_class_size?: string;
 };
 
 //Content for Grad
@@ -58,6 +64,11 @@ export interface GradDeptContent {
   cip: string,
   department_name: string;
   content: string;
+  total_students?: string;
+  total_student_percentile?: string;
+  graduation_rate?: string;
+  graduation_rate_percentile?: string;
+  average_class_size?: string;
 };
 
 export interface MasterTableProps {
@@ -93,6 +104,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   //Selected Column Options
   const [selectedNameSortingOption, setSelectedNameSortingOption] = useState<SingleValue<{ value: string; label: string }>>(null);
+  //Temporary Column Type selection in popover that will apply when apply is pressed!
+  const [selectedTempColumnType, setSelectedTempColumnType] = useState<ColumnType[]>([ColumnType.Location, ColumnType.GraduationRate, ColumnType.TotalStudents]);
+  //Selected Column Types (Default: Location, Grad Rate, Total Students)
+  const [columnTypes, setColumnTypes] = useState<ColumnType[]>([ColumnType.Location, ColumnType.GraduationRate, ColumnType.TotalStudents]);
 
   //Current Parameter With Which To Sort Page Data With
   const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
@@ -380,32 +395,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               </GridItem>
 
               <GridItem textAlign="center">
-                <Popover>
-                  <PopoverTrigger>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      fontWeight="bold"
-                      rightIcon={<ChevronDownIcon />}
-                      bg="transparent"
-                      borderColor="gray.200"
-                      _hover={{ bg: 'gray.100' }}
-                    >
-                      Location
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent>
-                    <PopoverBody>
-                      University location information
-                    </PopoverBody>
-                  </PopoverContent>
-                </Popover>
+                  <ColumnPopover columnType={columnTypes[0]} onNameChange={()=>{}}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                {mode === 'undergrad' ? 'Grad Rate' : 'Avg Class Size'}
+                  <ColumnPopover columnType={columnTypes[1]} onNameChange={()=>{}}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                {mode === 'undergrad' ? 'Student-Faculty Ratio' : 'Graduation Rate'}
+                  <ColumnPopover columnType={columnTypes[2]} onNameChange={()=>{}}/>
               </GridItem>
             </Grid>
 
