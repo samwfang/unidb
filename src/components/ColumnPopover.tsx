@@ -7,28 +7,53 @@ import ReactSelect from 'react-select';
 
 
 interface ColumnPopoverProps {
+    departmentName: string | null,
     columnType: ColumnType;
     onNameChange: (newName: string) => void;
 }
 
-const ColumnPopover: React.FC<ColumnPopoverProps> = ({ columnType, onNameChange }) => {
+const ColumnPopover: React.FC<ColumnPopoverProps> = ({ departmentName, columnType, onNameChange }) => {
+
+    if (!departmentName){
+        departmentName = "General";
+    }
     return (
         <Popover>
             {({ isOpen }) => (
                 <>
                     <PopoverTrigger>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            fontWeight="bold"
-                            rightIcon={<ChevronDownIcon />}
-                            bg={isOpen ? "gray.100" : "transparent"}
-                            borderColor="gray.200"
-                            _hover={{ bg: 'gray.100' }}
-                            zIndex={isOpen ? "popover" : "auto"}
-                        >
-                            {getColumnDisplayName(columnType)}
-                        </Button>
+                        <Box position="relative">
+                            {departmentName && (
+                                <Text 
+                                    fontSize="xs" 
+                                    fontWeight="semibold" 
+                                    color= {departmentName == "General" ? "gray.600" : "white"}
+                                    bg={departmentName == "General" ? "gray.100" : "purple.500"}
+                                    px={2}
+                                    py={1}
+                                    borderRadius="md"
+                                    mb={1}
+                                    border="1px solid"
+                                    borderColor="gray.200"
+                                    zIndex={isOpen ? "popover" : "auto"}
+                                    position="relative"
+                                >
+                                    {departmentName}
+                                </Text>
+                            )}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                fontWeight="bold"
+                                rightIcon={<ChevronDownIcon />}
+                                bg={isOpen ? "gray.100" : "transparent"}
+                                borderColor="gray.200"
+                                _hover={{ bg: 'gray.100' }}
+                                zIndex={isOpen ? "popover" : "auto"}
+                            >
+                                {getColumnDisplayName(columnType)}
+                            </Button>
+                        </Box>
                     </PopoverTrigger>
                     {isOpen && (
                         <Box

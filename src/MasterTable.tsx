@@ -309,7 +309,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         ) : (
           <>
             {/* Column Headers */}
-            <Grid templateColumns="50px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center" mb={2} px={4}>
+            <Grid templateColumns="50px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="flex-end"  mb={2} px={4}>
               <GridItem textAlign="center"></GridItem>
               <GridItem textAlign="left">
                 <Popover>
@@ -395,13 +395,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               </GridItem>
 
               <GridItem textAlign="center">
-                  <ColumnPopover columnType={columnTypes[0]} onNameChange={()=>{}}/>
+                  <ColumnPopover departmentName={"Computer Science"} columnType={columnTypes[0]} onNameChange={()=>{}}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                  <ColumnPopover columnType={columnTypes[1]} onNameChange={()=>{}}/>
+                  <ColumnPopover departmentName={"Ethnic, Cultural Minority, Gender, and Group Studies"} columnType={columnTypes[1]} onNameChange={()=>{}}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                  <ColumnPopover columnType={columnTypes[2]} onNameChange={()=>{}}/>
+                  <ColumnPopover departmentName={null} columnType={columnTypes[2]} onNameChange={()=>{}}/>
               </GridItem>
             </Grid>
 
