@@ -108,6 +108,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const [selectedTempColumnType, setSelectedTempColumnType] = useState<ColumnType[]>([ColumnType.Location, ColumnType.GraduationRate, ColumnType.TotalStudents]);
   //Selected Column Types (Default: Location, Grad Rate, Total Students)
   const [columnTypes, setColumnTypes] = useState<ColumnType[]>([ColumnType.Location, ColumnType.GraduationRate, ColumnType.TotalStudents]);
+  //Selected Department for Each Column
+  const [columnDepts, setColumnDepts] = useState<{ value: string, label: string }[]>([{ value: "General", label: "General" },
+  { value: "General", label: "General" }, { value: "General", label: "General" }]);
 
   //Current Parameter With Which To Sort Page Data With
   const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
@@ -245,8 +248,15 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const handleApplySort = (sortOption: string) => {
     // Update your table sorting logic here
     console.log("Applying sort:", sortOption);
-};
+  };
 
+  //Changes the Department Selection for a specific index
+  const handleDepartmentChange = (index: number, newCID: string, newDept: string) => {
+    const updatedItems = columnDepts.map((item, i) => 
+      i === index ? {value: newCID, label: newDept} : item
+    );
+    setColumnDepts(updatedItems)
+  };
   // TABLE PAGINATION
 
   const nextPage = () => {
@@ -316,7 +326,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         ) : (
           <>
             {/* Column Headers */}
-            <Grid templateColumns="50px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="flex-end"  mb={2} px={4}>
+            <Grid templateColumns="50px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="flex-end" mb={2} px={4}>
               <GridItem textAlign="center"></GridItem>
               <GridItem textAlign="left">
                 <Popover>
@@ -354,35 +364,35 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                         <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
                           boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
                           <PopoverBody p={4} >
-                              <Text fontSize="xl" fontWeight="bold"> University Name</Text>
+                            <Text fontSize="xl" fontWeight="bold"> University Name</Text>
                             <Text>The most common name for each university.</Text>
                             <Text fontWeight="bold"> Sort By: </Text>
                             {isOpen && (
-                            <FormControl mt={2}>
-                              <ReactSelect
-                                value={selectedNameSortingOption}
-                                options={[
-                                  { value: ExtraSortType.Alphabetical, label: 'Alphabetical A-Z' },
-                                  { value: ExtraSortType.ReverseAlphabetical, label: 'Alphabetical Z-A' }
-                                ]}
-                                placeholder="Select sort option"
-                                styles={{
-                                  control: (base) => ({
-                                    ...base,
-                                    backgroundColor: 'gray.50',
-                                    borderColor: '#E2E8F0',
-                                    _hover: { borderColor: '#CBD5E0' }
-                                  }),
-                                  option: (base) => ({
-                                    ...base,
-                                    backgroundColor: 'white',
-                                    color: 'black',
-                                    _hover: { backgroundColor: '#F7FAFC' }
-                                  })
-                                }}
-                                onChange={onUniversityNameSelectChange} 
-                              />
-                            </FormControl>
+                              <FormControl mt={2}>
+                                <ReactSelect
+                                  value={selectedNameSortingOption}
+                                  options={[
+                                    { value: ExtraSortType.Alphabetical, label: 'Alphabetical A-Z' },
+                                    { value: ExtraSortType.ReverseAlphabetical, label: 'Alphabetical Z-A' }
+                                  ]}
+                                  placeholder="Select sort option"
+                                  styles={{
+                                    control: (base) => ({
+                                      ...base,
+                                      backgroundColor: 'gray.50',
+                                      borderColor: '#E2E8F0',
+                                      _hover: { borderColor: '#CBD5E0' }
+                                    }),
+                                    option: (base) => ({
+                                      ...base,
+                                      backgroundColor: 'white',
+                                      color: 'black',
+                                      _hover: { backgroundColor: '#F7FAFC' }
+                                    })
+                                  }}
+                                  onChange={onUniversityNameSelectChange}
+                                />
+                              </FormControl>
                             )}
                             <Button
                               mt={4}
@@ -392,7 +402,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                             >
                               Apply Sort
                             </Button>
-                            
+
                           </PopoverBody>
                         </PopoverContent>
                       </Portal>
@@ -402,13 +412,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               </GridItem>
 
               <GridItem textAlign="center">
-                  <ColumnPopover departmentName={"Computer Science"} columnType={columnTypes[0]} onNameChange={()=>{}} onApply={handleApplySort}/>
+                <ColumnPopover departmentName={columnDepts[0].label} columnType={columnTypes[0]} onDepartmentChange={handleDepartmentChange} onApply={handleApplySort} index={0}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                  <ColumnPopover departmentName={"Ethnic, Cultural Minority, Gender, and Group Studies"} columnType={columnTypes[1]} onNameChange={()=>{}} onApply={handleApplySort}/>
+                <ColumnPopover departmentName={columnDepts[1].label} columnType={columnTypes[1]} onDepartmentChange={handleDepartmentChange} onApply={handleApplySort} index={1}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                  <ColumnPopover departmentName={null} columnType={columnTypes[2]} onNameChange={()=>{}} onApply={handleApplySort}/>
+                <ColumnPopover departmentName={columnDepts[2].label} columnType={columnTypes[2]} onDepartmentChange={handleDepartmentChange} onApply={handleApplySort} index={2}/>
               </GridItem>
             </Grid>
 
@@ -430,8 +440,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 }
               }}
             >
-              {data.map((item) => (
-                <MasterTableRow key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
+              {data.map((item, index) => (
+                <MasterTableRow rank={(currentPage) * pageSize + index + 1} key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
               ))}
             </Accordion>
           </>
