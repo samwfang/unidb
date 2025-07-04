@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Popover, PopoverTrigger, PopoverContent, PopoverBody, Menu, MenuButton, MenuList, MenuItem, Portal, Text, FormControl, Box, Divider } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { CIP_TO_CLASSIFICATION, ColumnType, ExtraSortType, SortType, getColumnDescription, getColumnDisplayName, cipToClassificationName } from 'src/helpers/DepartmentHelper';
@@ -69,6 +69,10 @@ export const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({ departme
         value: cipCode,
         label: name
     }));
+
+    useEffect(() => {
+        setSelectedField(null);
+        }, []);
 
      const handleReset = () => {
         setSelectedField(null);

@@ -114,6 +114,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   //Current Parameter With Which To Sort Page Data With
   const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
+  const [sortingDept, setSortingDept] = useState<string>("General");
 
 
   // Simulate API call for paginated data
