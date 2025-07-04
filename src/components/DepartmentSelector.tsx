@@ -15,41 +15,61 @@ interface DepartmentSelectorProps {
 const fieldSelectStyles = {
     control: (base: any) => ({
         ...base,
-        backgroundColor: '#DD6B20',
-        color: 'white',
-        borderColor: '#C05621',
-        fontSize: '0.75rem', // xs (12px)
-        fontWeight: '600', // semibold
+        backgroundColor: 'gray.100',
+        borderColor: 'gray.300',
+        borderRadius: 'md',
+        boxShadow: 'sm',
+        minHeight: '40px',
+        '&:hover': {
+            borderColor: 'gray.400'
+        }
+    }),
+    option: (base: any, state: any) => ({
+        ...base,
+        backgroundColor: state.isSelected ? 'orange.100' : 'white',
+        color: 'gray.800',
+        '&:hover': {
+            backgroundColor: 'gray.100'
+        }
     }),
     singleValue: (base: any) => ({
         ...base,
-        color: 'white'
+        color: 'gray.800'
     }),
     placeholder: (base: any) => ({
         ...base,
-        color: 'white'
+        color: 'gray.500'
     }),
-    // ... rest of field select styles ...
 };
 
 const deptSelectStyles = {
     control: (base: any) => ({
         ...base,
-        backgroundColor: '#805AD5',
-        color: 'white',
-        borderColor: '#6B46C1',
-        fontSize: '0.75rem', // xs (12px)
-        fontWeight: '600', // semibold
+        backgroundColor: 'gray.100',
+        borderColor: 'gray.300',
+        borderRadius: 'md',
+        boxShadow: 'sm',
+        minHeight: '40px',
+        '&:hover': {
+            borderColor: 'gray.400'
+        }
+    }),
+    option: (base: any, state: any) => ({
+        ...base,
+        backgroundColor: state.isSelected ? 'purple.100' : 'white',
+        color: 'gray.800',
+        '&:hover': {
+            backgroundColor: 'gray.100'
+        }
     }),
     singleValue: (base: any) => ({
         ...base,
-        color: 'white'
+        color: 'gray.800'
     }),
     placeholder: (base: any) => ({
         ...base,
-        color: 'white'
+        color: 'gray.500'
     }),
-    // ... rest of dept select styles ...
 };
 
 export const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({ departmentName, onDepartmentChange }) => {
