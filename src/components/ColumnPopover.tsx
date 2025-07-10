@@ -31,7 +31,12 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
         label: name
     }));
 
-
+    const handlePopoverOpen = () => {
+        setCurrentCID(departmentCID || "general");
+        setCurrentDept(departmentName || "General");
+        setCurrentColumnType(columnType);
+        setModifiedContent(false);
+    };
 
     useEffect(() => {
         if (!departmentName || !departmentCID) {
@@ -80,7 +85,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
 
 
     return (
-        <Popover onClose={() => { setModifiedContent(false) }}>
+        <Popover onOpen={handlePopoverOpen} onClose={() => { setModifiedContent(false) }}>
             {({ isOpen }) => (
                 <>
                     <PopoverTrigger>
