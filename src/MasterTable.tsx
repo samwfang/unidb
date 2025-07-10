@@ -109,12 +109,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   //Selected Column Types (Default: Location, Grad Rate, Total Students)
   const [columnTypes, setColumnTypes] = useState<ColumnType[]>([ColumnType.Location, ColumnType.GraduationRate, ColumnType.TotalStudents]);
   //Selected Department for Each Column
-  const [columnDepts, setColumnDepts] = useState<{ value: string, label: string }[]>([{ value: "General", label: "General" },
-  { value: "General", label: "General" }, { value: "General", label: "General" }]);
+  const [columnDepts, setColumnDepts] = useState<{ value: string, label: string }[]>([{ value: "general", label: "General" },
+  { value: "general", label: "General" }, { value: "general", label: "General" }]);
 
   //Current Parameter With Which To Sort Page Data With
   const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
-  const [sortingDept, setSortingDept] = useState<string>("General");
+  const [sortingDept, setSortingDept] = useState<string>("general");
+  const [sortingExtra, setSortingExtra] = useState<string>("greatest");
 
 
   // Simulate API call for paginated data
@@ -146,7 +147,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 average_class_size: '550'
               },
               dept_contents: [
-                { cip: "1107", department_name: "Computer Science", content: `CS department info for University ${globalIndex + 1}` },
+                { cip: "1107", department_name: "Computer Science", total_students: '2100', content: `CS department info for University ${globalIndex + 1}` },
                 { cip: "2601", department_name: "Biology", content: `Biology department info for University ${globalIndex + 1}` },
                 { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${globalIndex + 1}` }
               ]
@@ -246,18 +247,28 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   // SORTING AND COLUMN CHANGE OPERATIONS FOR OTHER COLUMNS
 
-  const handleApplySort = (sortOption: string) => {
+  const handleApplySort = (index: number, newCID: string, newDept: string, sortOption: string) => {
     // Update your table sorting logic here
     console.log("Applying sort:", sortOption);
-  };
-
-  //Changes the Department Selection for a specific index
-  const handleDepartmentChange = (index: number, newCID: string, newDept: string) => {
     const updatedItems = columnDepts.map((item, i) => 
       i === index ? {value: newCID, label: newDept} : item
     );
     setColumnDepts(updatedItems)
+
   };
+
+  //Changes the Department Selection for a specific index
+  const handleApply = (index: number, newCID: string, newDept: string, newColumnType: ColumnType) => {
+    const updatedItems = columnDepts.map((item, i) => 
+      i === index ? {value: newCID, label: newDept} : item
+    );
+    setColumnDepts(updatedItems)
+    const updatedColumnTypes = columnTypes.map((item, i) => 
+      i === index ? newColumnType : item
+    );
+    setColumnTypes(updatedColumnTypes)
+  };
+
   // TABLE PAGINATION
 
   const nextPage = () => {
@@ -413,13 +424,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               </GridItem>
 
               <GridItem textAlign="center">
-                <ColumnPopover departmentName={columnDepts[0].label} columnType={columnTypes[0]} onDepartmentChange={handleDepartmentChange} onApply={handleApplySort} index={0}/>
+                <ColumnPopover departmentCID={columnDepts[0].value} departmentName={columnDepts[0].label} columnType={columnTypes[0]} onApply={handleApply} onApplyAndSort={handleApplySort} index={0}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                <ColumnPopover departmentName={columnDepts[1].label} columnType={columnTypes[1]} onDepartmentChange={handleDepartmentChange} onApply={handleApplySort} index={1}/>
+                <ColumnPopover departmentCID={columnDepts[1].value} departmentName={columnDepts[1].label} columnType={columnTypes[1]} onApply={handleApply} onApplyAndSort={handleApplySort} index={1}/>
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                <ColumnPopover departmentName={columnDepts[2].label} columnType={columnTypes[2]} onDepartmentChange={handleDepartmentChange} onApply={handleApplySort} index={2}/>
+                <ColumnPopover departmentCID={columnDepts[2].value} departmentName={columnDepts[2].label} columnType={columnTypes[2]} onApply={handleApply} onApplyAndSort={handleApplySort} index={2}/>
               </GridItem>
             </Grid>
 
@@ -442,7 +453,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               }}
             >
               {data.map((item, index) => (
-                <MasterTableRow rank={(currentPage) * pageSize + index + 1} key={item.id} item={item} mode={mode} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
+                <MasterTableRow rank={(currentPage) * pageSize + index + 1} key={item.id} item={item} mode={mode} columnDepts={columnDepts} columnTypes={columnTypes} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
               ))}
             </Accordion>
           </>

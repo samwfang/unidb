@@ -4,17 +4,20 @@ import MTExpandedEntry from './MTExpandedEntry';
 import { UniversityData, UndergradContent, GradContent, Content } from './MasterTable'; // Adjust the path as necessary
 import { ModeType } from './App';
 import { FaUniversity } from 'react-icons/fa';
+import { ColumnType, getColumnData } from './helpers/DepartmentHelper';
 
 // Define the props interface for MasterTableRow
 interface MasterTableRowProps {
   rank: number;
   item: UniversityData;
   mode: ModeType;
+  columnDepts: { value: string, label: string }[];
+  columnTypes: ColumnType[];
   toggleMode: () => void;
   onExpand: (id: number) => Promise<Content>;
 }
 
-const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, toggleMode, onExpand }) => {
+const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, columnDepts, columnTypes, toggleMode, onExpand }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -75,9 +78,9 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, toggl
           </GridItem>
 
           {/* Other Columns */}
-          <GridItem textAlign="center">{item.location}</GridItem>
-          <GridItem textAlign="center">{item.content?.undergrad_content?.general_content.graduation_rate}</GridItem>
-          <GridItem textAlign="center">{item.location}</GridItem>
+          <GridItem textAlign="center">{getColumnData(item, columnTypes[0], mode, columnDepts[0].value)}</GridItem>
+          <GridItem textAlign="center">{getColumnData(item, columnTypes[1], mode, columnDepts[1].value)}</GridItem>
+          <GridItem textAlign="center">{getColumnData(item, columnTypes[2], mode, columnDepts[2].value)}</GridItem>
         </Grid>
       </AccordionButton>
 

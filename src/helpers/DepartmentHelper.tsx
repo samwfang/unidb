@@ -1,3 +1,4 @@
+import { ModeType } from "src/App";
 import { GradContent, GradDeptContent, UGradDeptContent, UndergradContent, UniversityData } from "../MasterTable";
 
 
@@ -67,17 +68,17 @@ export const getColumnDescription = (columnType: ColumnType): string => {
 export const getColumnData = (
   item: UniversityData,
   columnType: ColumnType,
-  mode: 'undergrad' | 'grad',
+  mode: ModeType,
   departmentCip?: string
 ): string => {
   let content: UndergradContent | GradContent | undefined;
-  if (mode === 'undergrad') {
+  if (mode === ModeType.Undergrad) {
     content = item.content?.undergrad_content;
   } else {
     content = item.content?.grad_content;
   }
 
-  if (departmentCip) {
+  if (departmentCip && departmentCip != "general") {
     //Find Department Based on Department CIP
     const dept = content?.dept_contents?.find(d => d.cip === departmentCip);
 

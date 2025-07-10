@@ -2,25 +2,27 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Popover, PopoverTrigger, PopoverContent, PopoverBody, Menu, MenuButton, MenuList, MenuItem, Portal, Text, FormControl, Box } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { CIP_TO_CLASSIFICATION, ColumnType, ExtraSortType, SortType, getColumnDescription, getColumnDisplayName, cipToClassificationName } from 'src/helpers/DepartmentHelper';
+import { CIP_TO_CLASSIFICATION, ColumnType, ExtraSortType, SortType, getColumnDescription, getColumnDisplayName, cipToClassificationName, canBeDepartmentColumn } from 'src/helpers/DepartmentHelper';
 import ReactSelect from 'react-select';
 import DepartmentSelector from './DepartmentSelector';
 
 
 interface ColumnPopoverProps {
-    departmentName: string | null,
+    departmentCID: string;
+    departmentName: string,
     columnType: ColumnType;
-    onDepartmentChange: (index: number, newCID: string, newName: string) => void;
-    onApply: (sortOption: string) => void;
+    onApply: (index: number, newCID: string, newName: string, newColumnType: ColumnType) => void;
+    onApplyAndSort: (index: number, newCID: string, newDept: string, newColumnType: ColumnType, sortOption: string) => void;
     index: number;
 }
 
-const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentName, columnType, onDepartmentChange, onApply }) => {
+const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, departmentName, columnType, onApply: onApply, onApplyAndSort: onApplyAndSort }) => {
 
-    const [sortOption, setSortOption] = useState<string>("greatest");
+    const [sortExtraOption, setSortExtraOption] = useState<string>("greatest");
     const [currentField, setCurrentField] = useState<string>("General");
     const [currentCID, setCurrentCID] = useState<string>("general");
     const [currentDept, setCurrentDept] = useState<string>("General");
+    const [currentColumnType, setCurrentColumnType] = useState<ColumnType>(columnType);
     const [modifiedContent, setModifiedContent] = useState<boolean>(false);
 
     // Generate classification options from CIP_TO_CLASSIFICATION
@@ -32,23 +34,48 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentName, co
 
 
     useEffect(() => {
-        if (!departmentName) {
+        if (!departmentName || !departmentCID) {
+            departmentCID = "general";
             departmentName = "General";
         }
 
         setCurrentCID("general");
         setCurrentDept(departmentName);
+        setCurrentColumnType(columnType);
     }, []);
 
     const handleApply = () => {
-        onDepartmentChange(index, currentCID, currentDept);
-        onApply(sortOption); // Forward to parent
+        onApply(index, currentCID, currentDept, currentColumnType);
+    };
+
+    const handleApplyAndSort = () => {
+        if (modifiedContent){
+            onApplyAndSort(index, currentCID, currentDept, currentColumnType, sortExtraOption); // Forward to parent
+        }
+        else {
+            onApplyAndSort(index, departmentCID, departmentName, columnType, sortExtraOption);
+        }
+        
     };
 
     const handleDepartmentChange = (newCID: string, newName: string) => {
         setModifiedContent(true);
         setCurrentCID(newCID);
         setCurrentDept(newName);
+    };
+
+    //Generate options to select Column Type from all allowed column type options
+    const columnTypeOptions = Object.values(ColumnType).map(type => ({
+        value: type,
+        label: getColumnDisplayName(type),
+        isDisabled: !canBeDepartmentColumn(type) && currentDept !== "General"
+    }));
+
+    const handleColumnTypeChange = (selectedOption: any) => {
+        if (selectedOption) {
+            setCurrentColumnType(selectedOption.value);
+            setModifiedContent(true);
+        }
     };
 
 
@@ -118,6 +145,28 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentName, co
                                             <DepartmentSelector departmentName={currentDept} onDepartmentChange={handleDepartmentChange} />
                                         </Box>
                                         <Text fontWeight="bold"> Sort By: </Text>
+                                        <Text fontWeight="bold" mb={2}>Column Type:</Text>
+                                <ReactSelect
+                                    options={columnTypeOptions}
+                                    value={{ value: currentColumnType, label: getColumnDisplayName(currentColumnType) }}
+                                    onChange={handleColumnTypeChange}
+                                    styles={{
+                                        control: (base) => ({
+                                            ...base,
+                                            backgroundColor: 'white',
+                                            borderColor: 'gray.300',
+                                            _hover: { borderColor: 'gray.400' }
+                                        }),
+                                        option: (base, { isDisabled }) => ({
+                                            ...base,
+                                            color: isDisabled ? 'gray.400' : 'gray.800',
+                                            cursor: isDisabled ? 'not-allowed' : 'default'
+                                        })
+                                    }}
+                                />
+                                <Text fontSize="sm" color="gray.600" mb={4}>
+                                    {getColumnDescription(currentColumnType)}
+                                </Text>
                                         <FormControl mt={2}>
                                             <ReactSelect
                                                 options={[
@@ -145,7 +194,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentName, co
                                                     })
                                                 }}
                                                 onChange={(selected) => {
-                                                    setSortOption(selected?.value || "greatest")
+                                                    setSortExtraOption(selected?.value || "greatest")
                                                     setModifiedContent(true)
                                                 }}
                                             />
@@ -159,6 +208,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentName, co
                                         colorScheme="blue"
                                         size="sm"
                                         zIndex="overlay"
+                                        onClick={handleApplyAndSort}
                                     >
                                         {modifiedContent ? "Apply and Sort By" : "Sort By Column"}
                                     </Button>
