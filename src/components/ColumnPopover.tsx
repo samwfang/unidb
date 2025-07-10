@@ -151,18 +151,23 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                     value={{ value: currentColumnType, label: getColumnDisplayName(currentColumnType) }}
                                     onChange={handleColumnTypeChange}
                                     styles={{
-                                        control: (base) => ({
-                                            ...base,
-                                            backgroundColor: 'white',
-                                            borderColor: 'gray.300',
-                                            _hover: { borderColor: 'gray.400' }
-                                        }),
-                                        option: (base, { isDisabled }) => ({
-                                            ...base,
-                                            color: isDisabled ? 'gray.400' : 'gray.800',
-                                            cursor: isDisabled ? 'not-allowed' : 'default'
-                                        })
-                                    }}
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        backgroundColor: 'gray.50',
+                                                        borderColor: '#E2E8F0',
+                                                        _hover: { borderColor: '#CBD5E0' }
+                                                    }),
+                                                    option: (base) => ({
+                                                        ...base,
+                                                        backgroundColor: 'white',
+                                                        color: 'black',
+                                                        _hover: { backgroundColor: '#F7FAFC' }
+                                                    }),
+                                                    menu: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999 // Ensure dropdown appears above everything
+                                                    })
+                                                }}
                                 />
                                 <Text fontSize="sm" color="gray.600" mb={4}>
                                     {getColumnDescription(currentColumnType)}
