@@ -82,7 +82,7 @@ function App() {
     <div className="App">
       {/* Gradient Background to make it look nice and spiffy! */}
       <Box minH="100vh"
-        bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, teal.50, teal.100)"} // Chakra's gradient syntax
+        bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, gray.50, gray.200)"} // Chakra's gradient syntax
         p={4}
       >
         {/* Top Header: Only Display when ShowHeader == True */}

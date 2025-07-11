@@ -19,7 +19,7 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
             opacity={showHeader ? 1 : 0}
             transition="opacity 0.3s ease"
             pointerEvents={showHeader ? 'auto' : 'none'}
-            bg={mode === ModeType.Undergrad ? "blue.50" : "teal.50"}
+            bg={mode === ModeType.Undergrad ? "blue.50" : "gray.50"}
             boxShadow="sm"
             p={4}
         >

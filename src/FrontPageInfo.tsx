@@ -34,18 +34,18 @@ const FrontPageInfo: React.FC<FrontPageInfoProps> = ({ mode, onModeChange }) => 
 
                 </Flex>
                 <Flex alignItems="center" gap={4}>
-                    <Button bg={mode === 'undergrad' ? "blue.500" : "green.500"}
+                    <Button bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
                         color="white"
                         _hover={{
-                            bg: mode === 'undergrad' ? "blue.600" : "green.600",
+                            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
                             color: 'white',
                         }}>
                         Find Colleges
                     </Button>
-                    <Button bg={mode === 'undergrad' ? "blue.500" : "green.500"}
+                    <Button bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
                         color="white"
                         _hover={{
-                            bg: mode === 'undergrad' ? "blue.600" : "green.600",
+                            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
                             color: 'white',
                         }}>
                         Find Faculty
