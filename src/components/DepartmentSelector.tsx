@@ -96,7 +96,7 @@ export const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({ departme
 
      const handleReset = () => {
         setSelectedField(null);
-        setSelectedDept({value: "General", label: "General"});
+        setSelectedDept({value: "general", label: "General"});
         setAllowSubmit(true);
         
         if (fieldSelectRef.current) {
@@ -107,7 +107,7 @@ export const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({ departme
     //change field selection depending on which option is selected, and fetch departments from that field
     const handleFieldChange = async (selectedOption: any) => {
         if (selectedOption.value === "general") {
-            setSelectedDept({value: "General", label: "General"});
+            setSelectedDept({value: "general", label: "General"});
             setAllowSubmit(true);
             setSelectedField(null);
             return;
