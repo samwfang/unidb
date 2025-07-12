@@ -70,7 +70,7 @@ const FrontPageInfo: React.FC<FrontPageInfoProps> = ({ mode, onModeChange }) => 
                                     colorScheme={isUndergrad ? 'blue' : 'green'}
                                     sx={{
                                       '.chakra-switch__track': {
-                                        bg: isUndergrad ? 'blue.500' : 'green.500',
+                                        bg: isUndergrad ? 'blue.500' : 'gray.500',
                                       },
                                     }}
                                   />

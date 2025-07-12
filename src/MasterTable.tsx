@@ -315,10 +315,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         <Button
           onClick={() => { setExpandedIndex([]) }}
           isDisabled={Array.isArray(expandedIndex) ? !expandedIndex.length : true}
-          bg={mode === 'undergrad' ? "blue.500" : "green.500"}
+          bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
           color="white"
           _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "green.600",
+            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
             color: 'white',
           }}
         >
@@ -331,7 +331,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           <Flex justifyContent="center" alignItems="center" minH="100px">
             <Spinner
               size="xl"
-              color={mode === 'undergrad' ? "blue.500" : "green.500"}
+              color={mode === 'undergrad' ? "blue.500" : "gray.600"}
               thickness='4px'
             />
           </Flex>
@@ -462,10 +462,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
       <Flex justifyContent="space-between" alignItems="center" mt="4">
         <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}
-          bg={mode === 'undergrad' ? "blue.500" : "green.500"}
+          bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
           color="white"
           _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "green.600",
+            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
             color: 'white',
           }}>
           Back
@@ -494,10 +494,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
           </Tooltip>
           <Button onClick={goToPage} isDisabled={isLoading}
-            bg={mode === 'undergrad' ? "blue.500" : "green.500"}
+            bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
             color="white"
             _hover={{
-              bg: mode === 'undergrad' ? "blue.600" : "green.600",
+              bg: mode === 'undergrad' ? "blue.600" : "gray.800",
               color: 'white',
             }}>
             Go
@@ -505,10 +505,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         </Flex>
 
         <Button onClick={nextPage} isDisabled={(currentPage + 1) * pageSize >= totalItems || isLoading}
-          bg={mode === 'undergrad' ? "blue.500" : "green.500"}
+          bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
           color="white"
           _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "green.600",
+            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
             color: 'white',
           }}>
           Next

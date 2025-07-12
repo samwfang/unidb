@@ -180,9 +180,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
         <Tabs index={activeTabIndex} isLazy onChange={setActiveTabIndex}>
           <TabList flexWrap="wrap">
             <Tab _selected={{
-            color: mode === 'undergrad' ? "blue.500" : "green.500", // Change text color
+            color: mode === 'undergrad' ? "blue.500" : "gray.600", // Change text color
             borderBottom: '2px solid', // Ensure there is an underline
-            borderColor: mode === 'undergrad' ? "blue.500" : "green.500", // Change underline color
+            borderColor: mode === 'undergrad' ? "blue.500" : "gray.600", // Change underline color
           }}><b>General</b></Tab>
           {/* Render Tabs with names of Selected Departments*/}
           {selectedDepts.map((deptName, index) => (
@@ -190,9 +190,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
               <Tab
                 whiteSpace="nowrap"
                 _selected={{
-                  color: mode === 'undergrad' ? "blue.500" : "green.500",
+                  color: mode === 'undergrad' ? "blue.500" : "gray.600",
                   borderBottom: '2px solid',
-                  borderColor: mode === 'undergrad' ? "#blue.500" : "green.500",
+                  borderColor: mode === 'undergrad' ? "#blue.500" : "gray.600",
                 }}
               >
                 {deptName || <i>New Tab</i>}

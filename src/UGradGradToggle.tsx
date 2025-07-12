@@ -19,7 +19,7 @@ const ModeToggle: React.FC<ModeToggleProps> = ({ mode, onToggle }) => {
         colorScheme={isUndergrad ? 'blue' : 'green'}
         sx={{
           '.chakra-switch__track': {
-            bg: isUndergrad ? 'blue.500' : 'green.500',
+            bg: isUndergrad ? 'blue.500' : 'gray.500',
           },
         }}
       />

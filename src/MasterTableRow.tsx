@@ -50,7 +50,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
       <AccordionButton
         onClick={handleExpand}
         borderRadius="lg"
-        _expanded={{ bg: mode === 'undergrad' ? "blue.500" : "green.500", color: 'white' ,
+        _expanded={{ bg: mode === 'undergrad' ? "blue.500" : "gray.600", color: 'white' ,
           "& > div > div:first-of-type > div": {  // Targets the rank Box
                         color: "white"
                     }
@@ -62,7 +62,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
           <GridItem textAlign="center">
                         <Box 
                             fontWeight="bold" 
-                            color={mode === 'undergrad' ? "blue.500" : "green.500"}
+                            color={mode === 'undergrad' ? "blue.500" : "gray.600"}
                             _expanded={{ color: "white" }}
                             fontSize="lg"
                         >
