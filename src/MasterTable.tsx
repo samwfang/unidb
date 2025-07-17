@@ -120,13 +120,14 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   // Simulate API call for paginated data
   // In Real API Call, I will also need to return data based on sortingParameter!
-  const fetchPageData = async (page: number, sortingParameter: SortType) => {
+  const fetchPageData = async (page: number, sortingParameter: SortType, sortingDept: string, sortingExtraParam: string) => {
     setIsLoading(true);
     setExpandedIndex([]); // Reset expanded indices
 
     try {
       // Simulate a network delay
       await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log("Fetching new Data with Page #" + page + ", Column = " + sortingParameter + " Dept = " + sortingDept + " Extra = " + sortingExtraParam);
 
       // Simulated API response
       const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
@@ -206,8 +207,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   // -Size of each page is altered (could be inefficient but IDGAF ;))
   // -Sorting Parameter Changes
   useEffect(() => {
-    fetchPageData(currentPage, sortingParam);
-  }, [currentPage, pageSize, sortingParam]);
+    fetchPageData(currentPage, sortingParam, sortingDept, sortingExtra);
+  }, [currentPage, pageSize, sortingParam, sortingDept, sortingExtra]);
 
 
   // Track previous page size
@@ -259,7 +260,16 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     );
     setColumnTypes(updatedColumnTypes)
 
-    //
+    //Then Set Sorting Parameters
+    
+    //Set Base Sorting Param as the Column Type of the current Column
+    setSortingParam(newColumnType)
+
+    //Set Sorting Department as Department of current Column
+    setSortingDept(newCID)
+
+    //Set Sorting Extra parameter
+    setSortingExtra(sortOption)
 
   };
 
