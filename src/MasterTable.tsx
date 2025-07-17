@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem, Menu, FormControl, Select } from '@chakra-ui/react';
+import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem, Menu, FormControl, Select, Badge } from '@chakra-ui/react';
 import { Popover, PopoverTrigger, PopoverContent, PopoverBody, Portal } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { ModeType } from './App';
@@ -247,23 +247,29 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   // SORTING AND COLUMN CHANGE OPERATIONS FOR OTHER COLUMNS
 
-  const handleApplySort = (index: number, newCID: string, newDept: string, sortOption: string) => {
-    // Update your table sorting logic here
+  const handleApplySort = (index: number, newCID: string, newDept: string, newColumnType: ColumnType, sortOption: string) => {
+    // First Apply 
     console.log("Applying sort:", sortOption);
-    const updatedItems = columnDepts.map((item, i) => 
-      i === index ? {value: newCID, label: newDept} : item
+    const updatedItems = columnDepts.map((item, i) =>
+      i === index ? { value: newCID, label: newDept } : item
     );
     setColumnDepts(updatedItems)
+    const updatedColumnTypes = columnTypes.map((item, i) =>
+      i === index ? newColumnType : item
+    );
+    setColumnTypes(updatedColumnTypes)
+
+    //
 
   };
 
   //Changes the Department Selection for a specific index
   const handleApply = (index: number, newCID: string, newDept: string, newColumnType: ColumnType) => {
-    const updatedItems = columnDepts.map((item, i) => 
-      i === index ? {value: newCID, label: newDept} : item
+    const updatedItems = columnDepts.map((item, i) =>
+      i === index ? { value: newCID, label: newDept } : item
     );
     setColumnDepts(updatedItems)
-    const updatedColumnTypes = columnTypes.map((item, i) => 
+    const updatedColumnTypes = columnTypes.map((item, i) =>
       i === index ? newColumnType : item
     );
     setColumnTypes(updatedColumnTypes)
@@ -338,8 +344,55 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         ) : (
           <>
             {/* Column Headers */}
-            <Grid templateColumns="50px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="flex-end" mb={2} px={4}>
-              <GridItem textAlign="center"></GridItem>
+            <Grid templateColumns="75px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="flex-end" mb={2} px={4}>
+              <GridItem textAlign="center">
+                <Popover>
+                  {({ isOpen }) => (
+                    <>
+                      <PopoverTrigger>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          fontWeight="bold"
+                          rightIcon={<ChevronDownIcon />}
+                          bg={isOpen ? "gray.100" : "transparent"}
+                          borderColor="gray.200"
+                          _hover={{ bg: 'gray.100' }}
+                          zIndex={isOpen ? "popover" : "auto"}
+                        >
+                          Score
+                        </Button>
+                      </PopoverTrigger>
+                      {isOpen && (
+                        <Box
+                          position="absolute"
+                          top={0}
+                          left={0}
+                          right={0}
+                          bottom={0}
+                          backdropFilter="blur(12px)"
+                          bg="rgba(0, 0, 0, 0.1)"
+                          zIndex="overlay"
+                          borderRadius="lg"
+                          pointerEvents="none"
+                        />
+                      )}
+                      <Portal>
+                        <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
+                          boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
+                          <PopoverBody p={4}>
+                            <Text fontSize="xl" fontWeight="bold">Score</Text>
+                            <Badge variant="subtle" colorScheme="pink" ml={1}>
+                                                        WIP
+                                                    </Badge>
+                            <Text>Custom Scoring is currently a feature in progress!</Text>
+                          </PopoverBody>
+                        </PopoverContent>
+                      </Portal>
+                    </>
+                  )}
+                </Popover>
+              </GridItem>
               <GridItem textAlign="left">
                 <Popover>
                   {({ isOpen }) => (
@@ -424,13 +477,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               </GridItem>
 
               <GridItem textAlign="center">
-                <ColumnPopover departmentCID={columnDepts[0].value} departmentName={columnDepts[0].label} columnType={columnTypes[0]} onApply={handleApply} onApplyAndSort={handleApplySort} index={0}/>
+                <ColumnPopover departmentCID={columnDepts[0].value} departmentName={columnDepts[0].label} columnType={columnTypes[0]} onApply={handleApply} onApplyAndSort={handleApplySort} index={0} />
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                <ColumnPopover departmentCID={columnDepts[1].value} departmentName={columnDepts[1].label} columnType={columnTypes[1]} onApply={handleApply} onApplyAndSort={handleApplySort} index={1}/>
+                <ColumnPopover departmentCID={columnDepts[1].value} departmentName={columnDepts[1].label} columnType={columnTypes[1]} onApply={handleApply} onApplyAndSort={handleApplySort} index={1} />
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                <ColumnPopover departmentCID={columnDepts[2].value} departmentName={columnDepts[2].label} columnType={columnTypes[2]} onApply={handleApply} onApplyAndSort={handleApplySort} index={2}/>
+                <ColumnPopover departmentCID={columnDepts[2].value} departmentName={columnDepts[2].label} columnType={columnTypes[2]} onApply={handleApply} onApplyAndSort={handleApplySort} index={2} />
               </GridItem>
             </Grid>
 

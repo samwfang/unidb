@@ -46,7 +46,7 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
                             The University Database
                         </Text>
                         <Badge variant="subtle" colorScheme="pink" ml={1}>
-                            ALPHA
+                            DEMO
                         </Badge>
                     </Flex>
                     <Box>

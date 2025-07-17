@@ -141,16 +141,15 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                             boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
                             <PopoverBody p={4}>
                                 <Text fontSize="xl" fontWeight="bold"> {getColumnDisplayName(columnType)}</Text>
-                                <Text> {getColumnDescription(columnType)} </Text>
-                                <Text fontWeight="bold" mt={2}> Change Column Display: </Text>
+                                <Text color="gray.600"> {getColumnDescription(columnType)} </Text>
+
                                 {isOpen && (
                                     <Box position="relative" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
-                                        <Text fontWeight="bold"> Select Department: </Text>
+                                        <Text color="gray.600"> Select Department: </Text>
                                         <Box position="relative" zIndex="popover">
                                             <DepartmentSelector departmentName={currentDept} onDepartmentChange={handleDepartmentChange} />
                                         </Box>
-                                        <Text fontWeight="bold"> Sort By: </Text>
-                                        <Text fontWeight="bold" mb={2}>Column Type:</Text>
+                                        <Text color="gray.600" mt={2}>Column Type:</Text>
                                 <ReactSelect
                                     options={columnTypeOptions}
                                     value={{ value: currentColumnType, label: getColumnDisplayName(currentColumnType) }}
@@ -177,7 +176,8 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 <Text fontSize="sm" color="gray.600" mb={4}>
                                     {getColumnDescription(currentColumnType)}
                                 </Text>
-                                        <FormControl mt={2}>
+                                <Text color="gray.600" mt={2}>Sort From:</Text>   
+                                        <FormControl>
                                             <ReactSelect
                                                 options={[
                                                     { value: "greatest", label: 'High to Low' },
