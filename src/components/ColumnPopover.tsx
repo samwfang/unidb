@@ -1,6 +1,6 @@
 // ColumnPopover.tsx
 import React, { useEffect, useState } from 'react';
-import { Button, Popover, PopoverTrigger, PopoverContent, PopoverBody, Menu, MenuButton, MenuList, MenuItem, Portal, Text, FormControl, Box } from '@chakra-ui/react';
+import { Button, Popover, PopoverTrigger, PopoverContent, PopoverBody, Menu, MenuButton, MenuList, MenuItem, Portal, Text, FormControl, Box, Badge } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { CIP_TO_CLASSIFICATION, ColumnType, ExtraSortType, SortType, getColumnDescription, getColumnDisplayName, cipToClassificationName, canBeDepartmentColumn } from 'src/helpers/DepartmentHelper';
 import ReactSelect from 'react-select';
@@ -120,7 +120,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 color ={ isSortedBy ? "white" : "black"}
                                 borderColor={"gray.200"}
                                 borderRadius="md"
-                                _hover={{ bg: isSortedBy ? 'green.200' : 'gray.100',
+                                _hover={{ bg: isSortedBy ? 'green.700' : 'gray.100',
                                     color: isSortedBy ? 'white' : 'black'
                                  }}
                                 zIndex={isOpen ? "popover" : "auto"}
@@ -148,6 +148,9 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                             boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
                             <PopoverBody p={4}>
                                 <Text fontSize="xl" fontWeight="bold"> {getColumnDisplayName(columnType)}</Text>
+                                {isSortedBy && 
+                                    <Badge bg="green.200">Currently Sorted By</Badge>
+                                }
                                 <Text color="gray.600"> {getColumnDescription(columnType)} </Text>
 
                                 {isOpen && (
