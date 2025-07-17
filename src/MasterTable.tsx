@@ -104,30 +104,30 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   //Selected Column Options
   const [selectedNameSortingOption, setSelectedNameSortingOption] = useState<SingleValue<{ value: string; label: string }>>(null);
-  //Temporary Column Type selection in popover that will apply when apply is pressed!
-  const [selectedTempColumnType, setSelectedTempColumnType] = useState<ColumnType[]>([ColumnType.Location, ColumnType.GraduationRate, ColumnType.TotalStudents]);
   //Selected Column Types (Default: Location, Grad Rate, Total Students)
   const [columnTypes, setColumnTypes] = useState<ColumnType[]>([ColumnType.Location, ColumnType.GraduationRate, ColumnType.TotalStudents]);
   //Selected Department for Each Column
   const [columnDepts, setColumnDepts] = useState<{ value: string, label: string }[]>([{ value: "general", label: "General" },
   { value: "general", label: "General" }, { value: "general", label: "General" }]);
+  //Which column is sorted by
+  const [sortedByCol, setSortedByCol] = useState<number>(0);
 
   //Current Parameter With Which To Sort Page Data With
   const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
-  const [sortingDept, setSortingDept] = useState<string>("general");
+  const [sortingDeptCID, setSortingDeptCID] = useState<string>("general");
   const [sortingExtra, setSortingExtra] = useState<string>("greatest");
 
 
   // Simulate API call for paginated data
   // In Real API Call, I will also need to return data based on sortingParameter!
-  const fetchPageData = async (page: number, sortingParameter: SortType, sortingDept: string, sortingExtraParam: string) => {
+  const fetchPageData = async (page: number, sortingParameter: SortType, sortingDeptCID: string, sortingExtraParam: string) => {
     setIsLoading(true);
     setExpandedIndex([]); // Reset expanded indices
 
     try {
       // Simulate a network delay
       await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log("Fetching new Data with Page #" + page + ", Column = " + sortingParameter + " Dept = " + sortingDept + " Extra = " + sortingExtraParam);
+      console.log("Fetching new Data with Page #" + page + ", Column = " + sortingParameter + " Dept = " + sortingDeptCID + " Extra = " + sortingExtraParam);
 
       // Simulated API response
       const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
@@ -207,8 +207,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   // -Size of each page is altered (could be inefficient but IDGAF ;))
   // -Sorting Parameter Changes
   useEffect(() => {
-    fetchPageData(currentPage, sortingParam, sortingDept, sortingExtra);
-  }, [currentPage, pageSize, sortingParam, sortingDept, sortingExtra]);
+    fetchPageData(currentPage, sortingParam, sortingDeptCID, sortingExtra);
+  }, [currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra]);
 
 
   // Track previous page size
@@ -266,10 +266,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     setSortingParam(newColumnType)
 
     //Set Sorting Department as Department of current Column
-    setSortingDept(newCID)
+    setSortingDeptCID(newCID)
 
     //Set Sorting Extra parameter
     setSortingExtra(sortOption)
+
+    //Update
+    setSortedByCol(index + 2)
 
   };
 
@@ -487,13 +490,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               </GridItem>
 
               <GridItem textAlign="center">
-                <ColumnPopover departmentCID={columnDepts[0].value} departmentName={columnDepts[0].label} columnType={columnTypes[0]} onApply={handleApply} onApplyAndSort={handleApplySort} index={0} />
+                <ColumnPopover departmentCID={columnDepts[0].value} sortedByCol={sortedByCol} departmentName={columnDepts[0].label} columnType={columnTypes[0]} onApply={handleApply} onApplyAndSort={handleApplySort} index={0} />
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                <ColumnPopover departmentCID={columnDepts[1].value} departmentName={columnDepts[1].label} columnType={columnTypes[1]} onApply={handleApply} onApplyAndSort={handleApplySort} index={1} />
+                <ColumnPopover departmentCID={columnDepts[1].value} sortedByCol={sortedByCol} departmentName={columnDepts[1].label} columnType={columnTypes[1]} onApply={handleApply} onApplyAndSort={handleApplySort} index={1} />
               </GridItem>
               <GridItem textAlign="center" fontWeight="bold">
-                <ColumnPopover departmentCID={columnDepts[2].value} departmentName={columnDepts[2].label} columnType={columnTypes[2]} onApply={handleApply} onApplyAndSort={handleApplySort} index={2} />
+                <ColumnPopover departmentCID={columnDepts[2].value} sortedByCol={sortedByCol} departmentName={columnDepts[2].label} columnType={columnTypes[2]} onApply={handleApply} onApplyAndSort={handleApplySort} index={2} />
               </GridItem>
             </Grid>
 

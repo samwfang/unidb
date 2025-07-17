@@ -14,9 +14,10 @@ interface ColumnPopoverProps {
     onApply: (index: number, newCID: string, newName: string, newColumnType: ColumnType) => void;
     onApplyAndSort: (index: number, newCID: string, newDept: string, newColumnType: ColumnType, sortOption: string) => void;
     index: number;
+    sortedByCol: number;
 }
 
-const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, departmentName, columnType, onApply: onApply, onApplyAndSort: onApplyAndSort }) => {
+const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, departmentName, columnType, onApply: onApply, onApplyAndSort: onApplyAndSort, sortedByCol }) => {
 
     const [sortExtraOption, setSortExtraOption] = useState<string>("greatest");
     const [currentField, setCurrentField] = useState<string>("General");
@@ -30,6 +31,8 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
         value: cipCode,
         label: name
     }));
+
+    const isSortedBy: boolean = sortedByCol - 2 === index ? true : false;
 
     const handlePopoverOpen = () => {
         setCurrentCID(departmentCID || "general");
@@ -54,13 +57,13 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
     };
 
     const handleApplyAndSort = () => {
-        if (modifiedContent){
+        if (modifiedContent) {
             onApplyAndSort(index, currentCID, currentDept, currentColumnType, sortExtraOption); // Forward to parent
         }
         else {
             onApplyAndSort(index, departmentCID, departmentName, columnType, sortExtraOption);
         }
-        
+
     };
 
     const handleDepartmentChange = (newCID: string, newName: string) => {
@@ -113,9 +116,13 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 size="sm"
                                 fontWeight="bold"
                                 rightIcon={<ChevronDownIcon />}
-                                bg={isOpen ? "gray.100" : "transparent"}
-                                borderColor="gray.200"
-                                _hover={{ bg: 'gray.100' }}
+                                bg={isSortedBy ? "green.500" : isOpen ? "gray.100" : "transparent"}
+                                color ={ isSortedBy ? "white" : "black"}
+                                borderColor={"gray.200"}
+                                borderRadius="md"
+                                _hover={{ bg: isSortedBy ? 'green.200' : 'gray.100',
+                                    color: isSortedBy ? 'white' : 'black'
+                                 }}
                                 zIndex={isOpen ? "popover" : "auto"}
                             >
                                 {getColumnDisplayName(columnType)}
@@ -150,33 +157,33 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                             <DepartmentSelector departmentName={currentDept} onDepartmentChange={handleDepartmentChange} />
                                         </Box>
                                         <Text color="gray.600" mt={2}>Column Type:</Text>
-                                <ReactSelect
-                                    options={columnTypeOptions}
-                                    value={{ value: currentColumnType, label: getColumnDisplayName(currentColumnType) }}
-                                    onChange={handleColumnTypeChange}
-                                    styles={{
-                                                    control: (base) => ({
-                                                        ...base,
-                                                        backgroundColor: 'gray.50',
-                                                        borderColor: '#E2E8F0',
-                                                        _hover: { borderColor: '#CBD5E0' }
-                                                    }),
-                                                    option: (base) => ({
-                                                        ...base,
-                                                        backgroundColor: 'white',
-                                                        color: 'black',
-                                                        _hover: { backgroundColor: '#F7FAFC' }
-                                                    }),
-                                                    menu: (base) => ({
-                                                        ...base,
-                                                        zIndex: 9999 // Ensure dropdown appears above everything
-                                                    })
-                                                }}
-                                />
-                                <Text fontSize="sm" color="gray.600" mb={4}>
-                                    {getColumnDescription(currentColumnType)}
-                                </Text>
-                                <Text color="gray.600" mt={2}>Sort From:</Text>   
+                                        <ReactSelect
+                                            options={columnTypeOptions}
+                                            value={{ value: currentColumnType, label: getColumnDisplayName(currentColumnType) }}
+                                            onChange={handleColumnTypeChange}
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    backgroundColor: 'gray.50',
+                                                    borderColor: '#E2E8F0',
+                                                    _hover: { borderColor: '#CBD5E0' }
+                                                }),
+                                                option: (base) => ({
+                                                    ...base,
+                                                    backgroundColor: 'white',
+                                                    color: 'black',
+                                                    _hover: { backgroundColor: '#F7FAFC' }
+                                                }),
+                                                menu: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999 // Ensure dropdown appears above everything
+                                                })
+                                            }}
+                                        />
+                                        <Text fontSize="sm" color="gray.600" mb={4}>
+                                            {getColumnDescription(currentColumnType)}
+                                        </Text>
+                                        <Text color="gray.600" mt={2}>Sort From:</Text>
                                         <FormControl>
                                             <ReactSelect
                                                 options={[
