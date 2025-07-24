@@ -15,6 +15,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
+    "chakra-ui-simple-autocomplete": "^2.3.0",
     "framer-motion": "^6.5.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

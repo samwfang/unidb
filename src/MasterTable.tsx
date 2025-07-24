@@ -4,7 +4,7 @@ import { Popover, PopoverTrigger, PopoverContent, PopoverBody, Portal } from '@c
 import MasterTableRow from './MasterTableRow';
 import { ModeType } from './App';
 import { useSearchParams } from 'react-router-dom';
-import { ChevronDownIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons';
 import ReactSelect, { SingleValue } from 'react-select';
 import { ColumnType, ExtraSortType, SortType } from './helpers/DepartmentHelper';
 import ColumnPopover from './components/ColumnPopover';
@@ -110,7 +110,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const [columnDepts, setColumnDepts] = useState<{ value: string, label: string }[]>([{ value: "general", label: "General" },
   { value: "general", label: "General" }, { value: "general", label: "General" }]);
   //Which column is sorted by
-  const [sortedByCol, setSortedByCol] = useState<number>(0);
+  const [sortedByCol, setSortedByCol] = useState<number>(1);
 
   //Current Parameter With Which To Sort Page Data With
   const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
@@ -239,7 +239,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const applyAlphabeticalSort = () => {
     if (selectedNameSortingOption) {
       // Trust that you will always use a valid SortType as the value of a Sort Option
-      setSortingParam(selectedNameSortingOption.value as SortType)
+      setSortingParam(selectedNameSortingOption.value as SortType);
+      setSortedByCol(1);
       console.log('Selected option:', sortingParam);
     } else {
       console.log('No option selected.');
@@ -261,7 +262,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     setColumnTypes(updatedColumnTypes)
 
     //Then Set Sorting Parameters
-    
+
     //Set Base Sorting Param as the Column Type of the current Column
     setSortingParam(newColumnType)
 
@@ -330,7 +331,24 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
       p={6}
     >
-      <Flex justifyContent="flex-end" mb={4}>
+      <Flex justifyContent="space-between" mb={4}>
+        
+        <Flex flex="1" maxWidth="600px" mr={4}>
+          <Input
+            placeholder="Search Universities..."
+            flex="1"
+            borderColor="gray.300"
+            _hover={{ borderColor: "gray.300" }}
+            _focus={{ borderColor: "blue.400", boxShadow: "outline" }}
+          />
+          <Button
+            ml={2}
+            colorScheme="blue"
+            px={4}
+          >
+            <SearchIcon />
+          </Button>
+        </Flex>
         <Button
           onClick={() => { setExpandedIndex([]) }}
           isDisabled={Array.isArray(expandedIndex) ? !expandedIndex.length : true}
@@ -368,9 +386,14 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           size="sm"
                           fontWeight="bold"
                           rightIcon={<ChevronDownIcon />}
-                          bg={isOpen ? "gray.100" : "transparent"}
-                          borderColor="gray.200"
-                          _hover={{ bg: 'gray.100' }}
+                          bg={sortedByCol == 0 ? "green.500" : isOpen ? "gray.100" : "transparent"}
+                          color={sortedByCol == 0 ? "white" : "black"}
+                          borderColor={"gray.200"}
+                          borderRadius="md"
+                          _hover={{
+                            bg: sortedByCol == 0 ? 'green.700' : 'gray.100',
+                            color: sortedByCol == 0 ? 'white' : 'black'
+                          }}
                           zIndex={isOpen ? "popover" : "auto"}
                         >
                           Score
@@ -396,8 +419,11 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           <PopoverBody p={4}>
                             <Text fontSize="xl" fontWeight="bold">Score</Text>
                             <Badge variant="subtle" colorScheme="pink" ml={1}>
-                                                        WIP
-                                                    </Badge>
+                              WIP
+                            </Badge>
+                            {sortedByCol == 0  &&
+                              <Badge bg="green.200">Currently Sorted By</Badge>
+                            }
                             <Text>Custom Scoring is currently a feature in progress!</Text>
                           </PopoverBody>
                         </PopoverContent>
@@ -416,9 +442,14 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           size="sm"
                           fontWeight="bold"
                           rightIcon={<ChevronDownIcon />}
-                          bg={isOpen ? "gray.100" : "transparent"}
-                          borderColor="gray.200"
-                          _hover={{ bg: 'gray.100' }}
+                          bg={sortedByCol == 1 ? "green.500" : isOpen ? "gray.100" : "transparent"}
+                          color={sortedByCol == 1 ? "white" : "black"}
+                          borderColor={"gray.200"}
+                          borderRadius="md"
+                          _hover={{
+                            bg: sortedByCol == 1 ? 'green.700' : 'gray.100',
+                            color: sortedByCol == 1 ? 'white' : 'black'
+                          }}
                           zIndex={isOpen ? "popover" : "auto"}
                         >
                           University Name
@@ -443,6 +474,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
                           <PopoverBody p={4} >
                             <Text fontSize="xl" fontWeight="bold"> University Name</Text>
+                            {sortedByCol == 1  &&
+                              <Badge bg="green.200">Currently Sorted By</Badge>
+                            }
                             <Text>The most common name for each university.</Text>
                             <Text fontWeight="bold"> Sort By: </Text>
                             {isOpen && (

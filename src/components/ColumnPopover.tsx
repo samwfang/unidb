@@ -52,6 +52,16 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
         setCurrentColumnType(columnType);
     }, []);
 
+    //Fallback in case current department changes from General and a non department specific column is selected (e.g. "Location")
+     useEffect(() => {
+        if (currentDept !== "General" && !canBeDepartmentColumn(currentColumnType)) {
+            // Find first valid column type (fallback to first available)
+            const firstValidType = columnTypeOptions[0]?.value || ColumnType.TotalStudents;
+            setCurrentColumnType(firstValidType);
+            setModifiedContent(true);
+        }
+    }, [currentDept]);
+
     const handleApply = () => {
         onApply(index, currentCID, currentDept, currentColumnType);
     };
@@ -73,11 +83,12 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
     };
 
     //Generate options to select Column Type from all allowed column type options
-    const columnTypeOptions = Object.values(ColumnType).map(type => ({
-        value: type,
-        label: getColumnDisplayName(type),
-        isDisabled: !canBeDepartmentColumn(type) && currentDept !== "General"
-    }));
+     const columnTypeOptions = Object.values(ColumnType)
+        .filter(type => currentDept === "General" || canBeDepartmentColumn(type))
+        .map(type => ({
+            value: type,
+            label: getColumnDisplayName(type)
+        }));
 
     const handleColumnTypeChange = (selectedOption: any) => {
         if (selectedOption) {
