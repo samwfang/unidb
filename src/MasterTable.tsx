@@ -8,6 +8,7 @@ import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons';
 import ReactSelect, { SingleValue } from 'react-select';
 import { ColumnType, ExtraSortType, SortType } from './helpers/DepartmentHelper';
 import ColumnPopover from './components/ColumnPopover';
+import SearchBar from './components/SearchBar';
 
 // Top level entry for University Data
 export interface UniversityData {
@@ -117,10 +118,14 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const [sortingDeptCID, setSortingDeptCID] = useState<string>("general");
   const [sortingExtra, setSortingExtra] = useState<string>("greatest");
 
+  //Search Queries for Search Bar Functionality
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
 
   // Simulate API call for paginated data
   // In Real API Call, I will also need to return data based on sortingParameter!
-  const fetchPageData = async (page: number, sortingParameter: SortType, sortingDeptCID: string, sortingExtraParam: string) => {
+  const fetchPageData = async (page: number, sortingParameter: SortType, sortingDeptCID: string, sortingExtraParam: string, searchQuery?: string) => {
     setIsLoading(true);
     setExpandedIndex([]); // Reset expanded indices
 
@@ -128,6 +133,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       // Simulate a network delay
       await new Promise((resolve) => setTimeout(resolve, 500));
       console.log("Fetching new Data with Page #" + page + ", Column = " + sortingParameter + " Dept = " + sortingDeptCID + " Extra = " + sortingExtraParam);
+      console.log("Fetching with search:", searchQuery);
 
       // Simulated API response
       const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
@@ -207,8 +213,17 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   // -Size of each page is altered (could be inefficient but IDGAF ;))
   // -Sorting Parameter Changes
   useEffect(() => {
-    fetchPageData(currentPage, sortingParam, sortingDeptCID, sortingExtra);
-  }, [currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra]);
+    fetchPageData(currentPage, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery);
+  }, [currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery]);
+
+  // Debounce Search: Only change SearchQuery after 500 ms Delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
 
 
   // Track previous page size
@@ -334,20 +349,11 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       <Flex justifyContent="space-between" mb={4}>
         
         <Flex flex="1" maxWidth="600px" mr={4}>
-          <Input
-            placeholder="Search Universities..."
-            flex="1"
-            borderColor="gray.300"
-            _hover={{ borderColor: "gray.300" }}
-            _focus={{ borderColor: "blue.400", boxShadow: "outline" }}
-          />
-          <Button
-            ml={2}
-            colorScheme="blue"
-            px={4}
-          >
-            <SearchIcon />
-          </Button>
+          <SearchBar 
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search Universities..."
+        />
         </Flex>
         <Button
           onClick={() => { setExpandedIndex([]) }}
