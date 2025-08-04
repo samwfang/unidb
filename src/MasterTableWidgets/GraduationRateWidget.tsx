@@ -12,11 +12,14 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
       p={4} 
       borderWidth={1} 
       borderRadius="md" 
-      boxShadow="sm"
       display="flex"
       flexDirection="column"
       justifyContent="space-between"
       minHeight="120px"
+      bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
+      //backdropFilter="blur(16px)"  // Applies the frosted glass effect      // Rounds the corners of the box
+      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
+      border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
     >
       <Box>
         <Text fontSize="2xl" fontWeight="bold">Graduation Rate</Text>
