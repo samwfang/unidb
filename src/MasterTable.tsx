@@ -216,6 +216,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     fetchPageData(currentPage, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery);
   }, [currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery]);
 
+
+
+  // DEBOUNCE SEARCH FUNCTIONALITY:
   // Debounce Search: Only change SearchQuery after 500 ms Delay
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -225,24 +228,6 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   }, [searchQuery]);
 
 
-
-  // Track previous page size
-  const prevPageSizeRef = React.useRef(pageSize);
-  //Change current page based on page size selection
-  useEffect(() => {
-    if (prevPageSizeRef.current !== pageSize) {
-      const firstVisibleIndex = currentPage * prevPageSizeRef.current;
-      const newPage = Math.floor(firstVisibleIndex / pageSize);
-      setCurrentPage(newPage);
-      prevPageSizeRef.current = pageSize;
-    }
-  }, [pageSize, currentPage]);
-
-
-  // Change Page Input to Show Current Page
-  useEffect(() => {
-    setPageInput(((currentPage + 1).toString()))
-  }, [currentPage]);
 
   //HARDCODED UNIVERSITY NAME SORTING OPTION
 
@@ -333,6 +318,27 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       setTimeout(() => setShowInvalidPageTooltip(false), 2000);
     }
   };
+
+  
+  // PAGE CHANGE FUNCTIONALITY: LOGIC TO SHIFT PAGE ON PAGE SIZE CHANGE
+  // Track previous page size
+  const prevPageSizeRef = React.useRef(pageSize);
+  //Change current page based on page size selection
+  useEffect(() => {
+    if (prevPageSizeRef.current !== pageSize) {
+      const firstVisibleIndex = currentPage * prevPageSizeRef.current;
+      const newPage = Math.floor(firstVisibleIndex / pageSize);
+      setCurrentPage(newPage);
+      prevPageSizeRef.current = pageSize;
+    }
+  }, [pageSize, currentPage]);
+
+
+  // Change Page Input to Show Current Page
+  useEffect(() => {
+    setPageInput(((currentPage + 1).toString()))
+  }, [currentPage]);
+
 
 
   //TODO: Add "Favorited" Functionality
