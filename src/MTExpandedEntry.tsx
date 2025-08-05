@@ -103,7 +103,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
     const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
       mode === ModeType.Undergrad ? (
       /* Render for Undergraduate Content */
-      <Box p={4} overflow="visible" width="100%">
+      <Box p={2} overflow="visible" width="100%">
       <Grid 
         templateAreas={`"students students rate"
                         "students students ."`}
@@ -235,12 +235,12 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
         
         <TabPanels>
           <TabPanel>
-            <Box p={4}>{renderGeneralContent(generalContent) || "No general content available"}</Box>
+            <Box p={0}>{renderGeneralContent(generalContent) || "No general content available"}</Box>
           </TabPanel>
           
            {selectedDepts.map((selectedDept, index) => (
             <TabPanel key={index}>
-              <Box p={4}>
+              <Box p={0}>
                 {selectedDept === "" ? (
                   // Show Input for autocomplete selection
                   <Box>
