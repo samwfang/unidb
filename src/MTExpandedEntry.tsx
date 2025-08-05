@@ -103,15 +103,22 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
     const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
       mode === ModeType.Undergrad ? (
       /* Render for Undergraduate Content */
-      <Box p={4}>
-        <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-
-            <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'} />
-
-            <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />
-
-        </Grid>
-      </Box>
+      <Box p={4} overflow="visible" width="100%">
+      <Grid 
+        templateAreas={`"students students rate"
+                        "students students ."`}
+        gridTemplateColumns="1fr 1fr 1fr"
+        gridTemplateRows="auto auto"
+        gap={4}
+      >
+        <Box gridArea="students">
+          <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'} />
+        </Box>
+        <Box gridArea="rate">
+          <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />
+        </Box>
+      </Grid>
+    </Box>
       ):(
         // Render for Graduate Content
         <Box p={4}>

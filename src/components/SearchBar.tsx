@@ -18,9 +18,6 @@ export default function SearchBar({ value, onChange, placeholder = "Search..." }
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
-      <Button ml={2} colorScheme="blue" px={4}>
-        <SearchIcon />
-      </Button>
     </Flex>
   );
 }

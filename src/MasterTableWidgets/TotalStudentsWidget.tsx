@@ -49,16 +49,16 @@ const renderActiveShape = (props: any) => {
 const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents }) => {
 
   const data = [
-    { name: 'Male', value: 50.5 },
-    { name: 'Female', value: 49.5 },
-    { name: 'Other', value: 0 },
+    { name: 'Male', value: 40 },
+    { name: 'Female', value: 10 },
+    { name: 'Other', value: 50 },
   ];
 
   return (
-     <Box 
-      p={4} 
-      borderWidth={1} 
-      borderRadius="md" 
+    <Box
+      p={4}
+      borderWidth={1}
+      borderRadius="md"
       display="flex"
       flexDirection="column"
       justifyContent="space-between"
@@ -67,52 +67,61 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents 
       //backdropFilter="blur(16px)"  // Applies the frosted glass effect      // Rounds the corners of the box
       boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
       border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
+      position="relative" 
     >
       <Text fontSize="2xl" fontWeight="bold">Total Students:</Text>
-      <Box height="305px">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              activeShape={renderActiveShape}
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={80}
-              outerRadius={100}
-              paddingAngle={5}
-              dataKey="value"
-              animationDuration={800}
-              animationBegin={0}
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <g>
-              <text 
-                x="50%" 
-                y="50%" 
-                textAnchor="middle" 
-                dominantBaseline="middle" 
-                style={{
-                  fontSize: '32px',
-                  fontWeight: 'bold'
-                }}
+      <Box height="305px" position="relative" overflow="visible" css={{
+          "& .recharts-wrapper": {
+            overflow: "visible !important",
+          },
+          "& .recharts-surface": {
+            overflow: "visible !important",
+          }
+        }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart margin={{ left: 60, right: 60 }}>
+              <Pie
+                activeShape={renderActiveShape}
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius={80}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+                animationDuration={800}
+                animationBegin={0}
               >
-                {totalStudents}
-              </text>
-              <text 
-                x="50%" 
-                y="60%" 
-                textAnchor="middle" 
-                fill="#666" 
-                style={{ fontSize: '14px' }}
-              >
-                Students
-              </text>
-            </g>
-          </PieChart>
-        </ResponsiveContainer>
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <g>
+                <text
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  style={{
+                    fontSize: '32px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {totalStudents}
+                </text>
+                <text
+                  x="50%"
+                  y="60%"
+                  textAnchor="middle"
+                  fill="#666"
+                  style={{ fontSize: '14px' }}
+                >
+                  Students
+                </text>
+              </g>
+            </PieChart>
+          </ResponsiveContainer>
+
       </Box>
     </Box>
   );
