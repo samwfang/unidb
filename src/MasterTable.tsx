@@ -125,15 +125,20 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   // Simulate API call for paginated data
   // In Real API Call, I will also need to return data based on sortingParameter!
-  const fetchPageData = async (page: number, sortingParameter: SortType, sortingDeptCID: string, sortingExtraParam: string, searchQuery?: string) => {
+  const fetchPageData = async (
+    page: number,
+    pageSize: number, // Add pageSize parameter
+    sortingParameter: SortType,
+    sortingDeptCID: string,
+    sortingExtraParam: string,
+    searchQuery?: string
+  ) => {
     setIsLoading(true);
-    setExpandedIndex([]); // Reset expanded indices
+    setExpandedIndex([]);
 
     try {
-      // Simulate a network delay
       await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log("Fetching new Data with Page #" + page + ", Column = " + sortingParameter + " Dept = " + sortingDeptCID + " Extra = " + sortingExtraParam);
-      console.log("Fetching with search:", searchQuery);
+      console.log(`Fetching page ${page} with size ${pageSize}, sort=${sortingParameter}`);
 
       // Simulated API response
       const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
@@ -213,7 +218,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   // -Size of each page is altered (could be inefficient but IDGAF ;))
   // -Sorting Parameter Changes
   useEffect(() => {
-    fetchPageData(currentPage, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery);
+    fetchPageData(currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery);
   }, [currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery]);
 
 
@@ -319,7 +324,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     }
   };
 
-  
+
   // PAGE CHANGE FUNCTIONALITY: LOGIC TO SHIFT PAGE ON PAGE SIZE CHANGE
   // Track previous page size
   const prevPageSizeRef = React.useRef(pageSize);
@@ -353,13 +358,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       p={6}
     >
       <Flex justifyContent="space-between" mb={4}>
-        
+
         <Flex flex="1" maxWidth="600px" mr={4}>
-          <SearchBar 
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search Universities..."
-        />
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search Universities..."
+          />
         </Flex>
         <Button
           onClick={() => { setExpandedIndex([]) }}
@@ -433,7 +438,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                             <Badge variant="subtle" colorScheme="pink" ml={1}>
                               WIP
                             </Badge>
-                            {sortedByCol == 0  &&
+                            {sortedByCol == 0 &&
                               <Badge bg="green.200">Currently Sorted By</Badge>
                             }
                             <Text>Custom Scoring is currently a feature in progress!</Text>
@@ -486,7 +491,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
                           <PopoverBody p={4} >
                             <Text fontSize="xl" fontWeight="bold"> University Name</Text>
-                            {sortedByCol == 1  &&
+                            {sortedByCol == 1 &&
                               <Badge bg="green.200">Currently Sorted By</Badge>
                             }
                             <Text>The most common name for each university.</Text>
