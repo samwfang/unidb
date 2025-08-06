@@ -105,14 +105,17 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
       /* Render for Undergraduate Content */
       <Box p={2} overflow="visible" width="100%">
       <Grid 
-        templateAreas={`"students students rate"
-                        "students students ."`}
+        templateAreas={`"students students students"
+                        "students students students"
+                        "rate . ."`}
         gridTemplateColumns="1fr 1fr 1fr"
-        gridTemplateRows="auto auto"
+        gridTemplateRows="auto auto auto"
         gap={4}
       >
         <Box gridArea="students">
-          <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'} demographics={general?.demographics} />
+          <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'} 
+          demographics={general?.demographics}
+          departments={general?.dept_contents} />
         </Box>
         <Box gridArea="rate">
           <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />

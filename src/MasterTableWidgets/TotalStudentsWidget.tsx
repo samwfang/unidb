@@ -8,19 +8,22 @@ interface TotalStudentWidgetProps {
   totalStudents: string;
   avgHouseholdIncome?: string;
   demographics?: DemographicsData;
+  departments?: Array<{ department_name: string; total_students?: string }>;
 }
 
 enum DisplayMode {
-  Gender = 'gender',
+  Department = 'department',
+  Income = 'income',
   Ethnicity = 'ethnicity',
-  Income = 'income'
+  Gender = 'gender'
 }
 
 //match dataset names in json to displaymode
 const DATA_SET_NAMES: Record<DisplayMode, string> = {
   [DisplayMode.Gender]: "Gender",
   [DisplayMode.Ethnicity]: "Race and Ethnicity",
-  [DisplayMode.Income]: "Income"
+  [DisplayMode.Income]: "Income",
+  [DisplayMode.Department]: "Department"
 };
 
 
@@ -29,7 +32,8 @@ const DATA_SET_NAMES: Record<DisplayMode, string> = {
 const COLORS_BY_CATEGORY: Record<string, string[]> = {
   [DisplayMode.Gender]: ['#0088FE', '#FF69B4', '#FFBB28'],
   [DisplayMode.Ethnicity]: ['#4E79A7', '#F28E2B', '#E15759', '#76B7B2', '#59A14F'],
-  [DisplayMode.Income]: ['#8884D8', '#82CA9D', '#FFC658']
+  [DisplayMode.Income]: ['#8884D8', '#82CA9D', '#FFC658'],
+  [DisplayMode.Department]: ['#4E79A7', '#F28E2B', '#E15759', '#76B7B2', '#59A14F']
 };
 
 const getCenterText = (activeTab: DisplayMode, totalStudents: string, avgIncome?: string) => {
@@ -52,6 +56,59 @@ const renderActiveShape = (props: any) => {
   const RADIAN = Math.PI / 180;
   const sin = Math.sin(-RADIAN * midAngle);
   const cos = Math.cos(-RADIAN * midAngle);
+
+  // Position labels further out and make them always visible
+  const labelRadius = outerRadius * 1.2;
+  const labelX = cx + labelRadius * cos;
+  const labelY = cy + labelRadius * sin;
+  const textAnchor = cos >= 0 ? 'start' : 'end';
+
+  const lineCount = payload.name.split('\n').length;
+  const percentageOffset = 18 + (lineCount - 1) * 18; // Increased spacing
+
+  return (
+    <g>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius}
+        outerRadius={outerRadius}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+      />
+      <text
+        x={labelX}
+        y={labelY}
+        textAnchor={textAnchor}
+        fill="#333"
+        style={{ fontSize: '14px', fontWeight: '500' }} // Larger text
+      >
+        {payload.name.split('\n').map((line: string, i: number) => (
+          <tspan x={labelX} dy={i === 0 ? 0 : 18} key={i}>
+            {line}
+          </tspan>
+        ))}
+      </text>
+      <text
+        x={labelX}
+        y={labelY}
+        dy={percentageOffset}
+        textAnchor={textAnchor}
+        fill="#999"
+        style={{ fontSize: '14px' }} // Larger percentage
+      >
+        {`${(percent * 100).toFixed(1)}%`}
+      </text>
+    </g>
+  );
+};
+
+const renderActiveShapeLegacy = (props: any) => {
+  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
+  const RADIAN = Math.PI / 180;
+  const sin = Math.sin(-RADIAN * midAngle);
+  const cos = Math.cos(-RADIAN * midAngle);
   const sx = cx + (outerRadius + 10) * cos;
   const sy = cy + (outerRadius + 10) * sin;
   const mx = cx + (outerRadius + 30) * cos;
@@ -59,6 +116,9 @@ const renderActiveShape = (props: any) => {
   const ex = mx + (cos >= 0 ? 1 : -1) * 22;
   const ey = my;
   const textAnchor = cos >= 0 ? 'start' : 'end';
+
+  const lineCount = payload.name.split('\n').length;
+  const percentageOffset = 18 + (lineCount - 1) * 18; // 12px per additional line
 
   return (
     <g>
@@ -74,21 +134,64 @@ const renderActiveShape = (props: any) => {
       <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
       <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">
-        {payload.name}
+        {payload.name.split('\n').map((line: string, i: number) => (
+          <tspan x={ex + (cos >= 0 ? 1 : -1) * 12} dy={i === 0 ? 0 : 15} key={i}>
+            {line}
+          </tspan>
+        ))}
       </text>
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
+      <text
+        x={ex + (cos >= 0 ? 1 : -1) * 12}
+        y={ey}
+        dy={percentageOffset}
+        textAnchor={textAnchor}
+        fill="#999"
+      >
         {`${(percent * 100).toFixed(1)}%`}
       </text>
     </g>
   );
 };
 
-const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome, demographics }) => {
+//Find top 20 Departments and find the amount of total students per department as proportion
+const processDepartmentData = (
+  departments: Array<{ department_name: string; total_students?: string }> = [],
+  totalStudents: string
+) => {
+  const MAX_DEPTS = 20;
+  const totalNum = parseInt(totalStudents.replace(/,/g, '')) || 0;
 
-  const [activeTab, setActiveTab] = useState<DisplayMode>(DisplayMode.Gender);
+  // Filter and sort departments by number of total students
+  const validDepts = departments
+    .filter(dept => dept.total_students)
+    .map(dept => ({
+      name: dept.department_name,
+      value: parseInt(dept.total_students!.replace(/,/g, '')) || 0
+    }))
+    .sort((a, b) => b.value - a.value);
+
+  // Take top departments
+  const topDepts = validDepts.slice(0, MAX_DEPTS);
+  // Proportion "Other" is the value of all students other than those in the specified departments
+  const otherValue = Math.max(0, totalNum - topDepts.reduce((sum, dept) => sum + dept.value, 0));
+
+  if (otherValue > 0) {
+    topDepts.push({ name: 'Other/\nUnknown', value: otherValue });
+  }
+
+  return topDepts;
+};
+
+const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome, demographics, departments }) => {
+
+  const [activeTab, setActiveTab] = useState<DisplayMode>(DisplayMode.Department);
 
 
   const dataSets = [
+    {
+      name: "Department",
+      data: processDepartmentData(departments, totalStudents)
+    },
     {
       name: "Gender",
       data: demographics?.gender || []
@@ -101,6 +204,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       name: "Income",
       data: demographics?.income || []
     }
+
   ];
 
   const findDataSet = (mode: DisplayMode) => dataSets.find(set => set.name === DATA_SET_NAMES[mode])!;
@@ -134,7 +238,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
           <ResponsiveContainer width="100%" height="100%">
             <PieChart margin={{ left: 60, right: 60 }}>
               <Pie
-                activeShape={renderActiveShape}
+                activeShape={renderActiveShapeLegacy}
                 data={currentData.data}
                 cx="50%"
                 cy="50%"
