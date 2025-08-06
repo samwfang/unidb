@@ -112,7 +112,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
         gap={4}
       >
         <Box gridArea="students">
-          <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'} />
+          <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'} demographics={general?.demographics} />
         </Box>
         <Box gridArea="rate">
           <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />

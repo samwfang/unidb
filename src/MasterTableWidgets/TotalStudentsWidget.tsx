@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab } from '@chakra-ui/react';
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
+import { DemographicsData } from 'src/MasterTable';
 
 interface TotalStudentWidgetProps {
   totalStudents: string;
   avgHouseholdIncome?: string;
+  demographics?: DemographicsData;
 }
 
 enum DisplayMode {
@@ -81,7 +83,7 @@ const renderActiveShape = (props: any) => {
   );
 };
 
-const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome }) => {
+const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome, demographics }) => {
 
   const [activeTab, setActiveTab] = useState<DisplayMode>(DisplayMode.Gender);
 
@@ -89,29 +91,15 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   const dataSets = [
     {
       name: "Gender",
-      data: [
-        { name: 'Male', value: 40 },
-        { name: 'Female', value: 10 },
-        { name: 'Other', value: 50 },
-      ]
+      data: demographics?.gender || []
     },
     {
       name: "Race and Ethnicity",
-      data: [
-        { name: 'White', value: 30 },
-        { name: 'Black', value: 20 },
-        { name: 'Asian', value: 25 },
-        { name: 'Hispanic', value: 15 },
-        { name: 'Other', value: 10 },
-      ]
+      data: demographics?.ethnicity || []
     },
     {
       name: "Income",
-      data: [
-        { name: '<$30k', value: 20 },
-        { name: '$30k-$60k', value: 30 },
-        { name: '>$60k', value: 50 }
-      ]
+      data: demographics?.income || []
     }
   ];
 

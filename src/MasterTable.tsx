@@ -26,6 +26,12 @@ export interface Content {
   grad_content?: GradContent;
 };
 
+export interface DemographicsData {
+  gender: Array<{ name: string; value: number }>;
+  ethnicity: Array<{ name: string; value: number }>;
+  income: Array<{ name: string; value: number }>;
+}
+
 //Content for Undergrad
 export interface UndergradContent {
   general_content: {
@@ -35,6 +41,7 @@ export interface UndergradContent {
     graduation_rate_percentile: string;
     average_class_size: string;
   };
+  demographics?: DemographicsData;
   dept_contents?: UGradDeptContent[];
 };
 
@@ -57,6 +64,7 @@ export interface GradContent {
     graduation_rate: string;
     average_class_size: string;
   };
+  demographics?: DemographicsData;
   dept_contents?: GradDeptContent[];
 }
 
@@ -158,6 +166,25 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 graduation_rate_percentile: '95',
                 average_class_size: '550'
               },
+              demographics: {
+                gender: [
+                  { name: 'Male', value: 40 },
+                  { name: 'Female', value: 10 },
+                  { name: 'Other', value: 50 },
+                ],
+                ethnicity: [
+                  { name: 'White', value: 30 },
+                  { name: 'Black', value: 20 },
+                  { name: 'Asian', value: 25 },
+                  { name: 'Hispanic', value: 15 },
+                  { name: 'Other', value: 10 },
+                ],
+                income: [
+                  { name: '<$30k', value: 20 },
+                  { name: '$30k-$60k', value: 30 },
+                  { name: '>$60k', value: 50 }
+                ]
+              },
               dept_contents: [
                 { cip: "1107", department_name: "Computer Science", total_students: '2100', content: `CS department info for University ${globalIndex + 1}` },
                 { cip: "2601", department_name: "Biology", content: `Biology department info for University ${globalIndex + 1}` },
@@ -169,6 +196,25 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 total_students: '5,500',
                 graduation_rate: '92%',
                 average_class_size: '51'
+              },
+              demographics: {
+                gender: [
+                  { name: 'Male', value: 40 },
+                  { name: 'Female', value: 10 },
+                  { name: 'Other', value: 50 },
+                ],
+                ethnicity: [
+                  { name: 'White', value: 30 },
+                  { name: 'Black', value: 20 },
+                  { name: 'Asian', value: 25 },
+                  { name: 'Hispanic', value: 15 },
+                  { name: 'Other', value: 10 },
+                ],
+                income: [
+                  { name: '<$30k', value: 20 },
+                  { name: '$30k-$60k', value: 30 },
+                  { name: '>$60k', value: 50 }
+                ]
               },
               dept_contents: [
                 { cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${globalIndex + 1}` },
