@@ -50,53 +50,40 @@ const getCaption = (activeTab: DisplayMode) => {
   }
 };
 
-//render slice of the pie, tbh i have no idea how this works but it's recharts magic 
-const renderActiveShape = (props: any) => {
-  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
-  const RADIAN = Math.PI / 180;
-  const sin = Math.sin(-RADIAN * midAngle);
-  const cos = Math.cos(-RADIAN * midAngle);
 
-  // Position labels further out and make them always visible
-  const labelRadius = outerRadius * 1.2;
-  const labelX = cx + labelRadius * cos;
-  const labelY = cy + labelRadius * sin;
+const renderCustomizedLabel = (props: any) => {
+  const { cx, cy, midAngle, innerRadius, outerRadius, percent, payload } = props;
+  const RADIAN = Math.PI / 180;
+  const sin = Math.sin(-midAngle * RADIAN);
+  const cos = Math.cos(-midAngle * RADIAN);
+  const sx = cx + (outerRadius + 10) * cos;
+  const sy = cy + (outerRadius + 10) * sin;
+  const mx = cx + (outerRadius + 30) * cos;
+  const my = cy + (outerRadius + 30) * sin;
+  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+  const ey = my;
   const textAnchor = cos >= 0 ? 'start' : 'end';
 
   const lineCount = payload.name.split('\n').length;
-  const percentageOffset = 18 + (lineCount - 1) * 18; // Increased spacing
+  const percentageOffset = 18 + (lineCount - 1) * 18;
 
   return (
     <g>
-      <Sector
-        cx={cx}
-        cy={cy}
-        innerRadius={innerRadius}
-        outerRadius={outerRadius}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        fill={fill}
-      />
-      <text
-        x={labelX}
-        y={labelY}
-        textAnchor={textAnchor}
-        fill="#333"
-        style={{ fontSize: '14px', fontWeight: '500' }} // Larger text
-      >
+      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={payload.fill} fill="none" />
+      <circle cx={ex} cy={ey} r={2} fill={payload.fill} stroke="none" />
+      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">
         {payload.name.split('\n').map((line: string, i: number) => (
-          <tspan x={labelX} dy={i === 0 ? 0 : 18} key={i}>
+          <tspan x={ex + (cos >= 0 ? 1 : -1) * 12} dy={i === 0 ? 0 : 15} key={i}>
             {line}
           </tspan>
         ))}
       </text>
       <text
-        x={labelX}
-        y={labelY}
+        x={ex + (cos >= 0 ? 1 : -1) * 12}
+        y={ey}
         dy={percentageOffset}
         textAnchor={textAnchor}
         fill="#999"
-        style={{ fontSize: '14px' }} // Larger percentage
       >
         {`${(percent * 100).toFixed(1)}%`}
       </text>
@@ -104,7 +91,9 @@ const renderActiveShape = (props: any) => {
   );
 };
 
-const renderActiveShapeLegacy = (props: any) => {
+//renderCustomizedLabel vs renderActiveShape: to use this one just change remove label={
+// renderCustomizedLabel} and change it to activeShape={renderActiveShape}
+const renderActiveShape = (props: any) => {
   const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
   const RADIAN = Math.PI / 180;
   const sin = Math.sin(-RADIAN * midAngle);
@@ -238,7 +227,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
           <ResponsiveContainer width="100%" height="100%">
             <PieChart margin={{ left: 60, right: 60 }}>
               <Pie
-                activeShape={renderActiveShapeLegacy}
+                label={renderCustomizedLabel}
                 data={currentData.data}
                 cx="50%"
                 cy="50%"
