@@ -17,6 +17,8 @@ export interface UniversityData {
   location: string;
   studentFacultyRatio: string;
   icon: string;
+  isPublic?: boolean;
+  sectorScorecard?: number;
   content?: Content;
 }
 
@@ -157,6 +159,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           location: `Location ${globalIndex + 1}`,
           studentFacultyRatio: `${10 + (globalIndex % 5)}:1`,
           icon: 'FaUniversity',
+          isPublic: globalIndex % 2 === 0,
+          sectorScorecard: (globalIndex % 15) + 1,
           content: {
             undergrad_content: {
               general_content: {

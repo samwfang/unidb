@@ -57,7 +57,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
         }}
         minH={{ base: "50px", md: "60px" }}
       >
-        <Grid templateColumns="50px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
+        <Grid templateColumns="75px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
           {/* Logo for University */}
           <GridItem textAlign="center">
                         <Box 
@@ -86,7 +86,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
 
       {/* This is the Expanded Entry, what you see when the user clicks each entry in the table */}
 
-      <MTExpandedEntry mode={mode} content={item.content} isLoading={isLoading} isExpanded={isExpanded} />
+      <MTExpandedEntry mode={mode} item={item} rank={rank} content={item.content} isLoading={isLoading} isExpanded={isExpanded} />
     </AccordionItem>
   )
 };

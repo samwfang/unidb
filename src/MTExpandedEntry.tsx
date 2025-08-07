@@ -1,13 +1,14 @@
-import React, {useState} from 'react';
-import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select, Input, List, ListItem} from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select, Input, List, ListItem } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
-import { Content, UndergradContent, UGradDeptContent, GradDeptContent, GradContent } from './MasterTable';
+import { Content, UndergradContent, UGradDeptContent, GradDeptContent, GradContent, UniversityData } from './MasterTable';
 import { ModeType } from './App';
 import DepartmentContent from './MTDepartmentContent';
 import GraduationRateWidget from './MasterTableWidgets/GraduationRateWidget';
 import TotalStudentsWidget from './MasterTableWidgets/TotalStudentsWidget';
 import { Tooltip } from '@chakra-ui/react';
 import { cipToClassificationName, groupDepartmentsByCIP } from './helpers/DepartmentHelper';
+import UniversitySummaryWidget from './MasterTableWidgets/UniversitySummaryWidget';
 
 /*
 Expanded Entries: Rendering The Graphics Which Show when User Clicks An Entry in the Master Table
@@ -20,22 +21,24 @@ Renders the General Information Panel for Undergrad and Grad Students
 */
 interface MTExpandedEntryProps {
   mode: ModeType;
+  item?: UniversityData;
+  rank: number;
   content?: Content;
   isLoading?: boolean;
   isExpanded: boolean;
 }
 
-const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoading, isExpanded }) => {
+const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, mode, isLoading, isExpanded }) => {
   //Number of Top Departments to Display by Default
   const TOP_NUM_DEPTS = 5;
   //Maximum Number of Tabs User Can Create
   const MAX_TABS = 20;
 
 
-  const deptContents = mode === ModeType.Undergrad 
+  const deptContents = mode === ModeType.Undergrad
     ? content?.undergrad_content?.dept_contents
     : content?.grad_content?.dept_contents;
-  
+
   //All Departments offered by University (if none, then [])
   const availableDepts = deptContents || [];
   //Initial Departments Shown on Front Page. Up to TOP_NUM_DEPTS can be shown at once. These are simply filled by 
@@ -53,13 +56,13 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   const filteredDepts = availableDepts.filter(dept =>
     dept.department_name.toLowerCase().includes(inputValue.toLowerCase())
   );
-  
-  const generalContent = mode === ModeType.Undergrad 
+
+  const generalContent = mode === ModeType.Undergrad
     ? content?.undergrad_content
     : content?.grad_content;
-  
+
   // Helper function to group departments by the first two digits of their CIP
-  
+
   // When user changes department tab content, update the selected department array
   const handleDeptSelection = (index: number, departmentName: string) => {
     const updatedSelections = [...selectedDepts];
@@ -71,7 +74,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
   React.useEffect(() => {
     setSelectedDepts(initialDeptSelections);
   }, [deptContents]);
-  
+
   if (isLoading) return <AccordionPanel pb={4}>Loading...</AccordionPanel>;
 
 
@@ -97,177 +100,183 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ content, mode, isLoad
     }
   };
 
-    
+
 
   //Rendering For Undergrad "General" Tab
-    const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
-      mode === ModeType.Undergrad ? (
+  const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
+    mode === ModeType.Undergrad ? (
       /* Render for Undergraduate Content */
       <Box p={2} overflow="visible" width="100%">
-      <Grid 
-        templateAreas={`"students students students"
+        <UniversitySummaryWidget
+          universityName={item?.name || 'Unknown University'}
+          rank={rank.toString()}
+          isPublic={item?.isPublic}
+          sectorScorecard={item?.sectorScorecard}
+        />
+        <Grid
+          templateAreas={`"students students students"
                         "students students students"
                         "rate . ."`}
-        gridTemplateColumns="1fr 1fr 1fr"
-        gridTemplateRows="auto auto auto"
-        gap={4}
-      >
-        <Box gridArea="students">
-          <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'} 
-          demographics={general?.demographics}
-          departments={general?.dept_contents} />
-        </Box>
-        <Box gridArea="rate">
-          <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />
-        </Box>
-      </Grid>
-    </Box>
-      ):(
-        // Render for Graduate Content
-        <Box p={4}>
+          gridTemplateColumns="1fr 1fr 1fr"
+          gridTemplateRows="auto auto auto"
+          gap={4}
+        >
+          <Box gridArea="students">
+            <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'}
+              demographics={general?.demographics}
+              departments={general?.dept_contents} />
+          </Box>
+          <Box gridArea="rate">
+            <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />
+          </Box>
+        </Grid>
+      </Box>
+    ) : (
+      // Render for Graduate Content
+      <Box p={4}>
         <Grid templateColumns="repeat(2, 1fr)" gap={4}>
 
-            <Box>
-              <Text fontWeight="bold">Total Students:</Text>
-              <Text> {general?.general_content.total_students} </Text>
-            </Box>
+          <Box>
+            <Text fontWeight="bold">Total Students:</Text>
+            <Text> {general?.general_content.total_students} </Text>
+          </Box>
 
-            <Box>
-              <Text fontWeight="bold">Graduation Rate:</Text>
-              <Text> {general?.general_content.graduation_rate} </Text>
-            </Box>
+          <Box>
+            <Text fontWeight="bold">Graduation Rate:</Text>
+            <Text> {general?.general_content.graduation_rate} </Text>
+          </Box>
 
         </Grid>
       </Box>
-      )
+    )
+  );
+
+  //Render Departments by Group in New Tab
+  const renderFilteredGroupedDepartments = () => {
+    const groupedDepartments = groupDepartmentsByCIP(filteredDepts);
+
+    const groupedEntries = Object.entries(groupedDepartments);
+
+    // Calculate halfway point for splitting into two columns
+    const midpoint = Math.ceil(groupedEntries.length / 2);
+
+    // Split groups into two roughly equal parts
+    const firstColumnGroups = groupedEntries.slice(0, midpoint);
+    const secondColumnGroups = groupedEntries.slice(midpoint);
+
+    return (
+      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+        {[firstColumnGroups, secondColumnGroups].map((columnGroups, columnIndex) => (
+          <Box key={columnIndex}>
+            {columnGroups.map(([cip, depts]) => (
+              <Box key={cip} mb={4}>
+                <Text fontWeight="bold" mt={2} mb={2}>{cipToClassificationName(cip)}</Text>
+                <List>
+                  {depts.map((dept, i) => (
+                    <ListItem
+                      key={i}
+                      onClick={() => {
+                        handleDeptSelection(activeTabIndex - 1, dept.department_name);
+                      }}
+                      cursor="pointer"
+                      _hover={{ bg: "gray.100" }}
+                    >
+                      {dept.department_name}
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            ))}
+          </Box>
+        ))}
+      </Grid>
     );
+  };
 
-    //Render Departments by Group in New Tab
-    const renderFilteredGroupedDepartments = () => {
-      const groupedDepartments = groupDepartmentsByCIP(filteredDepts);
-
-      const groupedEntries = Object.entries(groupedDepartments);
-
-      // Calculate halfway point for splitting into two columns
-      const midpoint = Math.ceil(groupedEntries.length / 2);
-
-      // Split groups into two roughly equal parts
-      const firstColumnGroups = groupedEntries.slice(0, midpoint);
-      const secondColumnGroups = groupedEntries.slice(midpoint);
-
-      return (
-        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-          {[firstColumnGroups, secondColumnGroups].map((columnGroups, columnIndex) => (
-            <Box key={columnIndex}>
-              {columnGroups.map(([cip, depts]) => (
-                <Box key={cip} mb={4}>
-                  <Text fontWeight="bold" mt={2} mb={2}>{cipToClassificationName(cip)}</Text>
-                  <List>
-                    {depts.map((dept, i) => (
-                      <ListItem
-                        key={i}
-                        onClick={() => {
-                          handleDeptSelection(activeTabIndex - 1, dept.department_name);
-                        }}
-                        cursor="pointer"
-                        _hover={{ bg: "gray.100" }}
-                      >
-                        {dept.department_name}
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
-              ))}
-            </Box>
-          ))}
-        </Grid>
-      );
-    };
-
-   return (
+  return (
     <AccordionPanel pb={4} bg="white">
       {isExpanded && (
         <Tabs index={activeTabIndex} isLazy onChange={setActiveTabIndex}>
           <TabList flexWrap="wrap">
             <Tab _selected={{
-            color: mode === 'undergrad' ? "blue.500" : "gray.600", // Change text color
-            borderBottom: '2px solid', // Ensure there is an underline
-            borderColor: mode === 'undergrad' ? "blue.500" : "gray.600", // Change underline color
-          }}><b>General</b></Tab>
-          {/* Render Tabs with names of Selected Departments*/}
-          {selectedDepts.map((deptName, index) => (
-            <Box display="flex" alignItems="center" key={index}>
-              <Tab
-                whiteSpace="nowrap"
-                _selected={{
-                  color: mode === 'undergrad' ? "blue.500" : "gray.600",
-                  borderBottom: '2px solid',
-                  borderColor: mode === 'undergrad' ? "#blue.500" : "gray.600",
-                }}
-              >
-                {deptName || <i>New Tab</i>}
-              </Tab>
-              {/* Close Button Outside of Tab Clickable Area */}
-              <Box
-                as="span"
-                ml={2}
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  handleCloseTab(index);
-                }}
-                _hover={{ color: "red.500" }}
-                cursor="pointer"
-              >
-                ×
+              color: mode === 'undergrad' ? "blue.500" : "gray.600", // Change text color
+              borderBottom: '2px solid', // Ensure there is an underline
+              borderColor: mode === 'undergrad' ? "blue.500" : "gray.600", // Change underline color
+            }}><b>General</b></Tab>
+            {/* Render Tabs with names of Selected Departments*/}
+            {selectedDepts.map((deptName, index) => (
+              <Box display="flex" alignItems="center" key={index}>
+                <Tab
+                  whiteSpace="nowrap"
+                  _selected={{
+                    color: mode === 'undergrad' ? "blue.500" : "gray.600",
+                    borderBottom: '2px solid',
+                    borderColor: mode === 'undergrad' ? "#blue.500" : "gray.600",
+                  }}
+                >
+                  {deptName || <i>New Tab</i>}
+                </Tab>
+                {/* Close Button Outside of Tab Clickable Area */}
+                <Box
+                  as="span"
+                  ml={2}
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    handleCloseTab(index);
+                  }}
+                  _hover={{ color: "red.500" }}
+                  cursor="pointer"
+                >
+                  ×
+                </Box>
               </Box>
-            </Box>
-          ))}
-          {/* Allow User to Add New Tab If Not At Maximum */}
-          {selectedDepts.length < MAX_TABS ? (
-            <Tab onClick={handleAddTab} _hover={{ bg: "gray.100" }}>
-              +
-            </Tab>
-          ) : (
-            <Tooltip label="Maximum tabs reached" placement="top" hasArrow>
-              <Tab isDisabled _hover={{ cursor: "not-allowed" }}>
+            ))}
+            {/* Allow User to Add New Tab If Not At Maximum */}
+            {selectedDepts.length < MAX_TABS ? (
+              <Tab onClick={handleAddTab} _hover={{ bg: "gray.100" }}>
                 +
               </Tab>
-            </Tooltip>
-          )}
+            ) : (
+              <Tooltip label="Maximum tabs reached" placement="top" hasArrow>
+                <Tab isDisabled _hover={{ cursor: "not-allowed" }}>
+                  +
+                </Tab>
+              </Tooltip>
+            )}
           </TabList>
-        
-        <TabPanels>
-          <TabPanel>
-            <Box p={0}>{renderGeneralContent(generalContent) || "No general content available"}</Box>
-          </TabPanel>
-          
-           {selectedDepts.map((selectedDept, index) => (
-            <TabPanel key={index}>
-              <Box p={0}>
-                {selectedDept === "" ? (
-                  // Show Input for autocomplete selection
-                  <Box>
-                    <Text>Select a department to display information on this tab.</Text>
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder="Type to search..."
-                    />
-                    {renderFilteredGroupedDepartments()}
-                  </Box>
-                ) : (
-                  // Display Department Content if a department is selected
-                  <DepartmentContent
-                    content={
-                      deptContents?.find(dept => dept.department_name === selectedDept)?.content || "No content available"
-                    }
-                  />
-                )}
-              </Box>
+
+          <TabPanels>
+            <TabPanel>
+              <Box p={0}>{renderGeneralContent(generalContent) || "No general content available"}</Box>
             </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
+
+            {selectedDepts.map((selectedDept, index) => (
+              <TabPanel key={index}>
+                <Box p={0}>
+                  {selectedDept === "" ? (
+                    // Show Input for autocomplete selection
+                    <Box>
+                      <Text>Select a department to display information on this tab.</Text>
+                      <Input
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        placeholder="Type to search..."
+                      />
+                      {renderFilteredGroupedDepartments()}
+                    </Box>
+                  ) : (
+                    // Display Department Content if a department is selected
+                    <DepartmentContent
+                      content={
+                        deptContents?.find(dept => dept.department_name === selectedDept)?.content || "No content available"
+                      }
+                    />
+                  )}
+                </Box>
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
       )}
     </AccordionPanel>
   );

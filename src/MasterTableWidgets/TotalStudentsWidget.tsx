@@ -228,6 +228,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
             <PieChart margin={{ left: 60, right: 60 }}>
               <Pie
                 label={renderCustomizedLabel}
+                activeShape={renderActiveShape}
                 data={currentData.data}
                 cx="50%"
                 cy="50%"
