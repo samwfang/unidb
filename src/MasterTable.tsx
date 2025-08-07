@@ -398,7 +398,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   //TODO: Add "Favorited" Functionality
   return (
-    <Box maxW="1000px" mx="auto" mt="8"
+    <Box maxW={{ base: "100vw", md: "1000px" }} mx="auto" mt="8"
       position="relative"
       bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
       //backdropFilter="blur(16px)"  // Applies the frosted glass effect
