@@ -53,7 +53,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
     }, []);
 
     //Fallback in case current department changes from General and a non department specific column is selected (e.g. "Location")
-     useEffect(() => {
+    useEffect(() => {
         if (currentDept !== "General" && !canBeDepartmentColumn(currentColumnType)) {
             // Find first valid column type (fallback to first available)
             const firstValidType = columnTypeOptions[0]?.value || ColumnType.TotalStudents;
@@ -83,7 +83,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
     };
 
     //Generate options to select Column Type from all allowed column type options
-     const columnTypeOptions = Object.values(ColumnType)
+    const columnTypeOptions = Object.values(ColumnType)
         .filter(type => currentDept === "General" || canBeDepartmentColumn(type))
         .map(type => ({
             value: type,
@@ -103,7 +103,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
             {({ isOpen }) => (
                 <>
                     <PopoverTrigger>
-                        <Box position="relative">
+                        <Box position="relative" minW="80px" maxW="160px">
                             {departmentName && (
                                 <Text
                                     fontSize="xs"
@@ -128,13 +128,19 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 fontWeight="bold"
                                 rightIcon={<ChevronDownIcon />}
                                 bg={isSortedBy ? "green.500" : isOpen ? "gray.100" : "transparent"}
-                                color ={ isSortedBy ? "white" : "black"}
+                                color={isSortedBy ? "white" : "black"}
                                 borderColor={"gray.200"}
                                 borderRadius="md"
-                                _hover={{ bg: isSortedBy ? 'green.700' : 'gray.100',
+                                _hover={{
+                                    bg: isSortedBy ? 'green.700' : 'gray.100',
                                     color: isSortedBy ? 'white' : 'black'
-                                 }}
+                                }}
                                 zIndex={isOpen ? "popover" : "auto"}
+                                whiteSpace="normal" 
+                                wordBreak="break-word"
+                                h="auto"
+                                minH="40px"
+                                lineHeight="short"
                             >
                                 {getColumnDisplayName(columnType)}
                             </Button>
@@ -159,7 +165,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                             boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
                             <PopoverBody p={4}>
                                 <Text fontSize="xl" fontWeight="bold"> {getColumnDisplayName(columnType)}</Text>
-                                {isSortedBy && 
+                                {isSortedBy &&
                                     <Badge bg="green.200">Currently Sorted By</Badge>
                                 }
                                 <Text color="gray.600"> {getColumnDescription(columnType)} </Text>

@@ -442,7 +442,15 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         ) : (
           <>
             {/* Column Headers */}
-            <Grid templateColumns="75px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="flex-end" mb={2} px={4}>
+            <Grid templateColumns={{
+              base: "75px minmax(120px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr)",
+              md: "75px 2fr 1fr 1fr 1fr"
+            }}
+              gap={4}
+              w="full"
+              alignItems="flex-end"
+              mb={2}
+              px={4}>
               <GridItem textAlign="center">
                 <Popover>
                   {({ isOpen }) => (
@@ -519,7 +527,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           }}
                           zIndex={isOpen ? "popover" : "auto"}
                         >
-                          University Name
+                          Name
                         </Button>
                       </PopoverTrigger>
                       {isOpen && (

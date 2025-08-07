@@ -43,32 +43,39 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
 
   return (
     <AccordionItem
-      _odd={{ bg: "rgba(255, 255, 255, 0.2)"}}  // Light grey for odd items
+      _odd={{ bg: "rgba(255, 255, 255, 0.2)" }}  // Light grey for odd items
       _even={{ bg: "rgba(255, 255, 255, 0.4)" }}
       minH={{ base: "50px", md: "60px" }}   // White for even items
     >
       <AccordionButton
         onClick={handleExpand}
         borderRadius="lg"
-        _expanded={{ bg: mode === 'undergrad' ? "blue.500" : "gray.600", color: 'white' ,
+        _expanded={{
+          bg: mode === 'undergrad' ? "blue.500" : "gray.600", color: 'white',
           "& > div > div:first-of-type > div": {  // Targets the rank Box
-                        color: "white"
-                    }
+            color: "white"
+          }
         }}
         minH={{ base: "50px", md: "60px" }}
       >
-        <Grid templateColumns="75px 2fr 1fr 1fr 1fr" gap={4} w="full" alignItems="center">
+        <Grid templateColumns={{
+          base: "75px minmax(150px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)",
+          md: "75px 2fr 1fr 1fr 1fr"
+        }}
+          gap={4}
+          w="full"
+          alignItems="center">
           {/* Logo for University */}
           <GridItem textAlign="center">
-                        <Box 
-                            fontWeight="bold" 
-                            color={mode === 'undergrad' ? "blue.500" : "gray.600"}
-                            _expanded={{ color: "white" }}
-                            fontSize="lg"
-                        >
-                            {rank}
-                        </Box>
-                    </GridItem>
+            <Box
+              fontWeight="bold"
+              color={mode === 'undergrad' ? "blue.500" : "gray.600"}
+              _expanded={{ color: "white" }}
+              fontSize="lg"
+            >
+              {rank}
+            </Box>
+          </GridItem>
 
           {/* University Name */}
           <GridItem textAlign="center">
