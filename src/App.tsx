@@ -84,7 +84,7 @@ function App() {
       {/* Gradient Background to make it look nice and spiffy! */}
       <Box minH="100vh"
         bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, gray.50, gray.200)"} // Chakra's gradient syntax
-        p={4}
+         p={{ base: 2, md: 4 }}
       >
         {/* Top Header: Only Display when ShowHeader == True */}
         <TopHeader 
@@ -93,11 +93,17 @@ function App() {
           onToggle={undergradGradToggle} 
         />
 
-        <Flex maxW="1000px" alignItems="center" mx="auto" ref={frontPageInfoRef}>
+        <Flex maxW="1000px" 
+          w="100%" // Ensure it takes full width on mobile
+          px={{ base: 2, md: 0 }} // Add padding on mobile
+          alignItems="center" 
+          mx="auto" 
+          ref={frontPageInfoRef}>
           <FrontPageInfo mode={mode} onModeChange={undergradGradToggle}/>
         </Flex>
         {/* Master Table and Control Panel */}
-        <Flex direction={{ base: "column", md: "row" }} gap={2} mt={6} maxW="1300px" mx="auto">
+        <Flex direction={{ base: "column", md: "row" }} gap={2} mt={6} maxW="1300px" mx="auto" w="100%"
+          px={{ base: 2, md: 0 }}>
           <MTControlPanel
             pageSize={pageSize}
             onPageSizeChange={setPageSize}
@@ -106,11 +112,11 @@ function App() {
           />
 
           {/* MasterTable - updated to use pageSize prop */}
-          <Box flex={1}>
+          <Box flex={1}  w="100%" overflowX="auto">
             <MasterTable mode={mode} toggleMode={undergradGradToggle} pageSize={pageSize} />
           </Box>
         </Flex>
-        <Flex maxW="1000px" alignItems="center" mx="auto" ref={frontPageInfoRef}>
+        <Flex maxW="1000px" alignItems="center"  mx="auto" ref={frontPageInfoRef}>
           <ThankYouPage mode={mode} onModeChange={undergradGradToggle}/>
         </Flex>
         <Box mt="auto" py={4} textAlign="center" color="gray.600">
