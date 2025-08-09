@@ -26,6 +26,8 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
     const [currentColumnType, setCurrentColumnType] = useState<ColumnType>(columnType);
     const [modifiedContent, setModifiedContent] = useState<boolean>(false);
 
+    const [isSelectOpen, setIsSelectOpen] = useState(false);
+
     // Generate classification options from CIP_TO_CLASSIFICATION
     const classificationOptions = Object.entries(CIP_TO_CLASSIFICATION).map(([cipCode, name]) => ({
         value: cipCode,
@@ -99,7 +101,12 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
 
 
     return (
-        <Popover onOpen={handlePopoverOpen} onClose={() => { setModifiedContent(false) }}>
+        <Popover onOpen={handlePopoverOpen} onClose={() => {
+            if (!isSelectOpen) {
+                setModifiedContent(false);
+            }
+        }}
+            closeOnBlur={!isSelectOpen} >
             {({ isOpen }) => (
                 <>
                     <PopoverTrigger>
@@ -136,7 +143,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                     color: isSortedBy ? 'white' : 'black'
                                 }}
                                 zIndex={isOpen ? "popover" : "auto"}
-                                whiteSpace="normal" 
+                                whiteSpace="normal"
                                 wordBreak="break-word"
                                 h="auto"
                                 minH="40px"
@@ -178,6 +185,8 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                         </Box>
                                         <Text color="gray.600" mt={2}>Column Type:</Text>
                                         <ReactSelect
+                                            onMenuOpen={() => setIsSelectOpen(true)}
+                                            onMenuClose={() => setIsSelectOpen(false)}
                                             options={columnTypeOptions}
                                             value={{ value: currentColumnType, label: getColumnDisplayName(currentColumnType) }}
                                             onChange={handleColumnTypeChange}
@@ -212,6 +221,8 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                                 ]}
                                                 defaultValue={{ value: "greatest", label: 'High to Low' }}
                                                 placeholder="Select sort option"
+                                                onMenuOpen={() => setIsSelectOpen(true)}
+                                                onMenuClose={() => setIsSelectOpen(false)}
                                                 styles={{
                                                     control: (base) => ({
                                                         ...base,

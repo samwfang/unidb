@@ -430,210 +430,233 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         </Button>
       </Flex>
 
-      <Box minH={`${calculatedMinHeight}px`}> {/* Add minimum height for this box */}
-        {isLoading ? ( // Show spinner when loading
-          <Flex justifyContent="center" alignItems="center" minH="100px">
-            <Spinner
-              size="xl"
-              color={mode === 'undergrad' ? "blue.500" : "gray.600"}
-              thickness='4px'
-            />
-          </Flex>
-        ) : (
-          <>
-            {/* Column Headers */}
-            <Grid templateColumns={{
-              base: "75px minmax(120px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr)",
-              md: "75px 2fr 1fr 1fr 1fr"
-            }}
-              gap={4}
-              w="full"
-              alignItems="flex-end"
-              mb={2}
-              px={4}>
-              <GridItem textAlign="center">
-                <Popover>
-                  {({ isOpen }) => (
-                    <>
-                      <PopoverTrigger>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          fontWeight="bold"
-                          rightIcon={<ChevronDownIcon />}
-                          bg={sortedByCol == 0 ? "green.500" : isOpen ? "gray.100" : "transparent"}
-                          color={sortedByCol == 0 ? "white" : "black"}
-                          borderColor={"gray.200"}
-                          borderRadius="md"
-                          _hover={{
-                            bg: sortedByCol == 0 ? 'green.700' : 'gray.100',
-                            color: sortedByCol == 0 ? 'white' : 'black'
-                          }}
-                          zIndex={isOpen ? "popover" : "auto"}
-                        >
-                          Score
-                        </Button>
-                      </PopoverTrigger>
-                      {isOpen && (
-                        <Box
-                          position="absolute"
-                          top={0}
-                          left={0}
-                          right={0}
-                          bottom={0}
-                          backdropFilter="blur(12px)"
-                          bg="rgba(0, 0, 0, 0.1)"
-                          zIndex="overlay"
-                          borderRadius="lg"
-                          pointerEvents="none"
-                        />
-                      )}
-                      <Portal>
-                        <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
-                          boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
-                          <PopoverBody p={4}>
-                            <Text fontSize="xl" fontWeight="bold">Score</Text>
-                            <Badge variant="subtle" colorScheme="pink" ml={1}>
-                              WIP
-                            </Badge>
-                            {sortedByCol == 0 &&
-                              <Badge bg="green.200">Currently Sorted By</Badge>
-                            }
-                            <Text>Custom Scoring is currently a feature in progress!</Text>
-                          </PopoverBody>
-                        </PopoverContent>
-                      </Portal>
-                    </>
-                  )}
-                </Popover>
-              </GridItem>
-              <GridItem textAlign="left">
-                <Popover>
-                  {({ isOpen }) => (
-                    <>
-                      <PopoverTrigger>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          fontWeight="bold"
-                          rightIcon={<ChevronDownIcon />}
-                          bg={sortedByCol == 1 ? "green.500" : isOpen ? "gray.100" : "transparent"}
-                          color={sortedByCol == 1 ? "white" : "black"}
-                          borderColor={"gray.200"}
-                          borderRadius="md"
-                          _hover={{
-                            bg: sortedByCol == 1 ? 'green.700' : 'gray.100',
-                            color: sortedByCol == 1 ? 'white' : 'black'
-                          }}
-                          zIndex={isOpen ? "popover" : "auto"}
-                        >
-                          Name
-                        </Button>
-                      </PopoverTrigger>
-                      {isOpen && (
-                        <Box
-                          position="absolute"
-                          top={0}
-                          left={0}
-                          right={0}
-                          bottom={0}
-                          backdropFilter="blur(12px)"
-                          bg="rgba(0, 0, 0, 0.1)"
-                          zIndex="overlay"
-                          borderRadius="lg"
-                          pointerEvents="none"
-                        />
-                      )}
-                      <Portal>
-                        <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
-                          boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
-                          <PopoverBody p={4} >
-                            <Text fontSize="xl" fontWeight="bold"> University Name</Text>
-                            {sortedByCol == 1 &&
-                              <Badge bg="green.200">Currently Sorted By</Badge>
-                            }
-                            <Text>The most common name for each university.</Text>
-                            <Text fontWeight="bold"> Sort By: </Text>
-                            {isOpen && (
-                              <FormControl mt={2}>
-                                <ReactSelect
-                                  value={selectedNameSortingOption}
-                                  options={[
-                                    { value: ExtraSortType.Alphabetical, label: 'Alphabetical A-Z' },
-                                    { value: ExtraSortType.ReverseAlphabetical, label: 'Alphabetical Z-A' }
-                                  ]}
-                                  placeholder="Select sort option"
-                                  styles={{
-                                    control: (base) => ({
-                                      ...base,
-                                      backgroundColor: 'gray.50',
-                                      borderColor: '#E2E8F0',
-                                      _hover: { borderColor: '#CBD5E0' }
-                                    }),
-                                    option: (base) => ({
-                                      ...base,
-                                      backgroundColor: 'white',
-                                      color: 'black',
-                                      _hover: { backgroundColor: '#F7FAFC' }
-                                    })
-                                  }}
-                                  onChange={onUniversityNameSelectChange}
-                                />
-                              </FormControl>
-                            )}
-                            <Button
-                              mt={4}
-                              colorScheme="blue"
-                              size="sm"
-                              onClick={applyAlphabeticalSort}
-                            >
-                              Apply Sort
-                            </Button>
-
-                          </PopoverBody>
-                        </PopoverContent>
-                      </Portal>
-                    </>
-                  )}
-                </Popover>
-              </GridItem>
-
-              <GridItem textAlign="center">
-                <ColumnPopover departmentCID={columnDepts[0].value} sortedByCol={sortedByCol} departmentName={columnDepts[0].label} columnType={columnTypes[0]} onApply={handleApply} onApplyAndSort={handleApplySort} index={0} />
-              </GridItem>
-              <GridItem textAlign="center" fontWeight="bold">
-                <ColumnPopover departmentCID={columnDepts[1].value} sortedByCol={sortedByCol} departmentName={columnDepts[1].label} columnType={columnTypes[1]} onApply={handleApply} onApplyAndSort={handleApplySort} index={1} />
-              </GridItem>
-              <GridItem textAlign="center" fontWeight="bold">
-                <ColumnPopover departmentCID={columnDepts[2].value} sortedByCol={sortedByCol} departmentName={columnDepts[2].label} columnType={columnTypes[2]} onApply={handleApply} onApplyAndSort={handleApplySort} index={2} />
-              </GridItem>
-            </Grid>
-
-            <Accordion
-              allowMultiple
-              borderRadius="lg"
-              index={expandedIndex}
-              onChange={(index) => setExpandedIndex(index)}
-              sx={{
-                '& > div': {
-                  borderRadius: 'lg',
-                  overflow: 'hidden',
-                  '&:first-of-type': {
-                    borderTopRadius: 'lg'
-                  },
-                  '&:last-of-type': {
-                    borderBottomRadius: 'lg'
-                  }
-                }
+      <Box
+        overflowX="auto"
+        css={{
+          '&::-webkit-scrollbar': {
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: mode === ModeType.Undergrad ? '#3182ce' : '#888',
+            borderRadius: '4px',
+            _hover: {
+              background: mode === ModeType.Undergrad ? '#2c5282' : '#555',
+            }
+          },
+        }}
+      >
+        <Box minH={`${calculatedMinHeight}px`} minW="800px"> {/* Add minimum height for this box */}
+          {isLoading ? ( // Show spinner when loading
+            <Flex justifyContent="center" alignItems="center" minH="100px">
+              <Spinner
+                size="xl"
+                color={mode === 'undergrad' ? "blue.500" : "gray.600"}
+                thickness='4px'
+              />
+            </Flex>
+          ) : (
+            <>
+              {/* Column Headers */}
+              <Grid templateColumns={{
+                base: "75px minmax(120px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr)",
+                md: "75px 2fr 1fr 1fr 1fr"
               }}
-            >
-              {data.map((item, index) => (
-                <MasterTableRow rank={(currentPage) * pageSize + index + 1} key={item.id} item={item} mode={mode} columnDepts={columnDepts} columnTypes={columnTypes} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
-              ))}
-            </Accordion>
-          </>
-        )}
+                gap={4}
+                w="full"
+                alignItems="flex-end"
+                mb={2}
+                px={4}
+                minW="800px">
+                <GridItem textAlign="center">
+                  <Popover>
+                    {({ isOpen }) => (
+                      <>
+                        <PopoverTrigger>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            fontWeight="bold"
+                            rightIcon={<ChevronDownIcon />}
+                            bg={sortedByCol == 0 ? "green.500" : isOpen ? "gray.100" : "transparent"}
+                            color={sortedByCol == 0 ? "white" : "black"}
+                            borderColor={"gray.200"}
+                            borderRadius="md"
+                            _hover={{
+                              bg: sortedByCol == 0 ? 'green.700' : 'gray.100',
+                              color: sortedByCol == 0 ? 'white' : 'black'
+                            }}
+                            zIndex={isOpen ? "popover" : "auto"}
+                          >
+                            Score
+                          </Button>
+                        </PopoverTrigger>
+                        {isOpen && (
+                          <Box
+                            position="absolute"
+                            top={0}
+                            left={0}
+                            right={0}
+                            bottom={0}
+                            backdropFilter="blur(12px)"
+                            bg="rgba(0, 0, 0, 0.1)"
+                            zIndex="overlay"
+                            borderRadius="lg"
+                            pointerEvents="none"
+                          />
+                        )}
+                        <Portal>
+                          <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
+                            boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
+                            <PopoverBody p={4}>
+                              <Text fontSize="xl" fontWeight="bold">Score</Text>
+                              <Badge variant="subtle" colorScheme="pink" ml={1}>
+                                WIP
+                              </Badge>
+                              {sortedByCol == 0 &&
+                                <Badge bg="green.200">Currently Sorted By</Badge>
+                              }
+                              <Text>Custom Scoring is currently a feature in progress!</Text>
+                            </PopoverBody>
+                          </PopoverContent>
+                        </Portal>
+                      </>
+                    )}
+                  </Popover>
+                </GridItem>
+                <GridItem textAlign="left">
+                  <Popover>
+                    {({ isOpen }) => (
+                      <>
+                        <PopoverTrigger>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            fontWeight="bold"
+                            rightIcon={<ChevronDownIcon />}
+                            bg={sortedByCol == 1 ? "green.500" : isOpen ? "gray.100" : "transparent"}
+                            color={sortedByCol == 1 ? "white" : "black"}
+                            borderColor={"gray.200"}
+                            borderRadius="md"
+                            _hover={{
+                              bg: sortedByCol == 1 ? 'green.700' : 'gray.100',
+                              color: sortedByCol == 1 ? 'white' : 'black'
+                            }}
+                            zIndex={isOpen ? "popover" : "auto"}
+                          >
+                            Name
+                          </Button>
+                        </PopoverTrigger>
+                        {isOpen && (
+                          <Box
+                            position="absolute"
+                            top={0}
+                            left={0}
+                            right={0}
+                            bottom={0}
+                            backdropFilter="blur(12px)"
+                            bg="rgba(0, 0, 0, 0.1)"
+                            zIndex="overlay"
+                            borderRadius="lg"
+                            pointerEvents="none"
+                          />
+                        )}
+                        <Portal>
+                          <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
+                            boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
+                            <PopoverBody p={4} >
+                              <Text fontSize="xl" fontWeight="bold"> University Name</Text>
+                              {sortedByCol == 1 &&
+                                <Badge bg="green.200">Currently Sorted By</Badge>
+                              }
+                              <Text>The most common name for each university.</Text>
+                              <Text fontWeight="bold"> Sort By: </Text>
+                              {isOpen && (
+                                <FormControl mt={2}>
+                                  <ReactSelect
+                                    value={selectedNameSortingOption}
+                                    options={[
+                                      { value: ExtraSortType.Alphabetical, label: 'Alphabetical A-Z' },
+                                      { value: ExtraSortType.ReverseAlphabetical, label: 'Alphabetical Z-A' }
+                                    ]}
+                                    placeholder="Select sort option"
+                                    styles={{
+                                      control: (base) => ({
+                                        ...base,
+                                        backgroundColor: 'gray.50',
+                                        borderColor: '#E2E8F0',
+                                        _hover: { borderColor: '#CBD5E0' }
+                                      }),
+                                      option: (base) => ({
+                                        ...base,
+                                        backgroundColor: 'white',
+                                        color: 'black',
+                                        _hover: { backgroundColor: '#F7FAFC' }
+                                      })
+                                    }}
+                                    onChange={onUniversityNameSelectChange}
+                                  />
+                                </FormControl>
+                              )}
+                              <Button
+                                mt={4}
+                                colorScheme="blue"
+                                size="sm"
+                                onClick={applyAlphabeticalSort}
+                              >
+                                Apply Sort
+                              </Button>
+
+                            </PopoverBody>
+                          </PopoverContent>
+                        </Portal>
+                      </>
+                    )}
+                  </Popover>
+                </GridItem>
+
+                <GridItem textAlign="center">
+                  <ColumnPopover departmentCID={columnDepts[0].value} sortedByCol={sortedByCol} departmentName={columnDepts[0].label} columnType={columnTypes[0]} onApply={handleApply} onApplyAndSort={handleApplySort} index={0} />
+                </GridItem>
+                <GridItem textAlign="center" fontWeight="bold">
+                  <ColumnPopover departmentCID={columnDepts[1].value} sortedByCol={sortedByCol} departmentName={columnDepts[1].label} columnType={columnTypes[1]} onApply={handleApply} onApplyAndSort={handleApplySort} index={1} />
+                </GridItem>
+                <GridItem textAlign="center" fontWeight="bold">
+                  <ColumnPopover departmentCID={columnDepts[2].value} sortedByCol={sortedByCol} departmentName={columnDepts[2].label} columnType={columnTypes[2]} onApply={handleApply} onApplyAndSort={handleApplySort} index={2} />
+                </GridItem>
+              </Grid>
+
+              <Accordion
+                allowMultiple
+                borderRadius="lg"
+                index={expandedIndex}
+                onChange={(index) => setExpandedIndex(index)}
+                minW="800px"
+                sx={{
+                  '& > div': {
+                    borderRadius: 'lg',
+                    overflow: 'hidden',
+                    '&:first-of-type': {
+                      borderTopRadius: 'lg'
+                    },
+                    '&:last-of-type': {
+                      borderBottomRadius: 'lg'
+                    }
+                  }
+                }}
+              >
+                {data.map((item, index) => (
+                  <MasterTableRow rank={(currentPage) * pageSize + index + 1} key={item.id} item={item} mode={mode} columnDepts={columnDepts} columnTypes={columnTypes} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
+                ))}
+              </Accordion>
+            </>
+          )}
+        </Box>
       </Box>
+
+
 
       <Flex justifyContent="space-between" alignItems="center" mt="4">
         <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}
