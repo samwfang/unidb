@@ -172,9 +172,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               },
               demographics: {
                 gender: [
-                  { name: 'Male', value: 40 },
-                  { name: 'Female', value: 10 },
-                  { name: 'Other', value: 50 },
+                  { name: 'Male', value: 48 },
+                  { name: 'Female', value: 50 },
+                  { name: 'Other', value: 2 },
                 ],
                 ethnicity: [
                   { name: 'White', value: 30 },
@@ -203,9 +203,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               },
               demographics: {
                 gender: [
-                  { name: 'Male', value: 40 },
-                  { name: 'Female', value: 10 },
-                  { name: 'Other', value: 50 },
+                  { name: 'Male', value: 48 },
+                  { name: 'Female', value: 50 },
+                  { name: 'Other', value: 2 },
                 ],
                 ethnicity: [
                   { name: 'White', value: 30 },
