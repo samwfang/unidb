@@ -1,7 +1,11 @@
-import { Badge, Box, Button, Circle, Flex, List, ListIcon, ListItem, Switch, Text } from "@chakra-ui/react";
+import { Badge, Box, Button, Circle, Flex, Icon, List, ListIcon, ListItem, Switch, Text } from "@chakra-ui/react";
 import { ModeType } from "./App";
 import UGradGradToggle from "./UGradGradToggle";
 import { CheckCircleIcon } from "@chakra-ui/icons";
+import { FiCircle } from 'react-icons/fi';
+import { Grid, Avatar } from '@chakra-ui/react';
+import { StarIcon, ViewIcon, SearchIcon, SmallAddIcon } from '@chakra-ui/icons';
+import React from "react";
 
 interface FrontPageInfoProps {
     mode: ModeType;
@@ -67,45 +71,51 @@ const FrontPageInfo: React.FC<FrontPageInfoProps> = ({ mode, onModeChange, onFin
                         <Text fontSize="2xl" fontWeight="bold">
                             {isUndergrad ? "Undergraduate Mode" : "Graduate Mode"}
                         </Text>
-                        <Box textAlign="left" w="100%" pl={4} mt={4} mb={4}>
+                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4} width="100%">
                             {isUndergrad ? (
                                 <>
-                                    <List spacing={1.5}>
-                                        <ListItem>
-                                            <ListIcon as={CheckCircleIcon} color="blue.500" />
-                                            Compare and Score Undergraduate Programs
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListIcon as={CheckCircleIcon} color="blue.500" />
-                                            View Demographics, Admission Statistics, and Tuition Costs
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListIcon as={CheckCircleIcon} color=" blue.500" />
-                                            Check How Recent Alumni Are Doing
-                                        </ListItem>
-
-                                    </List>
+                                    <Box bg="blue.50" p={3} borderRadius="md">
+                                        <Flex alignItems="flex-start">
+                                            <Avatar size="sm" bg="blue.500" color="white" icon={<StarIcon />} mr={3} />
+                                            <Box>
+                                                <Text fontWeight="bold" mb={1}>Compare & Rank</Text>
+                                                <Text fontSize="sm" color="gray.600">Score programs side-by-side</Text>
+                                            </Box>
+                                        </Flex>
+                                    </Box>
+                                    <Box bg="blue.50" p={3} borderRadius="md">
+                                        <Flex alignItems="flex-start">
+                                            <Avatar size="sm" bg="blue.500" color="white" icon={<ViewIcon />} mr={3} />
+                                            <Box>
+                                                <Text fontWeight="bold" mb={1}>Student Stats</Text>
+                                                <Text fontSize="sm" color="gray.600">View demographics & outcomes</Text>
+                                            </Box>
+                                        </Flex>
+                                    </Box>
                                 </>
                             ) : (
                                 <>
-                                      <List spacing={1.5}>
-                                        <ListItem>
-                                            <ListIcon as={CheckCircleIcon} color="gray.500" />
-                                            Compare and Score Graduate Programs
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListIcon as={CheckCircleIcon} color="gray.500" />
-                                            Check if Research Labs Are Accepting Candidates
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListIcon as={CheckCircleIcon} color="gray.500" />
-                                            Find and Search Faculty Research Interests
-                                        </ListItem>
-
-                                    </List>
+                                    <Box bg="purple.50" p={3} borderRadius="md">
+                                        <Flex alignItems="flex-start">
+                                            <Avatar size="sm" bg="purple.500" color="white" icon={<SearchIcon />} mr={3} />
+                                            <Box>
+                                                <Text fontWeight="bold" mb={1}>Research Labs</Text>
+                                                <Text fontSize="sm" color="gray.600">Find open positions</Text>
+                                            </Box>
+                                        </Flex>
+                                    </Box>
+                                    <Box bg="purple.50" p={3} borderRadius="md">
+                                        <Flex alignItems="flex-start">
+                                            <Avatar size="sm" bg="purple.500" color="white" icon={<SmallAddIcon />} mr={3} />
+                                            <Box>
+                                                <Text fontWeight="bold" mb={1}>Faculty Interests</Text>
+                                                <Text fontSize="sm" color="gray.600">Search by research area</Text>
+                                            </Box>
+                                        </Flex>
+                                    </Box>
                                 </>
                             )}
-                        </Box>
+                        </Grid>
 
                         <Switch size="lg"
                             isChecked={!isUndergrad}
