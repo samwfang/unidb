@@ -56,6 +56,13 @@ function App() {
   const [showHeader, setShowHeader] = useState<boolean>(false);
   const frontPageInfoRef = useRef<HTMLDivElement>(null);
 
+
+  const masterTableRef = useRef<HTMLDivElement>(null);
+
+  const scrollToMasterTable = () => {
+    masterTableRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   //handle showing or removing the front header based on user scroll location
   useEffect(() => {
     const handleScroll = () => {
@@ -83,45 +90,50 @@ function App() {
     <div className="App">
       {/* Gradient Background to make it look nice and spiffy! */}
       <Box minH="100vh"
-      height="100%"
-      position="relative"
-      overflow="hidden"
+        height="100%"
+        position="relative"
+        overflow="hidden"
         bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, gray.50, gray.200)"} // Chakra's gradient syntax
-         p={{ base: 2, md: 4 }}
+        p={{ base: 2, md: 4 }}
       >
         {/* Top Header: Only Display when ShowHeader == True */}
-        <TopHeader 
-          mode={mode} 
-          showHeader={showHeader} 
-          onToggle={undergradGradToggle} 
+        <TopHeader
+          mode={mode}
+          showHeader={showHeader}
+          onToggle={undergradGradToggle}
         />
 
-        <Flex maxW="1000px" 
+        <Flex maxW="1000px"
           w="100%" // Ensure it takes full width on mobile
           px={{ base: 2, md: 0 }} // Add padding on mobile
-          alignItems="center" 
-          mx="auto" 
+          alignItems="center"
+          mx="auto"
           ref={frontPageInfoRef}>
-          <FrontPageInfo mode={mode} onModeChange={undergradGradToggle}/>
+          <FrontPageInfo mode={mode}
+            onModeChange={undergradGradToggle}
+            onFindCollegesClick={scrollToMasterTable} />
         </Flex>
         {/* Master Table and Control Panel */}
-        <Flex direction={{ base: "column", md: "row" }} gap={2} mt={6} maxW="1300px" mx="auto" w="100%"
-          px={{ base: 2, md: 0 }}>
-          <MTControlPanel
-            pageSize={pageSize}
-            onPageSizeChange={setPageSize}
-            mode={mode}
-            onModeChange={undergradGradToggle}
-          />
+        <Box ref={masterTableRef}>
+          <Flex direction={{ base: "column", md: "row" }} gap={2} mt={6} maxW="1300px" mx="auto" w="100%"
+            px={{ base: 2, md: 0 }}>
+            <MTControlPanel
+              pageSize={pageSize}
+              onPageSizeChange={setPageSize}
+              mode={mode}
+              onModeChange={undergradGradToggle}
+            />
 
-          {/* MasterTable - updated to use pageSize prop */}
-          <Box flex={1}  w="100%" overflowX="auto">
-            <MasterTable mode={mode} toggleMode={undergradGradToggle} pageSize={pageSize} />
-          </Box>
-        </Flex>
-        <Flex maxW="1000px" alignItems="center"  mx="auto" ref={frontPageInfoRef}>
-          <ThankYouPage mode={mode} onModeChange={undergradGradToggle}/>
-        </Flex>
+            {/* MasterTable - updated to use pageSize prop */}
+            <Box flex={1} w="100%" overflowX="auto">
+              <MasterTable mode={mode} toggleMode={undergradGradToggle} pageSize={pageSize} />
+            </Box>
+          </Flex>
+          <Flex maxW="1000px" alignItems="center" mx="auto" ref={frontPageInfoRef}>
+            <ThankYouPage mode={mode} onModeChange={undergradGradToggle} />
+          </Flex>
+        </Box>
+
         <Box mt="auto" py={4} textAlign="center" color="gray.600">
           <Text fontSize="sm">
             By Samuel Fang | Built with React & Chakra UI

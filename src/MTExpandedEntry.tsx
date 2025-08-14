@@ -114,9 +114,10 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           sectorScorecard={item?.sectorScorecard}
         />
         <Grid
-          templateAreas={`"students students students"
+          templateAreas={`"rate . ."
+            "students students students"
                         "students students students"
-                        "rate . ."`}
+                        `}
           gridTemplateColumns="1fr 1fr 1fr"
           gridTemplateRows="auto auto auto"
           gap={4}
