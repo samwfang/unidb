@@ -59,7 +59,7 @@ const FrontPageInfo: React.FC<FrontPageInfoProps> = ({ mode, onModeChange, onFin
                     </Button>
                 </Flex>
 
-                <Box w={{ base: "100%", md: "600px" }} mx="auto" mt="8"
+                <Box w={{ base: "100%", md: "700px" }} mx="auto" mt="8"
                     bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
                     backdropFilter="blur(16px)"  // Applies the frosted glass effect
                     borderRadius="lg"            // Rounds the corners of the box
@@ -74,42 +74,78 @@ const FrontPageInfo: React.FC<FrontPageInfoProps> = ({ mode, onModeChange, onFin
                         <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4} width="100%">
                             {isUndergrad ? (
                                 <>
-                                    <Box bg="blue.50" p={3} borderRadius="md">
+                                    <Box p={3} borderRadius="md">
                                         <Flex alignItems="flex-start">
                                             <Avatar size="sm" bg="blue.500" color="white" icon={<StarIcon />} mr={3} />
                                             <Box>
-                                                <Text fontWeight="bold" mb={1}>Compare & Rank</Text>
-                                                <Text fontSize="sm" color="gray.600">Score programs side-by-side</Text>
+                                                <Text fontWeight="bold" mb={1}>Find The Right College</Text>
+                                                <Text fontSize="sm" color="gray.600">Score programs side-by-side using custom criteria</Text>
                                             </Box>
                                         </Flex>
                                     </Box>
-                                    <Box bg="blue.50" p={3} borderRadius="md">
+                                    <Box  p={3} borderRadius="md">
                                         <Flex alignItems="flex-start">
                                             <Avatar size="sm" bg="blue.500" color="white" icon={<ViewIcon />} mr={3} />
                                             <Box>
-                                                <Text fontWeight="bold" mb={1}>Student Stats</Text>
-                                                <Text fontSize="sm" color="gray.600">View demographics & outcomes</Text>
+                                                <Text fontWeight="bold" mb={1}>Student Population</Text>
+                                                <Text fontSize="sm" color="gray.600">View student makeup and post-graduation metrics</Text>
+                                            </Box>
+                                        </Flex>
+                                    </Box>
+                                    <Box p={3} borderRadius="md">
+                                        <Flex alignItems="flex-start">
+                                            <Avatar size="sm" bg="blue.500" color="white" icon={<ViewIcon />} mr={3} />
+                                            <Box>
+                                                <Text fontWeight="bold" mb={1}>Admissions Info</Text>
+                                                <Text fontSize="sm" color="gray.600">Check acceptance criteria and rates</Text>
+                                            </Box>
+                                        </Flex>
+                                    </Box>
+                                    <Box p={3} borderRadius="md">
+                                        <Flex alignItems="flex-start">
+                                            <Avatar size="sm" bg="blue.500" color="white" icon={<ViewIcon />} mr={3} />
+                                            <Box>
+                                                <Text fontWeight="bold" mb={1}>Financial Info</Text>
+                                                <Text fontSize="sm" color="gray.600">Compare tuition costs and financial aid</Text>
                                             </Box>
                                         </Flex>
                                     </Box>
                                 </>
                             ) : (
                                 <>
-                                    <Box bg="purple.50" p={3} borderRadius="md">
+                                    <Box p={3} borderRadius="md">
                                         <Flex alignItems="flex-start">
                                             <Avatar size="sm" bg="purple.500" color="white" icon={<SearchIcon />} mr={3} />
                                             <Box>
-                                                <Text fontWeight="bold" mb={1}>Research Labs</Text>
-                                                <Text fontSize="sm" color="gray.600">Find open positions</Text>
+                                                <Text fontWeight="bold" mb={1}>Find The Right Lab</Text>
+                                                <Text fontSize="sm" color="gray.600">Find research groups currently looking for students</Text>
                                             </Box>
                                         </Flex>
                                     </Box>
-                                    <Box bg="purple.50" p={3} borderRadius="md">
+                                    <Box p={3} borderRadius="md">
                                         <Flex alignItems="flex-start">
                                             <Avatar size="sm" bg="purple.500" color="white" icon={<SmallAddIcon />} mr={3} />
                                             <Box>
-                                                <Text fontWeight="bold" mb={1}>Faculty Interests</Text>
-                                                <Text fontSize="sm" color="gray.600">Search by research area</Text>
+                                                <Text fontWeight="bold" mb={1}>Faculty Directory</Text>
+                                                <Text fontSize="sm" color="gray.600">Search faculty research interests and previous work</Text>
+                                            </Box>
+                                        </Flex>
+                                    </Box>
+                                    <Box p={3} borderRadius="md">
+                                        <Flex alignItems="flex-start">
+                                            <Avatar size="sm" bg="purple.500" color="white" icon={<SmallAddIcon />} mr={3} />
+                                            <Box>
+                                                <Text fontWeight="bold" mb={1}>Admissions Criteria</Text>
+                                                <Text fontSize="sm" color="gray.600">Check acceptance criteria and rates</Text>
+                                            </Box>
+                                        </Flex>
+                                    </Box>
+                                    <Box p={3} borderRadius="md">
+                                        <Flex alignItems="flex-start">
+                                            <Avatar size="sm" bg="purple.500" color="white" icon={<SmallAddIcon />} mr={3} />
+                                            <Box>
+                                                <Text fontWeight="bold" mb={1}>Student Population</Text>
+                                                <Text fontSize="sm" color="gray.600">View student makeup and post-graduation metrics</Text>
                                             </Box>
                                         </Flex>
                                     </Box>
