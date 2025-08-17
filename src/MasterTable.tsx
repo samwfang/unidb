@@ -150,9 +150,18 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       await new Promise((resolve) => setTimeout(resolve, 500));
       console.log(`Fetching page ${page} with size ${pageSize}, sort=${sortingParameter}`);
 
+      const randomInRange = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+      const randomRate = () => randomInRange(40, 100);
+      const randomStudents = () => randomInRange(1000, 50000).toLocaleString();
+      const randomClassSize = () => randomInRange(10, 500);
+      const randomPercentile = () => randomInRange(10, 99);
+
       // Simulated API response
       const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
         const globalIndex = page * pageSize + i;
+        const gradRate = randomRate();
+        const totalStudents = randomStudents();
+
         return {
           id: globalIndex + 1,
           name: `The University of the Number ${globalIndex + 1}`,
@@ -164,11 +173,11 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           content: {
             undergrad_content: {
               general_content: {
-                total_students: '35,500',
-                total_student_percentile: '70',
-                graduation_rate: '95%',
-                graduation_rate_percentile: '95',
-                average_class_size: '550'
+                total_students: totalStudents,
+                total_student_percentile: randomPercentile().toString(),
+                graduation_rate: `${gradRate}%`,
+                graduation_rate_percentile: randomPercentile().toString(),
+                average_class_size: randomClassSize().toString()
               },
               demographics: {
                 gender: [
