@@ -59,12 +59,12 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
     return (
         <Box
             p={4}
-            borderWidth={1}
+            // borderWidth={1}
             borderRadius="md"
             minHeight="120px"
-            bg="rgba(255, 255, 255, 0.2)"
-            boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
-            border="1px solid rgba(255, 255, 255, 0.2)"
+            // bg="rgba(255, 255, 255, 0.2)"
+            // boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
+            // border="1px solid rgba(255, 255, 255, 0.2)"
             mb={4} // Add margin bottom to separate from other widgets
         >
             <Flex alignItems="center" justifyContent="space-between">
