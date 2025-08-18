@@ -235,6 +235,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
                 innerRadius={80}
                 outerRadius={100}
                 paddingAngle={5}
+                cornerRadius={10}
                 dataKey="value"
               >
                 {currentData.data.map((entry, index) => (

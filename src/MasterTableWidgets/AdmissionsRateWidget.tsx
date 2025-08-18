@@ -2,20 +2,31 @@ import React from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
-interface GraduationRateWidgetProps {
-  graduationRate: string;
+interface AdmissionsRateProps {
+  admissionsRate: string;
 }
 
-const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationRate }) => {
-  const rate = parseFloat(graduationRate) || 0;
+const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ admissionsRate }) => {
+  const rate = parseFloat(admissionsRate) || 0;
   const remaining = 100 - rate;
 
   const data = [
-    { name: 'Graduated', value: rate },
-    { name: 'Remaining', value: remaining }
+    { name: 'Admitted', value: rate },
+    { name: 'Not Admitted', value: remaining }
   ];
 
-  const color = rate >= 80 ? '#489c4bff' : rate >= 50 ? '#FFC107' : '#F44336';
+  const colorThresholds = [
+    { threshold: 15, color: '#613ed2ff' }, 
+    { threshold: 25, color: '#1b6abeff' }, 
+    { threshold: 50, color: '#0b5f1fff' },    
+    { threshold: 75, color: '#10a508ff' },
+    { threshold: Infinity, color: '#424342ff' }
+  ];
+
+  // Find the first threshold that matches
+  const { color } = colorThresholds.find(({ threshold }) => rate <= threshold) ||
+    { color: '#F44336' };
+
 
   return (
     <Box
@@ -27,7 +38,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
       boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
       border="1px solid rgba(255, 255, 255, 0.2)"
     >
-      <Text fontSize="2xl" fontWeight="bold" mb={4}>Graduation Rate:</Text>
+      <Text fontSize="2xl" fontWeight="bold" mb={4}>Admissions Rate:</Text>
 
       <Box height="140px" position="relative">
         <ResponsiveContainer width="100%" height="100%">
@@ -40,8 +51,8 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
               endAngle={0}
               innerRadius={70}
               outerRadius={90}
-              cornerRadius={10}  // Adds rounded edges
-              paddingAngle={2}  // Small gap between slices
+              cornerRadius={10}
+              paddingAngle={2}
               dataKey="value"
             >
               <Cell fill={color} stroke={color} strokeWidth={1} />
@@ -54,14 +65,14 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
               style={{
                 fontSize: '32px',
                 fontWeight: 'bold',
-                fill: color  // Match text color to gauge
+                fill: color
               }}
             >
-              {graduationRate}%
+              {admissionsRate}%
             </text>
             <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: '14px' }}>
-              <tspan x="50%" dy="0">Graduated Within</tspan>
-              <tspan x="50%" dy="15">8 Years</tspan>
+              <tspan x="50%" dy="0">Of Applicants</tspan>
+              <tspan x="50%" dy="15">Admitted</tspan>
             </text>
           </PieChart>
         </ResponsiveContainer>
@@ -70,4 +81,4 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
   );
 };
 
-export default GraduationRateWidget;
+export default AdmissionsRateWidget;

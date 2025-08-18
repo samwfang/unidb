@@ -41,6 +41,9 @@ export interface UndergradContent {
     total_student_percentile: string;
     graduation_rate: string;
     graduation_rate_percentile: string;
+    admissions_rate: string;
+    admissions_rate_percentile: string;
+    
     average_class_size: string;
   };
   demographics?: DemographicsData;
@@ -64,6 +67,9 @@ export interface GradContent {
   general_content: {
     total_students: string;
     graduation_rate: string;
+    graduation_rate_percentile?: string;
+    admissions_rate?: string;
+    admissions_rate_percentile?: string;
     average_class_size: string;
   };
   demographics?: DemographicsData;
@@ -151,7 +157,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       console.log(`Fetching page ${page} with size ${pageSize}, sort=${sortingParameter}`);
 
       const randomInRange = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-      const randomRate = () => randomInRange(40, 100);
+      const randomRate = () => randomInRange(5, 100);
       const randomStudents = () => randomInRange(1000, 50000).toLocaleString();
       const randomClassSize = () => randomInRange(10, 500);
       const randomPercentile = () => randomInRange(10, 99);
@@ -175,8 +181,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
               general_content: {
                 total_students: totalStudents,
                 total_student_percentile: randomPercentile().toString(),
-                graduation_rate: `${gradRate}%`,
+                graduation_rate: `${gradRate}`,
                 graduation_rate_percentile: randomPercentile().toString(),
+                admissions_rate: randomRate().toString(),
+                admissions_rate_percentile: randomPercentile().toString(),
                 average_class_size: randomClassSize().toString()
               },
               demographics: {
