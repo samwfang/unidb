@@ -10,6 +10,7 @@ import { Tooltip } from '@chakra-ui/react';
 import { cipToClassificationName, groupDepartmentsByCIP } from './helpers/DepartmentHelper';
 import UniversitySummaryWidget from './MasterTableWidgets/UniversitySummaryWidget';
 import AdmissionsRateWidget from './MasterTableWidgets/AdmissionsRateWidget';
+import TestScoresWidget from './MasterTableWidgets/TestScoresWidget';
 
 /*
 Expanded Entries: Rendering The Graphics Which Show when User Clicks An Entry in the Master Table
@@ -115,7 +116,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           sectorScorecard={item?.sectorScorecard}
         />
         <Grid
-          templateAreas={`"rate admissions ."
+          templateAreas={`"rate admissions testscores"
             "students students students"
                         "students students students"
                         `}
@@ -133,6 +134,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           </Box>
           <Box gridArea="admissions">
             <AdmissionsRateWidget admissionsRate={general?.general_content.admissions_rate || 'No Data'} />
+          </Box>
+          <Box gridArea="testscores">
+            <TestScoresWidget satScore={"1184"} actScore={"34"}/>
           </Box>
         </Grid>
       </Box>

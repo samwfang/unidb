@@ -15,7 +15,20 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
     { name: 'Remaining', value: remaining }
   ];
 
-  const color = rate >= 80 ? '#489c4bff' : rate >= 50 ? '#FFC107' : '#F44336';
+  const colorThresholds = [
+    { threshold: 30, color: '#f10c0cff' }, 
+    { threshold: 50, color: '#fca800'   }, 
+    { threshold: 70, color: '#fcd200' }, 
+     { threshold: 80, color: '#10a508ff' },   
+    { threshold: 90, color: '#0b5f1fff' },    
+    { threshold: 95, color: '#1b6abeff' },
+    { threshold: Infinity, color: '#613ed2ff' }
+  ];
+
+  // Find the first threshold that matches
+  const { color } = colorThresholds.find(({ threshold }) => rate <= threshold) ||
+    { color: '#F44336' };
+
 
   return (
     <Box
