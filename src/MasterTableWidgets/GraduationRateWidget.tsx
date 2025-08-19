@@ -74,7 +74,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
             </text>
             <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: '14px' }}>
               <tspan x="50%" dy="0">Graduated Within</tspan>
-              <tspan x="50%" dy="15">8 Years</tspan>
+              <tspan x="50%" dy="15">6 Years</tspan>
             </text>
           </PieChart>
         </ResponsiveContainer>
