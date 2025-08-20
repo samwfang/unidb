@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -16,11 +16,11 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
   ];
 
   const colorThresholds = [
-    { threshold: 30, color: '#f10c0cff' }, 
-    { threshold: 50, color: '#fca800'   }, 
-    { threshold: 70, color: '#fcd200' }, 
-     { threshold: 80, color: '#10a508ff' },   
-    { threshold: 90, color: '#0b5f1fff' },    
+    { threshold: 30, color: '#f10c0cff' },
+    { threshold: 50, color: '#fca800' },
+    { threshold: 70, color: '#fcd200' },
+    { threshold: 80, color: '#10a508ff' },
+    { threshold: 90, color: '#0b5f1fff' },
     { threshold: 95, color: '#1b6abeff' },
     { threshold: Infinity, color: '#613ed2ff' }
   ];
@@ -28,6 +28,34 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
   // Find the first threshold that matches
   const { color } = colorThresholds.find(({ threshold }) => rate <= threshold) ||
     { color: '#F44336' };
+
+
+  // DYNAMICALLY ADJUST PIE CHART SIZE ACCORDING TO WINDOW HEIGHT (SINCE RECHARTS DOESNT SUPPORT THIS GRRR)
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Responsive radius based on window width
+  const getRadius = () => {
+    if (windowSize.width < 480) return { inner: 40, outer: 55 };
+    if (windowSize.width < 768) return { inner: 50, outer: 65 };
+    return { inner: 70, outer: 90 };
+  };
+
+  const { inner, outer } = getRadius();
 
 
   return (
@@ -39,8 +67,9 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
       bg="rgba(255, 255, 255, 0.2)"
       boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
       border="1px solid rgba(255, 255, 255, 0.2)"
+      height="100%"
     >
-      <Text fontSize="2xl" fontWeight="bold" mb={4}>Graduation Rate:</Text>
+      <Text fontSize="xl" fontWeight="bold" mb={2}>Graduation Rate:</Text>
 
       <Box height="140px" position="relative">
         <ResponsiveContainer width="100%" height="100%">
@@ -51,8 +80,8 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
               cy="70%"
               startAngle={180}
               endAngle={0}
-              innerRadius={70}
-              outerRadius={90}
+              innerRadius={inner}
+              outerRadius={outer}
               cornerRadius={10}  // Adds rounded edges
               paddingAngle={2}  // Small gap between slices
               dataKey="value"
@@ -65,7 +94,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
               y="60%"
               textAnchor="middle"
               style={{
-                fontSize: '32px',
+                fontSize: 'clamp(16px, 3.5vw, 32px)',
                 fontWeight: 'bold',
                 fill: color  // Match text color to gauge
               }}

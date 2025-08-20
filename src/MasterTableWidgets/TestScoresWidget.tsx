@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Text, Tabs, TabList, Tab, Flex } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -9,18 +9,20 @@ interface TestScoresProps {
 
 const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => {
   const [activeTab, setActiveTab] = useState<'SAT' | 'ACT'>('SAT');
-  
+
   // Parse scores or use defaults
   const sat = parseInt(satScore || '0') || 0;
   const act = parseInt(actScore || '0') || 0;
-  
+
   const maxSat = 1600;
   const maxAct = 36;
-  
+
   const currentScore = activeTab === 'SAT' ? sat : act;
   const maxScore = activeTab === 'SAT' ? maxSat : maxAct;
   const remaining = maxScore - currentScore;
-  
+
+
+
   const data = [
     { name: 'Score', value: currentScore },
     { name: 'Remaining', value: remaining }
@@ -29,11 +31,11 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
   // Color based on percentile of max score
   const percentile = currentScore / maxScore;
   const colorThresholds = [
-    { threshold: .60, color: '#f10c0cff' }, 
-    { threshold: .70, color: '#fca800' }, 
-    { threshold: .75, color: '#fcd200' }, 
-     { threshold: .80, color: '#10a508ff' },   
-    { threshold: .85, color: '#0b5f1fff' },    
+    { threshold: .60, color: '#f10c0cff' },
+    { threshold: .70, color: '#fca800' },
+    { threshold: .75, color: '#fcd200' },
+    { threshold: .80, color: '#10a508ff' },
+    { threshold: .85, color: '#0b5f1fff' },
     { threshold: .95, color: '#1b6abeff' },
     { threshold: Infinity, color: '#613ed2ff' }
   ];
@@ -43,26 +45,47 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
     { color: '#F44336' };
 
 
+  // DYNAMICALLY ADJUST PIE CHART SIZE ACCORDING TO WINDOW HEIGHT (SINCE RECHARTS DOESNT SUPPORT THIS GRRR)
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Responsive radius based on window width
+  const getRadius = () => {
+    if (windowSize.width < 480) return { inner: 40, outer: 55 };
+    if (windowSize.width < 768) return { inner: 50, outer: 65 };
+    return { inner: 70, outer: 90 };
+  };
+
+  const { inner, outer } = getRadius();
+
+  
   return (
     <Box
-      p={4}
+      p={{ base: 2, md: 4 }}
       borderWidth={1}
       borderRadius="md"
       minHeight="120px"
       bg="rgba(255, 255, 255, 0.2)"
       boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
       border="1px solid rgba(255, 255, 255, 0.2)"
+      height="100%"
     >
-      <Flex alignItems="center" justifyContent="space-between" mb={4}>
-        <Text fontSize="lg" fontWeight="bold">Avg.</Text>
-        <Tabs variant="soft-rounded" onChange={(index) => setActiveTab(index === 0 ? 'SAT' : 'ACT')}>
-          <TabList>
-            <Tab>SAT</Tab>
-            <Tab>ACT</Tab>
-          </TabList>
-        </Tabs>
-        <Text fontSize="lg" fontWeight="bold">Score:</Text>
-      </Flex>
+      <Text fontSize="xl" fontWeight="bold" mb={2}>Test Scores: </Text>
+
 
       <Box height="140px" position="relative">
         <ResponsiveContainer width="100%" height="100%">
@@ -73,8 +96,8 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
               cy="70%"
               startAngle={180}
               endAngle={0}
-              innerRadius={70}
-              outerRadius={90}
+              innerRadius={inner}
+              outerRadius={outer}
               cornerRadius={10}
               paddingAngle={2}
               dataKey="value"
@@ -87,7 +110,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
               y="60%"
               textAnchor="middle"
               style={{
-                fontSize: '32px',
+                fontSize: 'clamp(16px, 3.5vw, 32px)',
                 fontWeight: 'bold',
                 fill: color
               }}
@@ -95,12 +118,21 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
               {currentScore}
             </text>
             <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: '14px' }}>
-              <tspan x="50%" dy="0">Out of</tspan>
-              <tspan x="50%" dy="15">{maxScore}</tspan>
+              <tspan x="50%" dy="0">Avg. Score</tspan>
+              <tspan x="50%" dy="15">Out of {maxScore}</tspan>
             </text>
           </PieChart>
         </ResponsiveContainer>
       </Box>
+
+      <Flex alignItems="center" justifyContent="space-between" mb={2}>
+        <Tabs variant="soft-rounded" onChange={(index) => setActiveTab(index === 0 ? 'SAT' : 'ACT')}>
+          <TabList>
+            <Tab>SAT</Tab>
+            <Tab>ACT</Tab>
+          </TabList>
+        </Tabs>
+      </Flex>
     </Box>
   );
 };

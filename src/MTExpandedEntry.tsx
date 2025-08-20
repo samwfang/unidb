@@ -108,18 +108,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
     mode === ModeType.Undergrad ? (
       /* Render for Undergraduate Content */
-      <Box p={2} overflow="visible" width="100%" css={{
-          '& > *': {
-            transform: 'scale(1)',
-            transformOrigin: 'center',
-            '@media (max-width: 900px)': {
-              transform: 'scale(0.9)'
-            },
-            '@media (max-width: 600px)': {
-              transform: 'scale(0.8)'
-            }
-          }
-        }}>
+      <Box p={2} overflow="visible" width="100%">
         <UniversitySummaryWidget
           universityName={item?.name || 'Unknown University'}
           rank={rank.toString()}
@@ -134,6 +123,8 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           gridTemplateColumns="1fr 1fr 1fr"
           gridTemplateRows="auto auto auto"
           gap={4}
+          width="100%"
+          alignItems="stretch"
           
         >
           <Box gridArea="students">
@@ -141,13 +132,13 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
               demographics={general?.demographics}
               departments={general?.dept_contents} />
           </Box>
-          <Box gridArea="rate">
+          <Box gridArea="rate" height="100%">
             <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />
           </Box>
-          <Box gridArea="admissions">
+          <Box gridArea="admissions" height="100%">
             <AdmissionsRateWidget admissionsRate={general?.general_content.admissions_rate || 'No Data'} />
           </Box>
-          <Box gridArea="testscores">
+          <Box gridArea="testscores" height="100%">
             <TestScoresWidget satScore={"1440"} actScore={"34"}/>
           </Box>
         </Grid>
