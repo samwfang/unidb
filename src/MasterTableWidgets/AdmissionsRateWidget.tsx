@@ -57,7 +57,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ admissionsRate })
 
   return (
     <Box
-      p={4}
+      p={{ base: 2, md: 4 }}
       borderWidth={1}
       borderRadius="md"
       minHeight="120px"
@@ -66,7 +66,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ admissionsRate })
       border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
     >
-      <Text fontSize="xl" fontWeight="bold" mb={2}>Admissions Rate:</Text>
+      <Text fontSize={{base: "md", md: "xl"}} fontWeight="bold" mb={2}>Admissions Rate:</Text>
 
       <Box height="140px" position="relative">
         <ResponsiveContainer width="100%" height="100%">
@@ -98,7 +98,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ admissionsRate })
             >
               {admissionsRate}%
             </text>
-            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: '14px' }}>
+            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
               <tspan x="50%" dy="0">Of Applicants</tspan>
               <tspan x="50%" dy="15">Admitted</tspan>
             </text>

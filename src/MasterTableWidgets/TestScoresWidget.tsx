@@ -84,7 +84,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
       border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
     >
-      <Text fontSize="xl" fontWeight="bold" mb={2}>Test Scores: </Text>
+      <Text fontSize={{base: "md", md: "xl"}} fontWeight="bold" mb={2}>Test Scores: </Text>
 
 
       <Box height="140px" position="relative">
@@ -117,7 +117,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
             >
               {currentScore}
             </text>
-            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: '14px' }}>
+            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(10px, 2vw, 14px)'}}>
               <tspan x="50%" dy="0">Avg. Score</tspan>
               <tspan x="50%" dy="15">Out of {maxScore}</tspan>
             </text>
