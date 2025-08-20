@@ -136,7 +136,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             <AdmissionsRateWidget admissionsRate={general?.general_content.admissions_rate || 'No Data'} />
           </Box>
           <Box gridArea="testscores">
-            <TestScoresWidget satScore={"1184"} actScore={"34"}/>
+            <TestScoresWidget satScore={"1440"} actScore={"34"}/>
           </Box>
         </Grid>
       </Box>
