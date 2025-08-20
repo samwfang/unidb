@@ -21,8 +21,8 @@ export default function SearchBar({ value, onChange, placeholder = "Search..." }
         paddingX={6} // More horizontal padding for rounder look
         fontSize="lg" // Slightly larger text
 
-        bg="gray.50"
-        borderWidth="2px"
+        bg="rgba(255, 255, 255, 0.43)"
+        borderWidth="1px"
         _hover={{ 
           borderColor: "blue.400",
           boxShadow: "0 0 0 1px blue.400"

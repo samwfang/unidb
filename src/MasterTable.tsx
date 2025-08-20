@@ -422,7 +422,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       borderRadius="lg"            // Rounds the corners of the box
       boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
       border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
-      p={6}
+      p={{ base: 3, md: 6 }} // Responsive padding
     >
       <Flex justifyContent="space-between" mb={4}>
 
@@ -465,7 +465,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           },
         }}
       >
-        <Box minH={`${calculatedMinHeight}px`} minW="800px"> {/* Add minimum height for this box */}
+        <Box minH={`${calculatedMinHeight}px`} minW={{base: "600px", md: "800px"}}> {/* Add minimum height for this box */}
           {isLoading ? ( // Show spinner when loading
             <Flex justifyContent="center" alignItems="center" minH="100px">
               <Spinner
@@ -481,12 +481,11 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 base: "75px minmax(120px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr)",
                 md: "75px 2fr 1fr 1fr 1fr"
               }}
-                gap={4}
+                gap={{ base: 2, md: 4 }}
                 w="full"
                 alignItems="flex-end"
                 mb={2}
-                px={4}
-                minW="800px">
+                px={{ base: 2, md: 4 }}>
                 <GridItem textAlign="center">
                   <Popover>
                     {({ isOpen }) => (
@@ -494,7 +493,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                         <PopoverTrigger>
                           <Button
                             variant="outline"
-                            size="sm"
+                            size={{ base: "xs", md: "sm" }}
                             fontWeight="bold"
                             rightIcon={<ChevronDownIcon />}
                             bg={sortedByCol == 0 ? "green.500" : isOpen ? "gray.100" : "transparent"}
@@ -550,7 +549,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                         <PopoverTrigger>
                           <Button
                             variant="outline"
-                            size="sm"
+                            size={{ base: "xs", md: "sm" }}
                             fontWeight="bold"
                             rightIcon={<ChevronDownIcon />}
                             bg={sortedByCol == 1 ? "green.500" : isOpen ? "gray.100" : "transparent"}
@@ -650,7 +649,6 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 borderRadius="lg"
                 index={expandedIndex}
                 onChange={(index) => setExpandedIndex(index)}
-                minW="800px"
                 sx={{
                   '& > div': {
                     borderRadius: 'lg',

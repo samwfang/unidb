@@ -115,7 +115,7 @@ function App() {
         </Flex>
         {/* Master Table and Control Panel */}
         <Box ref={masterTableRef}>
-          <Flex direction={{ base: "column", md: "row" }} gap={2} mt={6} maxW="1300px" mx="auto" w="100%"
+          <Flex direction={{ base: "column", lg: "row" }} gap={2} mt={6} maxW="1300px" mx="auto" w="100%"
             px={{ base: 2, md: 0 }}>
             <MTControlPanel
               pageSize={pageSize}
@@ -125,7 +125,11 @@ function App() {
             />
 
             {/* MasterTable - updated to use pageSize prop */}
-            <Box flex={1} w="100%" overflowX="auto">
+            <Box
+              flex={1}
+              w="100%"
+              overflowX="auto"
+            >
               <MasterTable mode={mode} toggleMode={undergradGradToggle} pageSize={pageSize} />
             </Box>
           </Flex>

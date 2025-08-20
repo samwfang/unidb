@@ -108,7 +108,18 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
     mode === ModeType.Undergrad ? (
       /* Render for Undergraduate Content */
-      <Box p={2} overflow="visible" width="100%">
+      <Box p={2} overflow="visible" width="100%" css={{
+          '& > *': {
+            transform: 'scale(1)',
+            transformOrigin: 'center',
+            '@media (max-width: 900px)': {
+              transform: 'scale(0.9)'
+            },
+            '@media (max-width: 600px)': {
+              transform: 'scale(0.8)'
+            }
+          }
+        }}>
         <UniversitySummaryWidget
           universityName={item?.name || 'Unknown University'}
           rank={rank.toString()}
@@ -123,6 +134,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           gridTemplateColumns="1fr 1fr 1fr"
           gridTemplateRows="auto auto auto"
           gap={4}
+          
         >
           <Box gridArea="students">
             <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'}

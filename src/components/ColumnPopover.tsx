@@ -131,7 +131,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                             )}
                             <Button
                                 variant="outline"
-                                size="sm"
+                                size={{ base: "xs", md: "sm" }}
                                 fontWeight="bold"
                                 rightIcon={<ChevronDownIcon />}
                                 bg={isSortedBy ? "green.500" : isOpen ? "gray.100" : "transparent"}
