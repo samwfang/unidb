@@ -45,7 +45,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
     <AccordionItem
       _odd={{ bg: "rgba(255, 255, 255, 0.2)" }}  // Light grey for odd items
       _even={{ bg: "rgba(255, 255, 255, 0.4)" }}
-      minH={{ base: "50px", md: "60px" }}   // White for even items
+      minH={{ base: "40px", md: "60px" }}   // White for even items
     >
       <AccordionButton
         onClick={handleExpand}
@@ -56,13 +56,14 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
             color: "white"
           }
         }}
-        minH={{ base: "50px", md: "60px" }}
+        minH={{ base: "40px", md: "60px" }}
+        py={{ base: 1, md: 2 }}
       >
         <Grid templateColumns={{
-          base: "75px minmax(150px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)",
+          base: `30px minmax(150px, 1fr) ${'minmax(80px, 1fr) '.repeat(columnDepts.length)}`,
           md: "75px 2fr 1fr 1fr 1fr"
         }}
-          gap={4}
+          gap={{ base: 2, md: 4 }}
           w="full"
           alignItems="center">
           {/* Logo for University */}
@@ -71,7 +72,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
               fontWeight="bold"
               color={mode === 'undergrad' ? "blue.500" : "gray.600"}
               _expanded={{ color: "white" }}
-              fontSize="lg"
+              fontSize={{ base: "xs", md: "lg" }}
             >
               {rank}
             </Box>
@@ -79,15 +80,17 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
 
           {/* University Name */}
           <GridItem textAlign="center">
-            <Box flex="1" textAlign="left" fontWeight="bold">
+            <Box flex="1" textAlign="left" fontWeight="bold" fontSize={{ base: "xs", md: "md" }}>
               {item.name}
             </Box>
           </GridItem>
 
-          {/* Other Columns */}
-          <GridItem textAlign="center">{getColumnData(item, columnTypes[0], mode, columnDepts[0].value)}</GridItem>
-          <GridItem textAlign="center">{getColumnData(item, columnTypes[1], mode, columnDepts[1].value)}</GridItem>
-          <GridItem textAlign="center">{getColumnData(item, columnTypes[2], mode, columnDepts[2].value)}</GridItem>
+          {/* Dynamic Columns */}
+          {columnDepts.map((dept, index) => (
+            <GridItem key={index} textAlign="center" fontSize={{ base: "2xs", md: "sm" }}>
+              {getColumnData(item, columnTypes[index], mode, dept.value)}
+            </GridItem>
+          ))}
         </Grid>
       </AccordionButton>
 

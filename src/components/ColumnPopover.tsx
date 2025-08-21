@@ -110,21 +110,24 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
             {({ isOpen }) => (
                 <>
                     <PopoverTrigger>
-                        <Box position="relative" minW="80px" maxW="160px">
+                        <Box position="relative" minW={{ base: "60px", md: "80px" }} maxW={{ base: "100px", md: "160px" }} textAlign="center">
                             {departmentName && (
                                 <Text
-                                    fontSize="xs"
+                                    fontSize={{ base: "2xs", md: "xs" }}
                                     fontWeight="semibold"
                                     color={departmentName == "General" ? "gray.600" : "white"}
                                     bg={departmentName == "General" ? "gray.100" : "purple.500"}
-                                    px={2}
-                                    py={1}
+                                    px={{ base: 1, md: 2 }}
+                                    py={{ base: 0.5, md: 1 }}
                                     borderRadius="md"
                                     mb={1}
                                     border="1px solid"
                                     borderColor="gray.200"
                                     zIndex={isOpen ? "popover" : "auto"}
                                     position="relative"
+                                    display="inline-block"
+                                    mx="auto"
+                                    lineHeight="short"
                                 >
                                     {departmentName}
                                 </Text>
@@ -133,7 +136,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 variant="outline"
                                 size={{ base: "xs", md: "sm" }}
                                 fontWeight="bold"
-                                rightIcon={<ChevronDownIcon />}
+                                rightIcon={<ChevronDownIcon boxSize={{ base: 3, md: 4 }} />}
                                 bg={isSortedBy ? "green.500" : isOpen ? "gray.100" : "transparent"}
                                 color={isSortedBy ? "white" : "black"}
                                 borderColor={"gray.200"}
@@ -146,8 +149,11 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 whiteSpace="normal"
                                 wordBreak="break-word"
                                 h="auto"
-                                minH="40px"
+                                minH={{ base: "32px", md: "40px" }}
                                 lineHeight="short"
+                                fontSize={{ base: "2xs", md: "sm" }}
+                                px={{ base: 1, md: 2 }}
+                                width="full"
                             >
                                 {getColumnDisplayName(columnType)}
                             </Button>

@@ -128,6 +128,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   { value: "general", label: "General" }, { value: "general", label: "General" }]);
   //Which column is sorted by
   const [sortedByCol, setSortedByCol] = useState<number>(1);
+  //Amt of Columns Visible due to Screen Size
+   const [visibleColumnCount, setVisibleColumnCount] = useState(3);
 
   //Current Parameter With Which To Sort Page Data With
   const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
@@ -300,6 +302,28 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   }, [searchQuery]);
 
 
+   // Detect screen size and adjust column count
+   // <768px is one column
+   // 768-1024 is two columns
+   // >1024px is three columns
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setVisibleColumnCount(1);
+      } else if (window.innerWidth < 1024) {
+        setVisibleColumnCount(2);
+      } else {
+        setVisibleColumnCount(3);
+      }
+    };
+
+    handleResize(); // Initial call
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+
+
 
   //HARDCODED UNIVERSITY NAME SORTING OPTION
 
@@ -422,7 +446,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       borderRadius="lg"            // Rounds the corners of the box
       boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
       border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
-      p={{ base: 3, md: 6 }} // Responsive padding
+      p={{ base: 3, md: 6 }} 
     >
       <Flex justifyContent="space-between" mb={4}>
 
@@ -465,7 +489,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           },
         }}
       >
-        <Box minH={`${calculatedMinHeight}px`} minW={{base: "600px", md: "800px"}}>
+        <Box minH={`${calculatedMinHeight}px`} minW={{base: "300px", md: "800px"}}>
           {isLoading ? ( // Show spinner when loading
             <Flex justifyContent="center" alignItems="center" minH="100px">
               <Spinner
@@ -478,7 +502,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
             <>
               {/* Column Headers */}
               <Grid templateColumns={{
-                base: "75px minmax(120px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr) minmax(60px, 1fr)",
+                base: `75px minmax(120px, 1fr) ${'minmax(60px, 1fr) '.repeat(visibleColumnCount)}`,
                 md: "75px 2fr 1fr 1fr 1fr"
               }}
                 gap={{ base: 2, md: 4 }}
@@ -633,15 +657,20 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                   </Popover>
                 </GridItem>
 
-                <GridItem textAlign="center">
-                  <ColumnPopover departmentCID={columnDepts[0].value} sortedByCol={sortedByCol} departmentName={columnDepts[0].label} columnType={columnTypes[0]} onApply={handleApply} onApplyAndSort={handleApplySort} index={0} />
-                </GridItem>
-                <GridItem textAlign="center" fontWeight="bold">
-                  <ColumnPopover departmentCID={columnDepts[1].value} sortedByCol={sortedByCol} departmentName={columnDepts[1].label} columnType={columnTypes[1]} onApply={handleApply} onApplyAndSort={handleApplySort} index={1} />
-                </GridItem>
-                <GridItem textAlign="center" fontWeight="bold">
-                  <ColumnPopover departmentCID={columnDepts[2].value} sortedByCol={sortedByCol} departmentName={columnDepts[2].label} columnType={columnTypes[2]} onApply={handleApply} onApplyAndSort={handleApplySort} index={2} />
-                </GridItem>
+                 {/* Dynamic columns based on visibleColumnCount */}
+                {Array.from({ length: visibleColumnCount }).map((_, index) => (
+                  <GridItem key={index} textAlign="center" fontWeight="bold">
+                    <ColumnPopover 
+                      departmentCID={columnDepts[index].value} 
+                      sortedByCol={sortedByCol} 
+                      departmentName={columnDepts[index].label} 
+                      columnType={columnTypes[index]} 
+                      onApply={handleApply} 
+                      onApplyAndSort={handleApplySort} 
+                      index={index} 
+                    />
+                  </GridItem>
+                ))}
               </Grid>
 
               <Accordion
@@ -662,8 +691,18 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                   }
                 }}
               >
-                {data.map((item, index) => (
-                  <MasterTableRow rank={(currentPage) * pageSize + index + 1} key={item.id} item={item} mode={mode} columnDepts={columnDepts} columnTypes={columnTypes} toggleMode={toggleMode} onExpand={fetchExpandedEntryContent} />
+                {/* MasterTableRow will only display the columns currently stated to be visible */}
+                 {data.map((item, index) => (
+                  <MasterTableRow 
+                    key={item.id} 
+                    rank={(currentPage) * pageSize + index + 1} 
+                    item={item} 
+                    mode={mode} 
+                    columnDepts={columnDepts.slice(0, visibleColumnCount)} 
+                    columnTypes={columnTypes.slice(0, visibleColumnCount)} 
+                    toggleMode={toggleMode} 
+                    onExpand={fetchExpandedEntryContent} 
+                  />
                 ))}
               </Accordion>
             </>
