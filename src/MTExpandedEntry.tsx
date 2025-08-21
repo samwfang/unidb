@@ -116,16 +116,25 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           sectorScorecard={item?.sectorScorecard}
         />
         <Grid
-          templateAreas={`"rate admissions testscores"
-            "students students students"
-                        "students students students"
-                        `}
-          gridTemplateColumns="1fr 1fr 1fr"
-          gridTemplateRows="auto auto auto"
-          gap={4}
+          templateAreas={{
+            base: `"rate admissions"
+                   "testscores testscores2"
+                   "students students"`,
+            md: `"rate admissions testscores testscores2"
+                 "students students students students"
+                 "students students students students"`
+          }}
+          gridTemplateColumns={{
+            base: "1fr 1fr",
+            md: "1fr 1fr 1fr 1fr"
+          }}
+          gridTemplateRows={{
+            base: "auto auto auto",
+            md: "auto auto auto"
+          }}
+          gap={{ base: 2, md: 4 }}
           width="100%"
           alignItems="stretch"
-
         >
           <Box gridArea="students">
             <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'}
@@ -139,6 +148,10 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             <AdmissionsRateWidget admissionsRate={general?.general_content.admissions_rate || 'No Data'} />
           </Box>
           <Box gridArea="testscores" height="100%">
+            <TestScoresWidget satScore={"1440"} actScore={"34"} />
+          </Box>
+
+          <Box gridArea="testscores2" height="100%">
             <TestScoresWidget satScore={"1440"} actScore={"34"} />
           </Box>
         </Grid>

@@ -185,7 +185,8 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                     <Box position="relative" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
                                         <Text color="gray.600"> Select Department: </Text>
                                         <Box position="relative" zIndex="popover">
-                                            <DepartmentSelector departmentName={currentDept} onDepartmentChange={handleDepartmentChange} />
+                                            <DepartmentSelector departmentName={currentDept} onDepartmentChange={handleDepartmentChange} isSelectOpen={isSelectOpen}
+                                                setIsSelectOpen={setIsSelectOpen} />
                                         </Box>
                                         <Text color="gray.600" mt={2}>Column Type:</Text>
                                         <ReactSelect
@@ -249,6 +250,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                                     setSortExtraOption(selected?.value || "greatest")
                                                     setModifiedContent(true)
                                                 }}
+
                                             />
                                         </FormControl>
                                     </Box>

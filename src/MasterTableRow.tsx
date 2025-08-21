@@ -60,7 +60,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
         py={{ base: 1, md: 2 }}
       >
         <Grid templateColumns={{
-          base: `30px minmax(150px, 1fr) ${'minmax(80px, 1fr) '.repeat(columnDepts.length)}`,
+          base: `30px minmax(120px, 1fr) ${'minmax(60px, 1fr) '.repeat(columnDepts.length)}`,
           md: "75px 2fr 1fr 1fr 1fr"
         }}
           gap={{ base: 2, md: 4 }}

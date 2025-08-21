@@ -446,7 +446,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       borderRadius="lg"            // Rounds the corners of the box
       boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
       border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
-      p={{ base: 3, md: 6 }} 
+      p={{ base: 2, md: 3, lg: 6 }} 
     >
       <Flex justifyContent="space-between" mb={4}>
 
@@ -489,7 +489,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           },
         }}
       >
-        <Box minH={`${calculatedMinHeight}px`} minW={{base: "300px", md: "800px"}}>
+        <Box minH={`${calculatedMinHeight}px`} minW={{base: "300px", md: "600px", lg: "800px"}}>
           {isLoading ? ( // Show spinner when loading
             <Flex justifyContent="center" alignItems="center" minH="100px">
               <Spinner
@@ -502,7 +502,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
             <>
               {/* Column Headers */}
               <Grid templateColumns={{
-                base: `75px minmax(120px, 1fr) ${'minmax(60px, 1fr) '.repeat(visibleColumnCount)}`,
+                base: `60px minmax(100px, 1fr) ${'minmax(50px, 1fr) '.repeat(visibleColumnCount)}`,
                 md: "75px 2fr 1fr 1fr 1fr"
               }}
                 gap={{ base: 2, md: 4 }}

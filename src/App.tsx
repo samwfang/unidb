@@ -94,7 +94,7 @@ function App() {
         position="relative"
         overflow="hidden"
         bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, gray.50, gray.200)"} // Chakra's gradient syntax
-        p={{ base: 2, md: 4 }}
+        p={{ base: 1, md: 4 }}
       >
         {/* Top Header: Only Display when ShowHeader == True */}
         <TopHeader
@@ -116,7 +116,7 @@ function App() {
         {/* Master Table and Control Panel */}
         <Box ref={masterTableRef}>
           <Flex direction={{ base: "column", lg: "row" }} gap={2} mt={6} maxW="1300px" mx="auto" w="100%"
-            px={{ base: 2, md: 0 }}>
+            px={{ base: 0, md: 0 }}>
             <MTControlPanel
               pageSize={pageSize}
               onPageSizeChange={setPageSize}

@@ -254,7 +254,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
 
 
       <Box flex={1}>
-        <Text fontSize={{base: "md", md: "xl"}}  fontWeight="bold">Total Students:</Text>
+        <Text fontSize={{base: "sm", sm: "md", md: "lg"}}  fontWeight="bold">Total Students:</Text>
         <Box height="250px" position="relative" overflow="visible" css={{
           "& .recharts-wrapper": { overflow: "visible !important" },
           "& .recharts-surface": { overflow: "visible !important" }

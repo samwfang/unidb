@@ -51,8 +51,8 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
   // Responsive radius based on window width
   const getRadius = () => {
     if (windowSize.width < 480) return { inner: 40, outer: 55 };
-    if (windowSize.width < 768) return { inner: 50, outer: 65 };
-    return { inner: 70, outer: 90 };
+    if (windowSize.width < 1000) return { inner: 50, outer: 65 };
+    return { inner: 60, outer: 80 };
   };
 
   const { inner, outer } = getRadius();
@@ -69,7 +69,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
       border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
     >
-      <Text fontSize={{base: "md", md: "xl"}} fontWeight="bold" mb={2}>Graduation Rate:</Text>
+      <Text fontSize={{base: "sm", sm: "md",  lg: "lg"}} fontWeight="bold" mb={2}>Graduation Rate:</Text>
 
       <Box height={{base: "100px", md: "140px"}} position="relative">
         <ResponsiveContainer width="100%" height="100%">
@@ -94,16 +94,16 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
               y="60%"
               textAnchor="middle"
               style={{
-                fontSize: 'clamp(16px, 3.5vw, 32px)',
+                fontSize: 'clamp(16px, 3.5vw, 28px)',
                 fontWeight: 'bold',
                 fill: color  // Match text color to gauge
               }}
             >
               {graduationRate}%
             </text>
-            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(8px, 1.5vw, 14px)' }}>
+            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
               <tspan x="50%" dy="0">Graduated Within</tspan>
-              <tspan x="50%" dy="15">6 Years</tspan>
+              <tspan x="50%" dy="12">6 Years</tspan>
             </text>
           </PieChart>
         </ResponsiveContainer>
