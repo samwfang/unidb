@@ -117,7 +117,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
             >
               {currentScore}
             </text>
-            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
+            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(8px, 1.5vw, 14px)' }}>
               <tspan x="50%" dy="0">Avg. Score</tspan>
               <tspan x="50%" dy="15">Out of {maxScore}</tspan>
             </text>
