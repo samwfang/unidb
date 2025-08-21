@@ -1,5 +1,5 @@
 // GraduationRateWidget.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab } from '@chakra-ui/react';
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
 import { DemographicsData } from 'src/MasterTable';
@@ -56,11 +56,12 @@ const renderCustomizedLabel = (props: any) => {
   const RADIAN = Math.PI / 180;
   const sin = Math.sin(-midAngle * RADIAN);
   const cos = Math.cos(-midAngle * RADIAN);
-  const sx = cx + (outerRadius + 10) * cos;
-  const sy = cy + (outerRadius + 10) * sin;
-  const mx = cx + (outerRadius + 30) * cos;
-  const my = cy + (outerRadius + 30) * sin;
-  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+  const LINE_SCALE_FACTOR = 0.6;
+  const sx = cx + (outerRadius + 10 * LINE_SCALE_FACTOR) * cos;
+  const sy = cy + (outerRadius + 10 * LINE_SCALE_FACTOR) * sin;
+  const mx = cx + (outerRadius + 30 * LINE_SCALE_FACTOR) * cos;
+  const my = cy + (outerRadius + 30 * LINE_SCALE_FACTOR) * sin;
+  const ex = mx + (cos >= 0 ? 1 : -1) * 22 * LINE_SCALE_FACTOR;
   const ey = my;
   const textAnchor = cos >= 0 ? 'start' : 'end';
 
@@ -71,7 +72,7 @@ const renderCustomizedLabel = (props: any) => {
     <g>
       <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={payload.fill} fill="none" />
       <circle cx={ex} cy={ey} r={2} fill={payload.fill} stroke="none" />
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">
+      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333" style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
         {payload.name.split('\n').map((line: string, i: number) => (
           <tspan x={ex + (cos >= 0 ? 1 : -1) * 12} dy={i === 0 ? 0 : 15} key={i}>
             {line}
@@ -84,6 +85,7 @@ const renderCustomizedLabel = (props: any) => {
         dy={percentageOffset}
         textAnchor={textAnchor}
         fill="#999"
+        style={{ fontSize: 'clamp(9px, 1.8vw, 12px)' }}
       >
         {`${(percent * 100).toFixed(1)}%`}
       </text>
@@ -122,7 +124,7 @@ const renderActiveShape = (props: any) => {
       />
       <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">
+      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333 " style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
         {payload.name.split('\n').map((line: string, i: number) => (
           <tspan x={ex + (cos >= 0 ? 1 : -1) * 12} dy={i === 0 ? 0 : 15} key={i}>
             {line}
@@ -135,6 +137,7 @@ const renderActiveShape = (props: any) => {
         dy={percentageOffset}
         textAnchor={textAnchor}
         fill="#999"
+        style={{ fontSize: 'clamp(9px, 1.8vw, 12px)' }}
       >
         {`${(percent * 100).toFixed(1)}%`}
       </text>
@@ -199,7 +202,39 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   const findDataSet = (mode: DisplayMode) => dataSets.find(set => set.name === DATA_SET_NAMES[mode])!;
   const currentData = findDataSet(activeTab);
 
+  // DYNAMICALLY ADJUST PIE CHART SIZE ACCORDING TO WINDOW HEIGHT (SINCE RECHARTS DOESNT SUPPORT THIS GRRR)
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+
+
+  // Responsive radius based on window width
+  const getRadius = () => {
+    if (windowSize.width < 480) return { inner: 50, outer: 70 };
+    if (windowSize.width < 768) return { inner: 60, outer: 80 };
+    return { inner: 80, outer: 100 };
+  };
+
+  const { inner, outer } = getRadius();
+
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (!currentData) return <Alert status="error">Data not available</Alert>;
+
+
 
 
   return (
@@ -219,8 +254,8 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
 
 
       <Box flex={1}>
-        <Text fontSize="2xl" fontWeight="bold">Total Students:</Text>
-        <Box height="305px" position="relative" overflow="visible" css={{
+        <Text fontSize={{base: "md", md: "xl"}}  fontWeight="bold">Total Students:</Text>
+        <Box height="250px" position="relative" overflow="visible" css={{
           "& .recharts-wrapper": { overflow: "visible !important" },
           "& .recharts-surface": { overflow: "visible !important" }
         }}>
@@ -228,14 +263,13 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
             <PieChart margin={{ left: 60, right: 60 }}>
               <Pie
                 label={renderCustomizedLabel}
-                activeShape={renderActiveShape}
                 data={currentData.data}
                 cx="50%"
                 cy="50%"
-                innerRadius={80}
-                outerRadius={100}
+                innerRadius={inner}
+                outerRadius={outer}
                 paddingAngle={5}
-                cornerRadius={10}
+                cornerRadius={5}
                 dataKey="value"
               >
                 {currentData.data.map((entry, index) => (
@@ -247,10 +281,10 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
               </Pie>
               <g>
                 <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle"
-                  style={{ fontSize: '32px', fontWeight: 'bold' }}>
+                  style={{ fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 'bold' }}>
                   {getCenterText(activeTab, totalStudents, avgHouseholdIncome)}
                 </text>
-                <text x="50%" y="60%" textAnchor="middle" fill="#666" style={{ fontSize: '14px' }}>
+                <text x="50%" y="60%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
                   {getCaption(activeTab)}
                 </text>
               </g>
@@ -265,7 +299,9 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       >
         <TabList>
           {Object.values(DisplayMode).map((mode) => (
-            <Tab key={mode}>{DATA_SET_NAMES[mode]}</Tab>
+            <Tab key={mode} fontSize={{ base: "xs", md: "sm" }}
+              px={{ base: 2, md: 4 }}
+              py={{ base: 1, md: 2 }}>{DATA_SET_NAMES[mode]}</Tab>
           ))}
         </TabList>
       </Tabs>

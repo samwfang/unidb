@@ -58,45 +58,41 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
     sectorScorecard, region = "Midwest", citySize = "Medium", collegeSize = "Large" }) => {
     return (
         <Box
-            p={4}
-            // borderWidth={1}
+            p={{ base: 3, md: 4 }}
             borderRadius="md"
             minHeight="120px"
-            // bg="rgba(255, 255, 255, 0.2)"
-            // boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
-            // border="1px solid rgba(255, 255, 255, 0.2)"
-            mb={4} // Add margin bottom to separate from other widgets
+            mb={4}
         >
-            <Flex alignItems="center" justifyContent="space-between">
-                <Flex alignItems="flex-start" gap={8}>
+            <Flex alignItems="center" justifyContent="space-between" gap={{ base: 4, md: 0 }}>
+                <Flex alignItems="flex-start" gap={{ base: 4, md: 8 }}>
                     <Circle
-                        size="60px"
+                        size={{ base: "50px", md: "60px" }}
                         bg={"blue.500"}
                         color="white"
                     >
-                        <Text fontSize="2xl" fontWeight="bold">{rank || 'N/A'}</Text>
+                        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">{rank || 'N/A'}</Text>
                     </Circle>
                     <Box>
-                        <Text fontSize="3xl" fontWeight="bold">{universityName}</Text>
-                        <Flex alignItems="center" gap={4} mt={1}>
-                            <Text fontSize="md" color="gray.600">123 University Ave, City, State</Text>
-                            <Badge colorScheme="green" borderRadius="full" px={2} py={1}>
+                        <Text fontSize={{ base: "xl", md: "3xl" }} fontWeight="bold">{universityName}</Text>
+                        <Flex gap={{ base: 2, md: 4 }} mt={1}  alignItems={{ base: "flex-start", md: "center" }}>
+                            <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">123 University Ave, City, State</Text>
+                            <Badge colorScheme="green" borderRadius="full" px={2} py={1} fontSize={{ base: "xs", md: "sm" }}>
                                 <Flex alignItems="center" gap={1}>
                                     <Box>✓</Box>
                                     <Text>Middle States Commission</Text>
                                 </Flex>
                             </Badge>
                         </Flex>
-
                     </Box>
                 </Flex>
 
-                <Flex direction="column" gap={2} alignItems="flex-end">
+                <Flex direction="column" gap={2} alignItems={{ base: "flex-start", md: "flex-end" }} mt={{ base: 2, md: 0 }}>
                     <Badge
                         borderRadius="full"
                         px={4}
                         py={1}
                         colorScheme={isPublic ? 'blue' : 'purple'}
+                        fontSize={{ base: "xs", md: "sm" }}
                     >
                         {isPublic ? 'Public' : 'Private'}
                     </Badge>
@@ -108,10 +104,9 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                         py={1.5}
                         borderRadius="full"
                         _hover={{ bg: "blue.600" }}
-                        flex="1"
                         maxW="200px"
                         textAlign="center"
-                        fontSize="sm"
+                        fontSize={{ base: "xs", md: "sm" }}
                         onClick={() => window.open('https://www.university.edu', '_blank')}
                     >
                         Website
@@ -119,64 +114,64 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                 </Flex>
             </Flex>
 
-
-            <Flex gap={4} mt={6} width="100%" flexWrap="wrap">
+            <Flex gap={4} mt={6} width="100%" flexWrap="wrap" direction={{ base: "column", md: "row" }}>
                 {sectorScorecard && (
                     <Box
-                        flex="1"
+                        flex={{ base: "none", md: "1" }}
                         bg={"gray.100"}
                         borderRadius="lg"
                         p={1.5}
                         minW="120px"
                         textAlign="center"
+                        width={{ base: "100%", md: "auto" }}
                     >
-                        <Text fontSize="sm">Classification:</Text>
-                        <Text fontSize="md" fontWeight="bold">{sectorLabels[sectorScorecard] || 'Unknown'}</Text>
-
+                        <Text fontSize={{ base: "xs", md: "sm" }}>Classification:</Text>
+                        <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold">{sectorLabels[sectorScorecard] || 'Unknown'}</Text>
                     </Box>
                 )}
                 {/* Region Box */}
                 <Box
-                    flex="1"
+                    flex={{ base: "none", md: "1" }}
                     bg="gray.100"
                     borderRadius="lg"
                     p={1.5}
                     minW="120px"
                     textAlign="center"
+                    width={{ base: "100%", md: "auto" }}
                 >
-                    <Text fontSize="sm">Region:</Text>
-                    <Text fontSize="md" fontWeight="bold">{region || 'Unknown'}</Text>
-
+                    <Text fontSize={{ base: "xs", md: "sm" }}>Region:</Text>
+                    <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold">{region || 'Unknown'}</Text>
                 </Box>
 
                 {/* City Size Box */}
                 <Box
-                    flex="1"
+                    flex={{ base: "none", md: "1" }}
                     bg='gray.100'
                     borderRadius="lg"
                     p={1.5}
                     minW="120px"
                     textAlign="center"
+                    width={{ base: "100%", md: "auto" }}
                 >
-                    <Text fontSize="sm">Urban Index:</Text>
-                    <Text fontSize="md" fontWeight="bold">{citySize || 'Unknown'} City</Text>
-
+                    <Text fontSize={{ base: "xs", md: "sm" }}>Urban Index:</Text>
+                    <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold">{citySize || 'Unknown'} City</Text>
                 </Box>
 
                 {/* College Size Box */}
                 <Box
-                    flex="1"
+                    flex={{ base: "none", md: "1" }}
                     bg={'gray.100'}
                     borderRadius="lg"
                     p={1.5}
                     minW="120px"
                     textAlign="center"
+                    width={{ base: "100%", md: "auto" }}
                 >
-                    <Text fontSize="sm">College Size:</Text>
-                    <Text fontSize="md" fontWeight="bold">{collegeSize || 'Unknown'} College</Text>
-
+                    <Text fontSize={{ base: "xs", md: "sm" }}>College Size:</Text>
+                    <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold">{collegeSize || 'Unknown'} College</Text>
                 </Box>
             </Flex>
+            
             <Flex gap={8} mt={4} width="100%" justifyContent="center">
                 <Box
                     as="button"
@@ -189,7 +184,7 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                     flex="1"
                     minH="40px"
                     textAlign="center"
-                    fontSize="sm"
+                    fontSize={{ base: "xs", md: "sm" }}
                     opacity={0.7}
                     cursor="not-allowed"
                     title="Coming soon"
@@ -197,7 +192,6 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                     View Details
                 </Box>
             </Flex>
-
         </Box>
     );
 };

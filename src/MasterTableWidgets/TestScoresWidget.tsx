@@ -72,7 +72,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
 
   const { inner, outer } = getRadius();
 
-  
+
   return (
     <Box
       p={{ base: 2, md: 4 }}
@@ -84,10 +84,10 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
       border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
     >
-      <Text fontSize={{base: "md", md: "xl"}} fontWeight="bold" mb={2}>Test Scores: </Text>
+      <Text fontSize={{ base: "md", md: "xl" }} fontWeight="bold" mb={2}>Test Scores: </Text>
 
 
-      <Box height="140px" position="relative">
+      <Box height={{base: "100px", md: "140px"}} position="relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -117,7 +117,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
             >
               {currentScore}
             </text>
-            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(10px, 2vw, 14px)'}}>
+            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
               <tspan x="50%" dy="0">Avg. Score</tspan>
               <tspan x="50%" dy="15">Out of {maxScore}</tspan>
             </text>
@@ -128,8 +128,12 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
       <Flex alignItems="center" justifyContent="space-between" mb={2}>
         <Tabs variant="soft-rounded" onChange={(index) => setActiveTab(index === 0 ? 'SAT' : 'ACT')}>
           <TabList>
-            <Tab>SAT</Tab>
-            <Tab>ACT</Tab>
+            <Tab fontSize={{ base: "xs", md: "sm" }}
+              px={{ base: 2, md: 4 }}
+              py={{ base: 1, md: 2 }}>SAT</Tab>
+            <Tab fontSize={{ base: "xs", md: "sm" }}
+              px={{ base: 2, md: 4 }}
+              py={{ base: 1, md: 2 }}>ACT</Tab>
           </TabList>
         </Tabs>
       </Flex>

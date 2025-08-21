@@ -71,7 +71,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
     >
       <Text fontSize={{base: "md", md: "xl"}} fontWeight="bold" mb={2}>Graduation Rate:</Text>
 
-      <Box height="140px" position="relative">
+      <Box height={{base: "100px", md: "140px"}} position="relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

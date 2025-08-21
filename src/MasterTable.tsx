@@ -465,7 +465,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           },
         }}
       >
-        <Box minH={`${calculatedMinHeight}px`} minW={{base: "600px", md: "800px"}}> {/* Add minimum height for this box */}
+        <Box minH={`${calculatedMinHeight}px`} minW={{base: "600px", md: "800px"}}>
           {isLoading ? ( // Show spinner when loading
             <Flex justifyContent="center" alignItems="center" minH="100px">
               <Spinner
