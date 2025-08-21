@@ -308,9 +308,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
    // >1024px is three columns
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      if (window.innerWidth < 600) {
         setVisibleColumnCount(1);
-      } else if (window.innerWidth < 1024) {
+      } else if (window.innerWidth < 900) {
         setVisibleColumnCount(2);
       } else {
         setVisibleColumnCount(3);

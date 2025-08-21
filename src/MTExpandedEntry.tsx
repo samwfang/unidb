@@ -108,7 +108,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
     mode === ModeType.Undergrad ? (
       /* Render for Undergraduate Content */
-      <Box p={2} overflow="visible" width="100%">
+      <Box p={2} width="100%">
         <UniversitySummaryWidget
           universityName={item?.name || 'Unknown University'}
           rank={rank.toString()}
@@ -125,7 +125,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           gap={4}
           width="100%"
           alignItems="stretch"
-          
+
         >
           <Box gridArea="students">
             <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'}
@@ -139,7 +139,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             <AdmissionsRateWidget admissionsRate={general?.general_content.admissions_rate || 'No Data'} />
           </Box>
           <Box gridArea="testscores" height="100%">
-            <TestScoresWidget satScore={"1440"} actScore={"34"}/>
+            <TestScoresWidget satScore={"1440"} actScore={"34"} />
           </Box>
         </Grid>
       </Box>
@@ -182,7 +182,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           <Box key={columnIndex}>
             {columnGroups.map(([cip, depts]) => (
               <Box key={cip} mb={4}>
-                <Text fontWeight="bold" mt={2} mb={2}>{cipToClassificationName(cip)}</Text>
+                <Text fontWeight="bold" mt={2} mb={2} fontSize={{ base: "sm", md: "md" }}>{cipToClassificationName(cip)}</Text>
                 <List>
                   {depts.map((dept, i) => (
                     <ListItem
@@ -192,6 +192,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
                       }}
                       cursor="pointer"
                       _hover={{ bg: "gray.100" }}
+                      p={1}
+                      borderRadius="md"
+                      fontSize={{ base: "xs", md: "sm" }}
                     >
                       {dept.department_name}
                     </ListItem>
@@ -208,13 +211,24 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   return (
     <AccordionPanel pb={4} bg="white">
       {isExpanded && (
-        <Tabs index={activeTabIndex} isLazy onChange={setActiveTabIndex}>
-          <TabList flexWrap="wrap">
+        <Tabs index={activeTabIndex} isLazy onChange={setActiveTabIndex} overflowX="auto">
+          <TabList flexWrap="wrap" minW="300px" overflowX="auto" css={{
+            '&::-webkit-scrollbar': {
+              display: 'none', // Hide scrollbar for WebKit browsers
+            },
+            '-ms-overflow-style': 'none',  // Hide scrollbar for IE and Edge
+            'scrollbar-width': 'none',     // Hide scrollbar for Firefox
+          }}>
             <Tab _selected={{
               color: mode === 'undergrad' ? "blue.500" : "gray.600", // Change text color
               borderBottom: '2px solid', // Ensure there is an underline
               borderColor: mode === 'undergrad' ? "blue.500" : "gray.600", // Change underline color
-            }}><b>General</b></Tab>
+            }}
+              fontSize={{ base: "xs", md: "sm" }}
+              px={{ base: 2, md: 4 }}
+              py={{ base: 1, md: 2 }}
+              whiteSpace="nowrap"
+              minW="auto"><b>General</b></Tab>
             {/* Render Tabs with names of Selected Departments*/}
             {selectedDepts.map((deptName, index) => (
               <Box display="flex" alignItems="center" key={index}>
@@ -225,19 +239,29 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
                     borderBottom: '2px solid',
                     borderColor: mode === 'undergrad' ? "#blue.500" : "gray.600",
                   }}
+                  fontSize={{ base: "xs", md: "sm" }}
+                  px={{ base: 2, md: 4 }}
+                  py={{ base: 1, md: 2 }}
+                  minW="auto"
+                  maxW={{ base: "120px", md: "none" }}
+                  overflow="hidden"
+                  textOverflow="ellipsis"
                 >
                   {deptName || <i>New Tab</i>}
                 </Tab>
                 {/* Close Button Outside of Tab Clickable Area */}
                 <Box
                   as="span"
-                  ml={2}
+                  ml={1}
+                  mr={1}
+                  fontSize={{ base: "sm", md: "md" }}
                   onClick={(e: any) => {
                     e.stopPropagation();
                     handleCloseTab(index);
                   }}
                   _hover={{ color: "red.500" }}
                   cursor="pointer"
+                  flexShrink={0}
                 >
                   ×
                 </Box>
@@ -245,12 +269,20 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             ))}
             {/* Allow User to Add New Tab If Not At Maximum */}
             {selectedDepts.length < MAX_TABS ? (
-              <Tab onClick={handleAddTab} _hover={{ bg: "gray.100" }}>
+              <Tab onClick={handleAddTab} _hover={{ bg: "gray.100" }} fontSize={{ base: "xs", md: "sm" }}
+                px={{ base: 2, md: 4 }}
+                py={{ base: 1, md: 2 }}
+                minW="auto"
+                flexShrink={0}>
                 +
               </Tab>
             ) : (
               <Tooltip label="Maximum tabs reached" placement="top" hasArrow>
-                <Tab isDisabled _hover={{ cursor: "not-allowed" }}>
+                <Tab isDisabled _hover={{ cursor: "not-allowed" }} fontSize={{ base: "xs", md: "sm" }}
+                  px={{ base: 2, md: 4 }}
+                  py={{ base: 1, md: 2 }}
+                  minW="auto"
+                  flexShrink={0}>
                   +
                 </Tab>
               </Tooltip>
@@ -258,21 +290,24 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           </TabList>
 
           <TabPanels>
-            <TabPanel>
+            <TabPanel p={{ base: 2, md: 4 }}>
               <Box p={0}>{renderGeneralContent(generalContent) || "No general content available"}</Box>
             </TabPanel>
 
             {selectedDepts.map((selectedDept, index) => (
-              <TabPanel key={index}>
+              <TabPanel key={index} p={{ base: 2, md: 4 }}>
                 <Box p={0}>
                   {selectedDept === "" ? (
                     // Show Input for autocomplete selection
                     <Box>
-                      <Text>Select a department to display information on this tab.</Text>
+                      <Text fontSize={{ base: "sm", md: "md" }}>Select a department to display information on this tab.</Text>
                       <Input
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         placeholder="Type to search..."
+                        size={{ base: "sm", md: "md" }}
+                        mb={3}
+                        borderRadius="full"
                       />
                       {renderFilteredGroupedDepartments()}
                     </Box>

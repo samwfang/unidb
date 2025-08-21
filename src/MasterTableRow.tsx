@@ -72,7 +72,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
               fontWeight="bold"
               color={mode === 'undergrad' ? "blue.500" : "gray.600"}
               _expanded={{ color: "white" }}
-              fontSize={{ base: "xs", md: "lg" }}
+              fontSize={{ base: "s", md: "lg" }}
             >
               {rank}
             </Box>
@@ -87,7 +87,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
 
           {/* Dynamic Columns */}
           {columnDepts.map((dept, index) => (
-            <GridItem key={index} textAlign="center" fontSize={{ base: "2xs", md: "sm" }}>
+            <GridItem key={index} textAlign="center" fontSize={{ base: "xs", md: "sm" }}>
               {getColumnData(item, columnTypes[index], mode, dept.value)}
             </GridItem>
           ))}

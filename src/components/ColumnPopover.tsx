@@ -110,14 +110,14 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
             {({ isOpen }) => (
                 <>
                     <PopoverTrigger>
-                        <Box position="relative" minW={{ base: "60px", md: "80px" }} maxW={{ base: "100px", md: "160px" }} textAlign="center">
+                        <Box position="relative" minW={{ base: "70px", md: "80px" }} maxW={{ base: "140px", md: "160px" }} textAlign="center">
                             {departmentName && (
                                 <Text
                                     fontSize={{ base: "2xs", md: "xs" }}
                                     fontWeight="semibold"
                                     color={departmentName == "General" ? "gray.600" : "white"}
                                     bg={departmentName == "General" ? "gray.100" : "purple.500"}
-                                    px={{ base: 1, md: 2 }}
+                                    px={{ base: 2, md: 3 }}
                                     py={{ base: 0.5, md: 1 }}
                                     borderRadius="md"
                                     mb={1}
@@ -126,7 +126,6 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                     zIndex={isOpen ? "popover" : "auto"}
                                     position="relative"
                                     display="inline-block"
-                                    mx="auto"
                                     lineHeight="short"
                                 >
                                     {departmentName}
@@ -149,9 +148,8 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 whiteSpace="normal"
                                 wordBreak="break-word"
                                 h="auto"
-                                minH={{ base: "32px", md: "40px" }}
+                                minH={{ base: "36px", md: "42px" }}
                                 lineHeight="short"
-                                fontSize={{ base: "2xs", md: "sm" }}
                                 px={{ base: 1, md: 2 }}
                                 width="full"
                             >
