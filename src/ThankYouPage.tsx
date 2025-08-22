@@ -11,7 +11,7 @@ const ThankYouPage: React.FC<ThankYouPageProps> = ({ mode, onModeChange }) => {
 
     return (
 
-        <Box w="1000px" alignItems="center" mx="auto" mt="8"
+        <Box w="100%" alignItems="center" mx="auto" mt="8"
             p={6}
         >
             <Flex direction="column" alignItems="center" gap={4} p={3}>
@@ -53,7 +53,7 @@ const ThankYouPage: React.FC<ThankYouPageProps> = ({ mode, onModeChange }) => {
                     </Button>
                 </Flex>
                 
-                <Box w="600px" mx="auto" mt="8"
+                <Box w="60%" mx="auto" mt="8"
                       bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
                       backdropFilter="blur(16px)"  // Applies the frosted glass effect
                       borderRadius="lg"            // Rounds the corners of the box
