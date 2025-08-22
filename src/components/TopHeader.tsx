@@ -1,6 +1,7 @@
-import { Box, Flex, Text, Badge } from '@chakra-ui/react';
+import { Box, Flex, Text, Badge, Button, useColorMode } from '@chakra-ui/react';
 import { ModeType } from '../App';
 import UGradGradToggle from '../UGradGradToggle';
+
 
 interface TopHeaderProps {
     mode: ModeType;
@@ -9,6 +10,8 @@ interface TopHeaderProps {
 }
 
 export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps) {
+     const { toggleColorMode } = useColorMode(); // Add this line
+
     return (
         <Box
             position="fixed"
@@ -39,7 +42,7 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
                     alignItems="center"
                     position="relative"
                     flexWrap="wrap"  // Added to allow wrapping
-                    gap={2} 
+                    gap={2}
                 >
                     <Flex alignItems="center">
                         <Text fontSize="2xl" fontWeight="bold">
@@ -49,6 +52,9 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
                             DEMO
                         </Badge>
                     </Flex>
+                    <Button variant="outline" onClick={toggleColorMode}>
+                        Toggle Mode
+                    </Button>
                     <Box>
                         <UGradGradToggle mode={mode} onToggle={onToggle} />
                     </Box>

@@ -12,5 +12,5 @@
         // Add any necessary custom path mappings here
       }
     },
-    "include": ["src"]
+    "include": ["src", "src/MasterTableWidgets/.tsx"]
   }

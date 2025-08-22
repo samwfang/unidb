@@ -5,6 +5,7 @@ import TopHeader from './components/TopHeader';
 import UGradGradToggle from './UGradGradToggle';
 import { MTControlPanel } from './MTControlPanel';
 import FrontPageInfo from './FrontPageInfo';
+import { useColorMode, useColorModeValue } from '@chakra-ui/react';
 import {
   Box,
   Image,
@@ -48,6 +49,7 @@ export enum ModeType {
 
 function App() {
 
+  const { colorMode } = useColorMode(); // Get current color mode
   // whether table will prioritize undergraduate or graduate information
   const [mode, setMode] = useState<ModeType>(ModeType.Undergrad);
   // number of entries mastertable shows
@@ -62,6 +64,12 @@ function App() {
   const scrollToMasterTable = () => {
     masterTableRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Use color mode values for backgrounds
+  const bgGradient = useColorModeValue(
+    mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, gray.50, gray.200)",
+    mode === ModeType.Undergrad ? "linear(to-br, blue.900, blue.800)" : "linear(to-br, gray.900, gray.800)"
+  );
 
   //handle showing or removing the front header based on user scroll location
   useEffect(() => {
@@ -93,7 +101,7 @@ function App() {
         height="100%"
         position="relative"
         overflow="hidden"
-        bgGradient={mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, gray.50, gray.200)"} // Chakra's gradient syntax
+        bgGradient={bgGradient} // Chakra's gradient syntax
         p={{ base: 1, md: 4 }}
       >
         {/* Top Header: Only Display when ShowHeader == True */}
