@@ -219,7 +219,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   const getRadius = () => {
     if (windowSize.width < 768) return { inner: 60, outer: 80 };
     if (windowSize.width < 1024) return { inner: 60, outer: 80 };
-    return { inner: 80, outer: 100 };
+    return { inner: 75, outer: 100 };
   };
 
   const { inner, outer } = getRadius();
