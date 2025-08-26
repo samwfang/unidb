@@ -82,8 +82,8 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
               endAngle={0}
               innerRadius={inner}
               outerRadius={outer}
-              cornerRadius={10}  // Adds rounded edges
-              paddingAngle={2}  // Small gap between slices
+              cornerRadius={5}  // Adds rounded edges
+              paddingAngle={5}  // Small gap between slices
               dataKey="value"
             >
               <Cell fill={color} stroke={color} strokeWidth={1} />

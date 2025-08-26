@@ -98,8 +98,8 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
               endAngle={0}
               innerRadius={inner}
               outerRadius={outer}
-              cornerRadius={10}
-              paddingAngle={2}
+              cornerRadius={5}
+              paddingAngle={5}
               dataKey="value"
             >
               <Cell fill={color} stroke={color} strokeWidth={1} />
