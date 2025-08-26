@@ -121,8 +121,8 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
                    "testscores testscores2"
                    "students students"`,
             md: `"rate admissions testscores testscores2"
-                 "students students students students"
-                 "students students students students"`
+                 "students students . ."
+                 "students students . ."`
           }}
           gridTemplateColumns={{
             base: "1fr 1fr",

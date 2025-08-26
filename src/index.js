@@ -16,7 +16,7 @@ const theme = extendTheme({
     body: `'Poppins', sans-serif`,
   },
    fontWeights: {
-    normal: 300,
+    normal: 200,
     medium: 400,
     bold: 600,
   },

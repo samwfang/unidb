@@ -1,8 +1,9 @@
 // GraduationRateWidget.tsx
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab } from '@chakra-ui/react';
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
+import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab, Flex, Modal, ModalOverlay, ModalContent, ModalCloseButton, ModalBody, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody } from '@chakra-ui/react';
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DemographicsData } from 'src/MasterTable';
+import { HamburgerIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 
 interface TotalStudentWidgetProps {
   totalStudents: string;
@@ -145,6 +146,9 @@ const renderActiveShape = (props: any) => {
   );
 };
 
+
+
+
 //Find top 20 Departments and find the amount of total students per department as proportion
 const processDepartmentData = (
   departments: Array<{ department_name: string; total_students?: string }> = [],
@@ -177,6 +181,7 @@ const processDepartmentData = (
 const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome, demographics, departments }) => {
 
   const [activeTab, setActiveTab] = useState<DisplayMode>(DisplayMode.Department);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
 
   const dataSets = [
@@ -212,8 +217,8 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
 
   // Responsive radius based on window width
   const getRadius = () => {
-    if (windowSize.width < 480) return { inner: 50, outer: 70 };
     if (windowSize.width < 768) return { inner: 60, outer: 80 };
+    if (windowSize.width < 1024) return { inner: 60, outer: 80 };
     return { inner: 80, outer: 100 };
   };
 
@@ -235,6 +240,81 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   if (!currentData) return <Alert status="error">Data not available</Alert>;
 
 
+  // Not currently in use, maybe for expanded component
+  const renderLegend = () => {
+    if (!currentData.data.length) return null;
+
+    // Calculate sum of current data values instead of using totalStudents
+    const currentDataSum = currentData.data.reduce((sum, entry) => sum + entry.value, 0);
+
+    return (
+      <Box mt={2} maxW="100%" overflowY="auto" maxH="150px">
+        <Flex direction="column" gap={1}>
+          {currentData.data.map((entry, index) => (
+            <Flex key={index} align="center" gap={2}>
+              <Box
+                w="10px"
+                h="10px"
+                borderRadius="2px"
+                bg={COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length]}
+                flexShrink={0}
+              />
+              <Text fontSize="xs" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                {entry.name.replace('\n', ' ')}: {(entry.value / currentDataSum * 100).toFixed(1)}%
+              </Text>
+            </Flex>
+          ))}
+        </Flex>
+      </Box>
+    );
+  };
+
+  const renderLegendPopover = () => {
+    if (!currentData.data.length) return null;
+
+    const currentDataSum = currentData.data.reduce((sum, entry) => sum + entry.value, 0);
+
+    return (
+      <Popover>
+        <PopoverTrigger>
+          <HamburgerIcon
+            position="absolute"
+            top={3}
+            right={3}
+            cursor="pointer"
+            boxSize={{ base: 4, md: 6 }}
+            color="gray.500"
+            _hover={{ color: "gray.700" }}
+          />
+        </PopoverTrigger>
+        <PopoverContent width="auto" maxWidth="300px">
+          <PopoverArrow />
+          <PopoverBody p={4}>
+            <Text fontSize="md" fontWeight="bold" mb={3}>
+              {DATA_SET_NAMES[activeTab]} Distribution
+            </Text>
+            <Flex direction="column" gap={2}>
+              {currentData.data.map((entry, index) => (
+                <Flex key={index} align="center" gap={3}>
+                  <Box
+                    w="12px"
+                    h="12px"
+                    borderRadius="2px"
+                    bg={COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length]}
+                    flexShrink={0}
+                  />
+                  <Text fontSize="sm">
+                    {entry.name.replace('\n', ' ')}: {(entry.value / currentDataSum * 100).toFixed(1)}%
+                  </Text>
+                </Flex>
+              ))}
+            </Flex>
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
+    );
+  };
+
 
 
   return (
@@ -243,7 +323,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       borderWidth={1}
       borderRadius="md"
       display="flex"
-      flexDirection="row" // Changed to row for side-by-side layout
+      flexDirection="column"
       gap={4}
       minHeight="120px"
       bg="rgba(255, 255, 255, 0.2)"
@@ -251,18 +331,55 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       border="1px solid rgba(255, 255, 255, 0.2)"
       position="relative"
     >
-
-
-      <Box flex={1}>
-        <Text fontSize={{base: "sm", sm: "md", md: "lg"}}  fontWeight="bold">Total Students:</Text>
-        <Box height="250px" position="relative" overflow="visible" css={{
-          "& .recharts-wrapper": { overflow: "visible !important" },
-          "& .recharts-surface": { overflow: "visible !important" }
-        }}>
+      {renderLegendPopover()}
+      <Box>
+        <Text fontSize={{ base: "sm", sm: "md", md: "lg" }} fontWeight="bold">Total Students:</Text>
+        <Box height="250px" position="relative" overflow="visible">
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ left: 60, right: 60 }}>
+            <PieChart>
+              <Tooltip
+                content={({ payload }) => {
+                  if (payload && payload.length) {
+                    const data = payload[0].payload;
+                    const total = currentData.data.reduce((sum, entry) => sum + entry.value, 0);
+                    const percentage = ((data.value / total) * 100).toFixed(1);
+                    const index = currentData.data.findIndex(entry => entry.name === data.name);
+                    const color = COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length];
+
+                    return (
+                      <Box
+                        p={3}
+                        bg="white"
+                        border="1px solid"
+                        borderColor="gray.200"
+                        borderRadius="md"
+                        boxShadow="sm"
+                        fontSize="sm"
+                        minWidth="140px"
+                      >
+                        <Flex align="center" gap={2} mb={2}>
+                          <Box
+                            w="12px"
+                            h="12px"
+                            borderRadius="2px"
+                            bg={color}
+                            flexShrink={0}
+                          />
+                          <Text fontWeight="bold" color="gray.800">
+                            {data.name.replace('\n', ' ')}
+                          </Text>
+                        </Flex>
+                        <Text color="gray.600" fontSize="sm">
+                          {percentage}% of Total
+                        </Text>
+                      </Box>
+                    );
+                  }
+                  return null;
+                }}
+                animationDuration={0}
+              />
               <Pie
-                label={renderCustomizedLabel}
                 data={currentData.data}
                 cx="50%"
                 cy="50%"
@@ -292,19 +409,29 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
           </ResponsiveContainer>
         </Box>
       </Box>
-      <Tabs
-        orientation="vertical"
-        variant="soft-rounded"
-        onChange={(index) => setActiveTab(Object.values(DisplayMode)[index])}
-      >
-        <TabList>
-          {Object.values(DisplayMode).map((mode) => (
-            <Tab key={mode} fontSize={{ base: "xs", md: "sm" }}
-              px={{ base: 2, md: 4 }}
-              py={{ base: 1, md: 2 }}>{DATA_SET_NAMES[mode]}</Tab>
-          ))}
-        </TabList>
-      </Tabs>
+
+      {/* Horizontal tabs at the bottom */}
+      <Box>
+        <Tabs
+          variant="soft-rounded"
+          onChange={(index) => setActiveTab(Object.values(DisplayMode)[index])}
+        >
+          <TabList justifyContent="center" flexWrap="wrap" gap={{ base: 1, md: 2 }}>
+            {Object.values(DisplayMode).map((mode) => (
+              <Tab
+                key={mode}
+                fontSize={{ base: "xs", sm: "2xs", md: "xs" }}
+                px={{ base: 0.5, sm: 1, md: 2 }}
+                py={{ base: 0.5, sm: 1, md: 2 }}
+                whiteSpace="nowrap"
+                flexShrink={0}
+              >
+                {DATA_SET_NAMES[mode]}
+              </Tab>
+            ))}
+          </TabList>
+        </Tabs>
+      </Box>
     </Box>
   );
 };

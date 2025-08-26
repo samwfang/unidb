@@ -52,9 +52,6 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
                             DEMO
                         </Badge>
                     </Flex>
-                    <Button variant="outline" onClick={toggleColorMode}>
-                        Toggle Mode
-                    </Button>
                     <Box>
                         <UGradGradToggle mode={mode} onToggle={onToggle} />
                     </Box>

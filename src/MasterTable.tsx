@@ -311,10 +311,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       if (window.innerWidth < 480){
         setVisibleColumnCount(1);
       }
-      if (window.innerWidth < 600) {
+      else if (window.innerWidth < 768) {
         setVisibleColumnCount(2);
         setRowHeightEstimate(45);
-      } else if (window.innerWidth < 900) {
+      } else if (window.innerWidth < 1024) {
         setVisibleColumnCount(3);
          setRowHeightEstimate(55);
       } else {
