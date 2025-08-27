@@ -45,7 +45,7 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
                     gap={2}
                 >
                     <Flex alignItems="center">
-                        <Text fontSize="2xl" fontWeight="bold">
+                        <Text fontSize={{base: "lg", md: "2xl"}} fontWeight="bold">
                             The University Database
                         </Text>
                         <Badge variant="subtle" colorScheme="pink" ml={1}>

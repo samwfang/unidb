@@ -11,6 +11,7 @@ import { cipToClassificationName, groupDepartmentsByCIP } from './helpers/Depart
 import UniversitySummaryWidget from './MasterTableWidgets/UniversitySummaryWidget';
 import AdmissionsRateWidget from './MasterTableWidgets/AdmissionsRateWidget';
 import TestScoresWidget from './MasterTableWidgets/TestScoresWidget';
+import CostAndAidWidget from './MasterTableWidgets/CostAndAidWidget';
 
 /*
 Expanded Entries: Rendering The Graphics Which Show when User Clicks An Entry in the Master Table
@@ -119,10 +120,11 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           templateAreas={{
             base: `"rate admissions"
                    "testscores testscores2"
-                   "students students"`,
+                   "students students"
+                    "costaid costaid"`,
             md: `"rate admissions testscores testscores2"
-                 "students students . ."
-                 "students students . ."`
+                 "students students costaid costaid"
+                 "students students costaid costaid"`
           }}
           gridTemplateColumns={{
             base: "1fr 1fr",
@@ -140,6 +142,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'}
               demographics={general?.demographics}
               departments={general?.dept_contents} />
+          </Box>
+          <Box gridArea="costaid">
+            <CostAndAidWidget />
           </Box>
           <Box gridArea="rate" height="100%">
             <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />
