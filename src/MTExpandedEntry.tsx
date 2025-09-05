@@ -147,7 +147,10 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             <CostAndAidWidget />
           </Box>
           <Box gridArea="rate" height="100%">
-            <GraduationRateWidget graduationRate={general?.general_content.graduation_rate || 'No Data'} />
+            <GraduationRateWidget 
+            universityName={item?.name || 'Unknown University'}
+            graduationRate={general?.general_content.graduation_rate || 'No Data'} 
+            graduationRatePercentile={general?.general_content.graduation_rate_percentile || 'No Data'}/>
           </Box>
           <Box gridArea="admissions" height="100%">
             <AdmissionsRateWidget admissionsRate={general?.general_content.admissions_rate || 'No Data'} />

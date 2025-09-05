@@ -2,9 +2,24 @@ import React from 'react';
 import { Box, Text, Popover, PopoverTrigger, PopoverContent, PopoverBody, Flex } from '@chakra-ui/react';
 import { Cell, Pie, PieChart } from 'recharts';
 
+
+const getOrdinalSuffix = (num: number): string => {
+  const j = num % 10;
+  const k = num % 100;
+  
+  if (j === 1 && k !== 11) return 'st';
+  if (j === 2 && k !== 12) return 'nd';
+  if (j === 3 && k !== 13) return 'rd';
+  return 'th';
+};
+
+
 interface PercentileBarProps {
   value: number;
   colorScheme?: 'default' | 'inverted' | 'positive_only';
+  name?: string;
+  type?: string;
+  globalAvg?: number;
 }
 
 const colorSchemes = {
@@ -77,7 +92,7 @@ const Needle: React.FC<{
 
 
 
-const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'default' }) => {
+const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'default', name = "This university", type = "score", globalAvg = "No Data"}) => {
 
 
   const thresholds = colorSchemes[colorScheme];
@@ -109,6 +124,9 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
   const iR = 15;
   const oR = 25;
 
+  const ordinalSuffix = getOrdinalSuffix(value);
+
+
   return (
     <Popover trigger="hover" placement="top">
       <PopoverTrigger>
@@ -133,7 +151,9 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
               zIndex={1}
               textShadow={textPosition === 'outside' ? '0 0 2px rgba(0,0,0,0.3)' : 'none'}
             >
-              {value}th
+              {value}
+                {ordinalSuffix}
+
             </Text>
           </Box>
         </Box>
@@ -170,13 +190,21 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
               </PieChart>
             </Box>
             <Text fontSize="sm" fontWeight="bold" color={barColor}>
-              {value}th Percentile
+              {value}
+                {ordinalSuffix}
+  
+              {" "}Percentile
             </Text>
           </Flex>
 
           {/* Description */}
+          <Text fontSize="xs" color="gray.600" textAlign="left" mb={2}>
+            <Text as="span" fontWeight="bold" color="black">{name} </Text> has a higher <Text as="span" fontWeight="bold" color="black">{type}</Text> than <Text as="span" fontWeight="bold" color={barColor}>{value}%</Text> of all universities in UniDB
+
+            
+          </Text>
           <Text fontSize="xs" color="gray.600" textAlign="left">
-            This score is higher than <Text as="span" fontWeight="bold" color={barColor}>{value}%</Text> of the population
+            The average <Text as="span" fontWeight="bold" color="black">{type}</Text> is <Text as="span" fontWeight="bold" color={barColor}>{globalAvg}</Text>
           </Text>
         </PopoverBody>
       </PopoverContent>

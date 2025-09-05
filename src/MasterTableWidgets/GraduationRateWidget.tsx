@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import PercentileBar from 'src/helpers/PercentileBar';
 
 interface GraduationRateWidgetProps {
+  universityName: string;
   graduationRate: string;
+  graduationRatePercentile: string;
 }
 
-const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationRate }) => {
+const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityName, graduationRate, graduationRatePercentile }) => {
   const rate = parseFloat(graduationRate) || 0;
   const remaining = 100 - rate;
 
@@ -108,6 +111,15 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ graduationR
           </PieChart>
         </ResponsiveContainer>
       </Box>
+
+      <Box mt={2}>
+        <PercentileBar 
+          value={parseFloat(graduationRatePercentile)} 
+          name={universityName} 
+          type="Graduation Rate" 
+        />
+      </Box>
+
     </Box>
   );
 };
