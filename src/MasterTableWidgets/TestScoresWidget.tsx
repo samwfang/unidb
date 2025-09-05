@@ -84,7 +84,18 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
       border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
     >
-      <Text fontSize={{ base: "sm", sm: "md",  lg: "lg" }} fontWeight="bold" mb={2}>Test Scores: </Text>
+      <Flex alignItems="center" justifyContent="space-between" mb={1}>
+        <Tabs variant="soft-rounded" onChange={(index) => setActiveTab(index === 0 ? 'SAT' : 'ACT')}>
+          <TabList>
+            <Tab fontSize={{ base: "xs", md: "xs" }}
+              px={{ base: 2, md: 4 }}
+              py={{ base: 1, md: 2 }}>SAT</Tab>
+            <Tab fontSize={{ base: "xs", md: "xs" }}
+              px={{ base: 2, md: 4 }}
+              py={{ base: 1, md: 2 }}>ACT</Tab>
+          </TabList>
+        </Tabs>
+      </Flex>
 
 
       <Box height={{base: "100px", md: "140px"}} position="relative">
@@ -125,18 +136,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
         </ResponsiveContainer>
       </Box>
 
-      <Flex alignItems="center" justifyContent="space-between" mb={2}>
-        <Tabs variant="soft-rounded" onChange={(index) => setActiveTab(index === 0 ? 'SAT' : 'ACT')}>
-          <TabList>
-            <Tab fontSize={{ base: "xs", md: "sm" }}
-              px={{ base: 2, md: 4 }}
-              py={{ base: 1, md: 2 }}>SAT</Tab>
-            <Tab fontSize={{ base: "xs", md: "sm" }}
-              px={{ base: 2, md: 4 }}
-              py={{ base: 1, md: 2 }}>ACT</Tab>
-          </TabList>
-        </Tabs>
-      </Flex>
+      
     </Box>
   );
 };

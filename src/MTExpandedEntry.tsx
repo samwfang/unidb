@@ -131,19 +131,19 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             md: "1fr 1fr 1fr 1fr"
           }}
           gridTemplateRows={{
-            base: "auto auto auto",
+            base: "auto auto auto auto",
             md: "auto auto auto"
           }}
           gap={{ base: 2, md: 4 }}
           width="100%"
           alignItems="stretch"
         >
-          <Box gridArea="students">
+          <Box gridArea="students" height="100%">
             <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'}
               demographics={general?.demographics}
               departments={general?.dept_contents} />
           </Box>
-          <Box gridArea="costaid">
+          <Box gridArea="costaid" height="100%">
             <CostAndAidWidget />
           </Box>
           <Box gridArea="rate" height="100%">
