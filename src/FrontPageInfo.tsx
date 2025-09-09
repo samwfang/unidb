@@ -23,9 +23,9 @@ const FrontPageInfo: React.FC<FrontPageInfoProps> = ({ mode, onModeChange, onFin
             <Flex direction="column" alignItems="center" gap={4} p={3}>
                 <Flex direction="column" alignItems="center">
                     <Text fontSize="3xl" fontWeight="bold">
-                        Welcome to
+                        unidb
                     </Text>
-                    <Text fontSize="5xl" fontWeight="bold">
+                    <Text fontSize={{base: "3xl", md: "5xl"}} fontWeight="normal">
                         The University Database
                     </Text>
                     <Badge fontSize='1em' colorScheme="blue" ml={1}>

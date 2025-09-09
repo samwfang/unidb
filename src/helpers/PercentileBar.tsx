@@ -158,10 +158,10 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
           </Box>
         </Box>
       </PopoverTrigger>
-      <PopoverContent width="auto" maxW="250px">
-        <PopoverBody p={3}>
+      <PopoverContent width="auto" maxW="280px" borderRadius="md" boxShadow="lg">
+        <PopoverBody p={4}>
           {/* Chart and percentile header */}
-          <Flex align="center" mb={2}>
+          <Flex align="center" mb={3}>
             <Box  width={`${chartWidth}px`} height={`${chartHeight}px`} mr={1} mt={-5}>
               <PieChart width={chartWidth} height={chartHeight}>
                 <Pie

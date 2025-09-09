@@ -6,6 +6,7 @@ import UGradGradToggle from './UGradGradToggle';
 import { MTControlPanel } from './MTControlPanel';
 import FrontPageInfo from './FrontPageInfo';
 import { useColorMode, useColorModeValue } from '@chakra-ui/react';
+import NavigationFooter from './components/NavigationFooter';
 import {
   Box,
   Image,
@@ -48,6 +49,9 @@ export enum ModeType {
 
 
 function App() {
+
+  const [activeTab, setActiveTab] = useState<string>('explore');
+
 
   const { colorMode } = useColorMode(); // Get current color mode
   // whether table will prioritize undergraduate or graduate information
@@ -151,6 +155,12 @@ function App() {
             By Samuel Fang | Built with React & Chakra UI
           </Text>
         </Box>
+
+        <NavigationFooter 
+            mode={mode} 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab} 
+          />
       </Box>
     </div>
   );

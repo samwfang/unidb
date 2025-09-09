@@ -24,7 +24,7 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
             pointerEvents={showHeader ? 'auto' : 'none'}
             bg={mode === ModeType.Undergrad ? "blue.50" : "gray.50"}
             boxShadow="sm"
-            p={4}
+            p={1.5}
         >
             <Flex
                 display="flex"
@@ -33,7 +33,7 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
                 justifyContent="space-around"
                 textAlign="left"
                 pl={8}
-                mt={4}
+                mt={2}
             >
                 <Flex
                     width="100%"
@@ -46,11 +46,8 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
                 >
                     <Flex alignItems="center">
                         <Text fontSize={{base: "lg", md: "2xl"}} fontWeight="bold">
-                            The University Database
+                            unidb
                         </Text>
-                        <Badge variant="subtle" colorScheme="pink" ml={1}>
-                            DEMO
-                        </Badge>
                     </Flex>
                     <Box>
                         <UGradGradToggle mode={mode} onToggle={onToggle} />
