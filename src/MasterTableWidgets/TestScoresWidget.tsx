@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, Tabs, TabList, Tab, Flex } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import PercentileBar from 'src/helpers/PercentileBar';
 
 interface TestScoresProps {
   satScore?: string;
   actScore?: string;
+  universityName?: string;
+  satScorePercentile: string;
+  actScorePercentile: string;
 }
 
-const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => {
+const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore , universityName, 
+  satScorePercentile, actScorePercentile}) => {
   const [activeTab, setActiveTab] = useState<'SAT' | 'ACT'>('SAT');
 
   // Parse scores or use defaults
@@ -135,7 +140,14 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore }) => 
           </PieChart>
         </ResponsiveContainer>
       </Box>
-
+    
+     <Box mt={2}>
+        <PercentileBar 
+          value={activeTab === "SAT" ? parseFloat(satScorePercentile): parseFloat(actScorePercentile)} 
+          name={universityName} 
+          type={activeTab === "SAT" ? "SAT Score" : "ACT Score"}
+        />
+      </Box>
       
     </Box>
   );

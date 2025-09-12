@@ -16,10 +16,10 @@ const getOrdinalSuffix = (num: number): string => {
 
 interface PercentileBarProps {
   value: number;
-  colorScheme?: 'default' | 'inverted' | 'positive_only';
+  colorScheme?: 'default' | 'inverted' | 'positive_only' | 'positive_only_inverted';
   name?: string;
   type?: string;
-  globalAvg?: number;
+  globalAvg?: string;
 }
 
 const colorSchemes = {
@@ -42,13 +42,18 @@ const colorSchemes = {
     { threshold: Infinity, color: '#f10c0cff' }
   ],
   positive_only: [
-    { threshold: 30, color: '#f10c0cff' },
-    { threshold: 50, color: '#fca800' },
-    { threshold: 70, color: '#fcd200' },
-    { threshold: 80, color: '#10a508ff' },
-    { threshold: 90, color: '#0b5f1fff' },
-    { threshold: 95, color: '#0b5f1fff' },
-    { threshold: Infinity, color: '#0b5f1fff' }
+    { threshold: 25, color: '#5b5b5bff' },
+    { threshold: 50, color: '#10a508ff' },
+    { threshold: 75, color: '#0b5f1fff' },
+    { threshold: 90, color: '#1b6abeff' },
+    { threshold: Infinity, color: '#613ed2ff' }
+  ],
+  positive_only_inverted: [
+    { threshold: 15, color: '#613ed2ff'  },
+    { threshold: 25, color: '#1b6abeff' },
+    { threshold: 50, color: '#0b5f1fff' },
+    { threshold: 75, color: '#10a508ff' },
+    { threshold: Infinity, color: '#5b5b5bff' }
   ]
 };
 

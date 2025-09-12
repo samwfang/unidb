@@ -110,7 +110,7 @@ const CostAndAidWidget: React.FC<CostAndAidWidgetProps> = ({
                     variant="soft-rounded"
                     onChange={(index) => setActiveTab(Object.values(CostAidTab)[index])}
                 >
-                    <TabList justifyContent="center" flexWrap="wrap" gap={{ base: 1, md: 2 }} mb={1.5}>
+                    <TabList justifyContent="center" flexWrap="wrap" gap={{ base: 1, md: 2 }} mb={3.5}>
                         {Object.values(CostAidTab).map((tab) => (
                             <Tab
                                 key={tab}

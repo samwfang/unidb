@@ -60,9 +60,6 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
     dept.department_name.toLowerCase().includes(inputValue.toLowerCase())
   );
 
-  const generalContent = mode === ModeType.Undergrad
-    ? content?.undergrad_content
-    : content?.grad_content;
 
   // Helper function to group departments by the first two digits of their CIP
 
@@ -105,84 +102,101 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
 
 
 
-  //Rendering For Undergrad "General" Tab
-  const renderGeneralContent = (general: UndergradContent | GradContent | undefined) => (
-    mode === ModeType.Undergrad ? (
-      /* Render for Undergraduate Content */
-      <Box p={2} width="100%" overflow="hidden">
-        <UniversitySummaryWidget
-          universityName={item?.name || 'Unknown University'}
-          rank={rank.toString()}
-          isPublic={item?.isPublic}
-          sectorScorecard={item?.sectorScorecard}
-        />
-        <Grid
-          templateAreas={{
-            base: `"rate admissions"
-                   "testscores testscores2"
-                   "students students"
-                    "costaid costaid"`,
-            md: `"rate admissions testscores testscores2"
-                 "students students costaid costaid"
-                 "students students costaid costaid"`
-          }}
-          gridTemplateColumns={{
-            base: "1fr 1fr",
-            md: "1fr 1fr 1fr 1fr"
-          }}
-          gridTemplateRows={{
-            base: "auto auto auto auto",
-            md: "auto auto auto"
-          }}
-          gap={{ base: 2, md: 4 }}
-          width="100%"
-          alignItems="stretch"
-        >
-          <Box gridArea="students" height="100%">
-            <TotalStudentsWidget totalStudents={general?.general_content.total_students || 'No Data'}
-              demographics={general?.demographics}
-              departments={general?.dept_contents} />
-          </Box>
-          <Box gridArea="costaid" height="100%">
-            <CostAndAidWidget />
-          </Box>
-          <Box gridArea="rate" height="100%">
-            <GraduationRateWidget 
+  // Separate rendering functions for undergrad and grad
+  const renderUndergradContent = (general: UndergradContent | undefined) => (
+    <Box p={2} width="100%" overflow="hidden">
+      <UniversitySummaryWidget
+        universityName={item?.name || 'Unknown University'}
+        rank={rank.toString()}
+        isPublic={item?.isPublic}
+        sectorScorecard={item?.sectorScorecard}
+      />
+      <Grid
+        templateAreas={{
+          base: `"rate admissions"
+                 "testscores testscores2"
+                 "students students"
+                  "costaid costaid"`,
+          md: `"rate admissions testscores testscores2"
+               "students students costaid costaid"
+               "students students costaid costaid"`
+        }}
+        gridTemplateColumns={{
+          base: "1fr 1fr",
+          md: "1fr 1fr 1fr 1fr"
+        }}
+        gridTemplateRows={{
+          base: "auto auto auto auto",
+          md: "auto auto auto"
+        }}
+        gap={{ base: 2, md: 4 }}
+        width="100%"
+        alignItems="stretch"
+      >
+        <Box gridArea="students" height="100%">
+          <TotalStudentsWidget
             universityName={item?.name || 'Unknown University'}
-            graduationRate={general?.general_content.graduation_rate || 'No Data'} 
-            graduationRatePercentile={general?.general_content.graduation_rate_percentile || 'No Data'}/>
-          </Box>
-          <Box gridArea="admissions" height="100%">
-            <AdmissionsRateWidget admissionsRate={general?.general_content.admissions_rate || 'No Data'} />
-          </Box>
-          <Box gridArea="testscores" height="100%">
-            <TestScoresWidget satScore={"1440"} actScore={"34"} />
-          </Box>
-
-          <Box gridArea="testscores2" height="100%">
-            <TestScoresWidget satScore={"1440"} actScore={"34"} />
-          </Box>
-        </Grid>
-      </Box>
-    ) : (
-      // Render for Graduate Content
-      <Box p={4}>
-        <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-
-          <Box>
-            <Text fontWeight="bold">Total Students:</Text>
-            <Text> {general?.general_content.total_students} </Text>
-          </Box>
-
-          <Box>
-            <Text fontWeight="bold">Graduation Rate:</Text>
-            <Text> {general?.general_content.graduation_rate} </Text>
-          </Box>
-
-        </Grid>
-      </Box>
-    )
+            totalStudentsPercentile={general?.general_content.total_student_percentile || 'No Data'}
+            totalStudents={general?.general_content.total_students || 'No Data'}
+            demographics={general?.demographics}
+            departments={general?.dept_contents} />
+        </Box>
+        <Box gridArea="costaid" height="100%">
+          <CostAndAidWidget />
+        </Box>
+        <Box gridArea="rate" height="100%">
+          <GraduationRateWidget
+            universityName={item?.name || 'Unknown University'}
+            graduationRate={general?.general_content.graduation_rate || 'No Data'}
+            graduationRatePercentile={general?.general_content.graduation_rate_percentile || 'No Data'} />
+        </Box>
+        <Box gridArea="admissions" height="100%">
+          <AdmissionsRateWidget
+            universityName={item?.name || 'Unknown University'}
+            admissionsRate={general?.general_content.admissions_rate || 'No Data'}
+            admissionsRatePercentile={general?.general_content.admissions_rate_percentile || 'No Data'} />
+        </Box>
+        <Box gridArea="testscores" height="100%">
+          <TestScoresWidget
+            universityName={item?.name || 'Unknown University'}
+            satScore={general?.general_content.sat_score || 'No Data'}
+            actScore={general?.general_content.act_score || 'No Data'}
+            satScorePercentile={general?.general_content.sat_score_percentile || 'No Data'}
+            actScorePercentile={general?.general_content.act_score_percentile || 'No Data'} />
+        </Box>
+        <Box gridArea="testscores2" height="100%">
+          <TestScoresWidget
+            universityName={item?.name || 'Unknown University'}
+            satScore={"1440"} actScore={"34"}
+            satScorePercentile={"96"} actScorePercentile={"85"} />
+        </Box>
+      </Grid>
+    </Box>
   );
+
+  const renderGradContent = (general: GradContent | undefined) => (
+    <Box p={4}>
+      <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+        <Box>
+          <Text fontWeight="bold">Total Students:</Text>
+          <Text> {general?.general_content.total_students} </Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Graduation Rate:</Text>
+          <Text> {general?.general_content.graduation_rate} </Text>
+        </Box>
+      </Grid>
+    </Box>
+  );
+
+  // Unified render function
+  const renderGeneralContent = () => {
+    if (mode === ModeType.Undergrad) {
+      return renderUndergradContent(content?.undergrad_content);
+    } else {
+      return renderGradContent(content?.grad_content);
+    }
+  };
 
   //Render Departments by Group in New Tab
   const renderFilteredGroupedDepartments = () => {
@@ -312,7 +326,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
 
           <TabPanels>
             <TabPanel p={{ base: 2, md: 4 }}>
-              <Box p={0}>{renderGeneralContent(generalContent) || "No general content available"}</Box>
+              <Box p={0}>{renderGeneralContent() || "No general content available"}</Box>
             </TabPanel>
 
             {selectedDepts.map((selectedDept, index) => (

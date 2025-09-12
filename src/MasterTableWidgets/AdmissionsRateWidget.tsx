@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import PercentileBar from 'src/helpers/PercentileBar';
 
 interface AdmissionsRateProps {
+  universityName: string;
   admissionsRate: string;
+  admissionsRatePercentile: string;
 }
 
-const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ admissionsRate }) => {
+const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, admissionsRate, admissionsRatePercentile}) => {
   const rate = parseFloat(admissionsRate) || 0;
   const remaining = 100 - rate;
 
@@ -105,6 +108,16 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ admissionsRate })
           </PieChart>
         </ResponsiveContainer>
       </Box>
+
+      <Box mt={2}>
+        <PercentileBar 
+          value={parseFloat(admissionsRatePercentile)} 
+          name={universityName} 
+          type="Admissions Rate" 
+          colorScheme="positive_only_inverted"
+        />
+      </Box>
+      
     </Box>
   );
 };

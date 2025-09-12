@@ -39,10 +39,23 @@ export interface UndergradContent {
   general_content: {
     total_students: string;
     total_student_percentile: string;
+
     graduation_rate: string;
     graduation_rate_percentile: string;
+
     admissions_rate: string;
     admissions_rate_percentile: string;
+
+    sat_score?: string;
+    act_score?: string;
+    sat_score_percentile?: string;
+    act_score_percentile?: string;
+
+    studentFacultyRatio?: string;
+    studentFacultyRatioPercentile?: string;
+
+    avg_household_income?: string;
+    avg_household_income_percentile?: string;
 
     average_class_size: string;
   };
@@ -66,6 +79,7 @@ export interface UGradDeptContent {
 export interface GradContent {
   general_content: {
     total_students: string;
+    total_student_percentile: string;
     graduation_rate: string;
     graduation_rate_percentile?: string;
     admissions_rate?: string;
@@ -163,12 +177,19 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       const randomStudents = () => randomInRange(1000, 50000).toLocaleString();
       const randomClassSize = () => randomInRange(10, 500);
       const randomPercentile = () => randomInRange(10, 99);
+      const randomSAT = () => randomInRange(800, 1600);
+      const randomACT = () => randomInRange(16, 36);
+      const randomIncome = () => randomInRange(30000, 120000);
 
       // Simulated API response
       const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
         const globalIndex = page * pageSize + i;
         const gradRate = randomRate();
         const totalStudents = randomStudents();
+        const admissionsRate = randomRate();
+        const satScore = randomSAT();
+        const actScore = randomACT();
+        const avgIncome = randomIncome();
 
         return {
           id: globalIndex + 1,
@@ -185,8 +206,16 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 total_student_percentile: randomPercentile().toString(),
                 graduation_rate: `${gradRate}`,
                 graduation_rate_percentile: randomPercentile().toString(),
-                admissions_rate: randomRate().toString(),
+                admissions_rate: admissionsRate.toString(),
                 admissions_rate_percentile: randomPercentile().toString(),
+                sat_score: satScore.toString(),
+                act_score: actScore.toString(),
+                sat_score_percentile: randomPercentile().toString(),
+                act_score_percentile: randomPercentile().toString(),
+                studentFacultyRatio: `${10 + (globalIndex % 5)}:1`,
+                studentFacultyRatioPercentile: randomPercentile().toString(),
+                avg_household_income: avgIncome.toLocaleString(),
+                avg_household_income_percentile: randomPercentile().toString(),
                 average_class_size: randomClassSize().toString()
               },
               demographics: {
@@ -209,14 +238,42 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 ]
               },
               dept_contents: [
-                { cip: "1107", department_name: "Computer Science", total_students: '2100', content: `CS department info for University ${globalIndex + 1}` },
-                { cip: "2601", department_name: "Biology", content: `Biology department info for University ${globalIndex + 1}` },
-                { cip: "0502", department_name: "Ethnic, Cultural Minority, Gender, and Group Studies.", content: `Ethnic department info for University ${globalIndex + 1}` }
+                {
+                  cip: "1107",
+                  department_name: "Computer Science",
+                  total_students: '2100',
+                  total_student_percentile: randomPercentile().toString(),
+                  graduation_rate: `${gradRate + 5}`,
+                  graduation_rate_percentile: randomPercentile().toString(),
+                  average_class_size: randomClassSize().toString(),
+                  content: `CS department info for University ${globalIndex + 1}`
+                },
+                {
+                  cip: "2601",
+                  department_name: "Biology",
+                  total_students: '1800',
+                  total_student_percentile: randomPercentile().toString(),
+                  graduation_rate: `${gradRate + 2}`,
+                  graduation_rate_percentile: randomPercentile().toString(),
+                  average_class_size: randomClassSize().toString(),
+                  content: `Biology department info for University ${globalIndex + 1}`
+                },
+                {
+                  cip: "0502",
+                  department_name: "Ethnic, Cultural Minority, Gender, and Group Studies",
+                  total_students: '500',
+                  total_student_percentile: randomPercentile().toString(),
+                  graduation_rate: `${gradRate + 8}`,
+                  graduation_rate_percentile: randomPercentile().toString(),
+                  average_class_size: randomClassSize().toString(),
+                  content: `Ethnic department info for University ${globalIndex + 1}`
+                }
               ]
             },
             grad_content: {
               general_content: {
                 total_students: '5,500',
+                total_student_percentile: randomPercentile().toString(),
                 graduation_rate: '92%',
                 average_class_size: '51'
               },
@@ -308,7 +365,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   // >1024px is three columns
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 480){
+      if (window.innerWidth < 480) {
         setVisibleColumnCount(1);
       }
       else if (window.innerWidth < 768) {
@@ -316,10 +373,10 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         setRowHeightEstimate(45);
       } else if (window.innerWidth < 1024) {
         setVisibleColumnCount(3);
-         setRowHeightEstimate(55);
+        setRowHeightEstimate(55);
       } else {
         setVisibleColumnCount(3);
-         setRowHeightEstimate(61);
+        setRowHeightEstimate(61);
       }
     };
 

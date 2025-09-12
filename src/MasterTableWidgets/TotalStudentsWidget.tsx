@@ -4,9 +4,12 @@ import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab, Flex, Modal, ModalOver
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DemographicsData } from 'src/MasterTable';
 import { HamburgerIcon, InfoOutlineIcon } from '@chakra-ui/icons';
+import PercentileBar from 'src/helpers/PercentileBar';
 
 interface TotalStudentWidgetProps {
+  universityName: string;
   totalStudents: string;
+  totalStudentsPercentile: string;
   avgHouseholdIncome?: string;
   demographics?: DemographicsData;
   departments?: Array<{ department_name: string; total_students?: string }>;
@@ -178,7 +181,8 @@ const processDepartmentData = (
   return topDepts;
 };
 
-const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome, demographics, departments }) => {
+const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome, 
+  totalStudentsPercentile, universityName, demographics, departments }) => {
 
   const [activeTab, setActiveTab] = useState<DisplayMode>(DisplayMode.Department);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -409,6 +413,19 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
           </ResponsiveContainer>
         </Box>
       </Box>
+
+       {/* PercentileBar positioned above the tabs */}
+      <Flex justify="flex-end" mt={-10} mb={1}>
+        <Box width="120px">
+          <PercentileBar 
+            value={parseFloat(totalStudentsPercentile)} 
+            name={universityName} 
+            type="total students" 
+            globalAvg="5,000" 
+          />
+        </Box>
+      </Flex>
+
 
       {/* Horizontal tabs at the bottom */}
       <Box>
