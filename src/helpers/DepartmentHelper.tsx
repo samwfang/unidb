@@ -3,13 +3,17 @@ import { GradContent, GradDeptContent, UGradDeptContent, UndergradContent, Unive
 
 
 // Column Types
-// To Add a new Column Type: Add to Enum, Add
+// To Add a new Column Type: Add to Enum, Add to MetaDataMap, add to get column data
 
 export enum ColumnType {
   Location = "location",
   TotalStudents = "total_students",
   GraduationRate = "graduation_rate",
   StudentFacultyRatio = "average_class_size",
+  SATScore = "sat_score",
+  ACTScore = "act_score",
+  AdmissionsRate = "admissions_rate",
+  HouseholdIncome = "avg_household_income"
 }
 
 export enum ExtraSortType {
@@ -47,6 +51,26 @@ export const ColumnMetadataMap: Record<ColumnType, ColumnMetadata> = {
     departmentSpecificAllowed: true,
     description: "The ratio of students to faculty members at this institution or department."
   },
+  [ColumnType.SATScore]: {
+    displayName: "SAT Score",
+    departmentSpecificAllowed: false,
+    description: "The average SAT score of admitted students."
+  },
+  [ColumnType.ACTScore]: {
+    displayName: "ACT Score",
+    departmentSpecificAllowed: false,
+    description: "The average ACT score of admitted students."
+  },
+  [ColumnType.AdmissionsRate]: {
+    displayName: "Admissions Rate",
+    departmentSpecificAllowed: false,
+    description: "The percentage of applicants who are admitted."
+  },
+  [ColumnType.HouseholdIncome]: {
+    displayName: "Avg. Income",
+    departmentSpecificAllowed: false,
+    description: "The average household income of students."
+  }
   // ... other columns
 };
 
@@ -106,6 +130,14 @@ export const getColumnData = (
       return content?.general_content.graduation_rate || 'N/A';
     case ColumnType.StudentFacultyRatio:
       return content?.general_content.average_class_size || 'N/A';
+    case ColumnType.SATScore:
+      return content?.general_content.sat_score || 'N/A';
+    case ColumnType.ACTScore:
+      return content?.general_content.act_score || 'N/A';
+    case ColumnType.AdmissionsRate:
+      return content?.general_content.admissions_rate || 'N/A';
+    case ColumnType.HouseholdIncome:
+      return content?.general_content.avg_household_income || 'N/A';
     default:
       return 'N/A';
   }
@@ -122,15 +154,15 @@ export const getColumnData = (
 
 // Group Departments by the first two digits of their CIP
 export const groupDepartmentsByCIP = (departments: UGradDeptContent[] | GradDeptContent[]) => {
-    return departments.reduce((groups, dept) => {
-      const cipPrefix = dept.cip.substring(0, 2);
-      if (!groups[cipPrefix]) {
-        groups[cipPrefix] = [];
-      }
-      groups[cipPrefix].push(dept);
-      return groups;
-    }, {} as Record<string, (UGradDeptContent | GradDeptContent)[]>);
-  };
+  return departments.reduce((groups, dept) => {
+    const cipPrefix = dept.cip.substring(0, 2);
+    if (!groups[cipPrefix]) {
+      groups[cipPrefix] = [];
+    }
+    groups[cipPrefix].push(dept);
+    return groups;
+  }, {} as Record<string, (UGradDeptContent | GradDeptContent)[]>);
+};
 
 // Function to get Department type from CIP label
 export const CIP_TO_CLASSIFICATION: Record<string, string> = {
