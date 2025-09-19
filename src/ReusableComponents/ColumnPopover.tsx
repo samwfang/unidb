@@ -5,6 +5,7 @@ import { ChevronDownIcon } from '@chakra-ui/icons';
 import { CIP_TO_CLASSIFICATION, ColumnType, ExtraSortType, SortType, getColumnDescription, getColumnDisplayName, cipToClassificationName, canBeDepartmentColumn } from 'src/helpers/DepartmentHelper';
 import ReactSelect from 'react-select';
 import DepartmentSelector from './DepartmentSelector';
+import GlassBox from 'src/containers/GlassBox';
 
 
 interface ColumnPopoverProps {
@@ -172,8 +173,8 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                         />
                     )}
                     <Portal>
-                        <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
-                            boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)">
+                        <PopoverContent zIndex="popover">
+                            <GlassBox>
                             <PopoverBody p={4}>
                                 <Text fontSize="xl" fontWeight="bold"> {getColumnDisplayName(columnType)}</Text>
                                 {isSortedBy &&
@@ -259,7 +260,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 <Box display="flex" gap={2} mt={4}>
                                     <Button
                                         flex={1}
-                                        colorScheme="blue"
+                                        variant="primary"
                                         size="sm"
                                         zIndex="overlay"
                                         onClick={handleApplyAndSort}
@@ -277,8 +278,9 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                         Apply
                                     </Button>
                                 </Box>
-
+                            
                             </PopoverBody>
+                            </GlassBox>
                         </PopoverContent>
                     </Portal>
                 </>
