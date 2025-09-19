@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select, Input, List, ListItem } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
-import { Content, UndergradContent, UGradDeptContent, GradDeptContent, GradContent, UniversityData } from './MasterTable';
-import { ModeType } from './App';
+import { Content, UndergradContent, UGradDeptContent, GradDeptContent, GradContent, UniversityData } from '../MasterTable';
+import { ModeType } from '../../App';
 import DepartmentContent from './MTDepartmentContent';
-import GraduationRateWidget from './MasterTableWidgets/GraduationRateWidget';
-import TotalStudentsWidget from './MasterTableWidgets/TotalStudentsWidget';
+import GraduationRateWidget from '../../../UnivWidgets/GraduationRateWidget';
+import TotalStudentsWidget from '../../../UnivWidgets/TotalStudentsWidget';
 import { Tooltip } from '@chakra-ui/react';
-import { cipToClassificationName, groupDepartmentsByCIP } from './helpers/DepartmentHelper';
-import UniversitySummaryWidget from './MasterTableWidgets/UniversitySummaryWidget';
-import AdmissionsRateWidget from './MasterTableWidgets/AdmissionsRateWidget';
-import TestScoresWidget from './MasterTableWidgets/TestScoresWidget';
-import CostAndAidWidget from './MasterTableWidgets/CostAndAidWidget';
+import { cipToClassificationName, groupDepartmentsByCIP } from '../../../helpers/DepartmentHelper';
+import UniversitySummaryWidget from '../../../UnivWidgets/UniversitySummaryWidget';
+import AdmissionsRateWidget from '../../../UnivWidgets/AdmissionsRateWidget';
+import TestScoresWidget from '../../../UnivWidgets/TestScoresWidget';
+import CostAndAidWidget from '../../../UnivWidgets/CostAndAidWidget';
 
 /*
 Expanded Entries: Rendering The Graphics Which Show when User Clicks An Entry in the Master Table

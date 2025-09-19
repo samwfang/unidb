@@ -1,7 +1,7 @@
 import { Box, Stack, Text, Select } from '@chakra-ui/react';
-import UGradGradToggle from './UGradGradToggle';
-import { ModeType } from './App';
-import GlassBox from './containers/GlassBox';
+import UGradGradToggle from '../../ReusableComponents/UGradGradToggle';
+import { ModeType } from '../App';
+import GlassBox from '../../containers/GlassBox';
 
 interface MTControlPanelProps {
   pageSize: number;

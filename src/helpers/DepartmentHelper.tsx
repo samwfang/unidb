@@ -1,5 +1,5 @@
-import { ModeType } from "src/App";
-import { GradContent, GradDeptContent, UGradDeptContent, UndergradContent, UniversityData } from "../MasterTable";
+import { ModeType } from "src/Root/App";
+import { GradContent, GradDeptContent, UGradDeptContent, UndergradContent, UniversityData } from "../Root/FrontPage/MasterTable";
 
 
 // Column Types

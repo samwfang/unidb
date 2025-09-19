@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Text, Tabs, TabList, Tab, Flex, Badge } from '@chakra-ui/react';
-import PercentileBar from 'src/helpers/PercentileBar';
+import PercentileBar from 'src/ReusableComponents/PercentileBar';
 
 interface CostAndAidWidgetProps {
     inStateTuition?: string;

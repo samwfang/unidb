@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem, Menu, FormControl, Select, Badge } from '@chakra-ui/react';
 import { Popover, PopoverTrigger, PopoverContent, PopoverBody, Portal } from '@chakra-ui/react';
-import MasterTableRow from './MasterTableRow';
-import { ModeType } from './App';
+import MasterTableRow from './TableEntries/MasterTableRow';
+import { ModeType } from '../App';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons';
 import ReactSelect, { SingleValue } from 'react-select';
-import { ColumnType, ExtraSortType, SortType } from './helpers/DepartmentHelper';
-import ColumnPopover from './components/ColumnPopover';
-import SearchBar from './components/SearchBar';
-import { useAppTheme } from './containers/useTheme';
-import GlassBox from './containers/GlassBox';
+import { ColumnType, ExtraSortType, SortType } from '../../helpers/DepartmentHelper';
+import ColumnPopover from '../../ReusableComponents/ColumnPopover';
+import SearchBar from '../../ReusableComponents/SearchBar';
+import { useAppTheme } from '../../containers/useTheme';
+import GlassBox from '../../containers/GlassBox';
 
 // Top level entry for University Data
 export interface UniversityData {

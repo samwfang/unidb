@@ -1,6 +1,6 @@
 import { Box, Flex, Text, Badge, Button, useColorMode } from '@chakra-ui/react';
-import { ModeType } from '../App';
-import UGradGradToggle from '../UGradGradToggle';
+import { ModeType } from '../Root/App';
+import UGradGradToggle from './UGradGradToggle';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 

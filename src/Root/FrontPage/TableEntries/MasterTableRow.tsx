@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image, Icon } from '@chakra-ui/react';
 import MTExpandedEntry from './MTExpandedEntry';
-import { UniversityData, UndergradContent, GradContent, Content } from './MasterTable'; // Adjust the path as necessary
-import { ModeType } from './App';
+import { UniversityData, UndergradContent, GradContent, Content } from '../MasterTable'; // Adjust the path as necessary
+import { ModeType } from '../../App';
 import { FaUniversity } from 'react-icons/fa';
-import { ColumnType, getColumnData } from './helpers/DepartmentHelper';
+import { ColumnType, getColumnData } from '../../../helpers/DepartmentHelper';
 
 // Define the props interface for MasterTableRow
 interface MasterTableRowProps {

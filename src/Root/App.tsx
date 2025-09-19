@@ -1,12 +1,12 @@
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
-import MasterTable from './MasterTable'
-import TopHeader from './components/TopHeader';
-import UGradGradToggle from './UGradGradToggle';
-import { MTControlPanel } from './MTControlPanel';
-import FrontPageInfo from './components/FrontPageInfo';
+import MasterTable from './FrontPage/MasterTable'
+import TopHeader from '../ReusableComponents/TopHeader';
+import UGradGradToggle from '../ReusableComponents/UGradGradToggle';
+import { MTControlPanel } from './FrontPage/MTControlPanel';
+import FrontPageInfo from '../ReusableComponents/FrontPageInfo';
 import { useColorMode, useColorModeValue } from '@chakra-ui/react';
-import NavigationFooter from './components/NavigationFooter';
+import NavigationFooter from '../ReusableComponents/NavigationFooter';
 import {
   Box,
   Image,
@@ -38,7 +38,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@chakra-ui/icons'
-import ThankYouPage from './ThankYouPage';
+import ThankYouPage from './FrontPage/ThankYouPage';
 
 
 export enum ModeType {

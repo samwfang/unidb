@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import PercentileBar from 'src/helpers/PercentileBar';
+import PercentileBar from 'src/ReusableComponents/PercentileBar';
 
 interface AdmissionsRateProps {
   universityName: string;

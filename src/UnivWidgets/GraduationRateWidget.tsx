@@ -1,52 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Tabs, TabList, Tab, Flex } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import PercentileBar from 'src/helpers/PercentileBar';
+import PercentileBar from 'src/ReusableComponents/PercentileBar';
 
-interface TestScoresProps {
-  satScore?: string;
-  actScore?: string;
-  universityName?: string;
-  satScorePercentile: string;
-  actScorePercentile: string;
+interface GraduationRateWidgetProps {
+  universityName: string;
+  graduationRate: string;
+  graduationRatePercentile: string;
 }
 
-const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore , universityName, 
-  satScorePercentile, actScorePercentile}) => {
-  const [activeTab, setActiveTab] = useState<'SAT' | 'ACT'>('SAT');
-
-  // Parse scores or use defaults
-  const sat = parseInt(satScore || '0') || 0;
-  const act = parseInt(actScore || '0') || 0;
-
-  const maxSat = 1600;
-  const maxAct = 36;
-
-  const currentScore = activeTab === 'SAT' ? sat : act;
-  const maxScore = activeTab === 'SAT' ? maxSat : maxAct;
-  const remaining = maxScore - currentScore;
-
-
+const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityName, graduationRate, graduationRatePercentile }) => {
+  const rate = parseFloat(graduationRate) || 0;
+  const remaining = 100 - rate;
 
   const data = [
-    { name: 'Score', value: currentScore },
+    { name: 'Graduated', value: rate },
     { name: 'Remaining', value: remaining }
   ];
 
-  // Color based on percentile of max score
-  const percentile = currentScore / maxScore;
   const colorThresholds = [
-    { threshold: .60, color: '#f10c0cff' },
-    { threshold: .70, color: '#fca800' },
-    { threshold: .75, color: '#fcd200' },
-    { threshold: .80, color: '#10a508ff' },
-    { threshold: .85, color: '#0b5f1fff' },
-    { threshold: .95, color: '#1b6abeff' },
+    { threshold: 30, color: '#f10c0cff' },
+    { threshold: 50, color: '#fca800' },
+    { threshold: 70, color: '#fcd200' },
+    { threshold: 80, color: '#10a508ff' },
+    { threshold: 90, color: '#0b5f1fff' },
+    { threshold: 95, color: '#1b6abeff' },
     { threshold: Infinity, color: '#613ed2ff' }
   ];
 
   // Find the first threshold that matches
-  const { color } = colorThresholds.find(({ threshold }) => percentile <= threshold) ||
+  const { color } = colorThresholds.find(({ threshold }) => rate <= threshold) ||
     { color: '#F44336' };
 
 
@@ -88,19 +71,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore , univ
       border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
     >
-      <Flex alignItems="center" justifyContent="space-between" mb={1}>
-        <Tabs variant="soft-rounded" onChange={(index) => setActiveTab(index === 0 ? 'SAT' : 'ACT')}>
-          <TabList>
-            <Tab fontSize={{ base: "xs", md: "xs" }}
-              px={{ base: 2, md: 4 }}
-              py={{ base: 1, md: 2 }}>SAT</Tab>
-            <Tab fontSize={{ base: "xs", md: "xs" }}
-              px={{ base: 2, md: 4 }}
-              py={{ base: 1, md: 2 }}>ACT</Tab>
-          </TabList>
-        </Tabs>
-      </Flex>
-
+      <Text fontSize={{base: "sm", sm: "md",  lg: "lg"}} fontWeight="bold" mb={2}>Graduation Rate</Text>
 
       <Box height={{base: "100px", md: "140px"}} position="relative">
         <ResponsiveContainer width="100%" height="100%">
@@ -113,8 +84,8 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore , univ
               endAngle={0}
               innerRadius={inner}
               outerRadius={outer}
-              cornerRadius={5}
-              paddingAngle={5}
+              cornerRadius={5}  // Adds rounded edges
+              paddingAngle={5}  // Small gap between slices
               dataKey="value"
             >
               <Cell fill={color} stroke={color} strokeWidth={1} />
@@ -127,29 +98,29 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore , univ
               style={{
                 fontSize: 'clamp(16px, 3.5vw, 28px)',
                 fontWeight: 'bold',
-                fill: color
+                fill: color  // Match text color to gauge
               }}
             >
-              {currentScore}
+              {graduationRate}%
             </text>
             <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
-              <tspan x="50%" dy="0">Avg. Score</tspan>
-              <tspan x="50%" dy="12">Out of {maxScore}</tspan>
+              <tspan x="50%" dy="0">Graduated Within</tspan>
+              <tspan x="50%" dy="12">6 Years</tspan>
             </text>
           </PieChart>
         </ResponsiveContainer>
       </Box>
-    
-     <Box mt={2}>
+
+      <Box mt={2}>
         <PercentileBar 
-          value={activeTab === "SAT" ? parseFloat(satScorePercentile): parseFloat(actScorePercentile)} 
+          value={parseFloat(graduationRatePercentile)} 
           name={universityName} 
-          type={activeTab === "SAT" ? "SAT Score" : "ACT Score"}
+          type="Graduation Rate" 
         />
       </Box>
-      
+
     </Box>
   );
 };
 
-export default TestScoresWidget;
+export default GraduationRateWidget;
