@@ -9,6 +9,8 @@ import ReactSelect, { SingleValue } from 'react-select';
 import { ColumnType, ExtraSortType, SortType } from './helpers/DepartmentHelper';
 import ColumnPopover from './components/ColumnPopover';
 import SearchBar from './components/SearchBar';
+import { useAppTheme } from './containers/useTheme';
+import GlassBox from './containers/GlassBox';
 
 // Top level entry for University Data
 export interface UniversityData {
@@ -110,7 +112,13 @@ export interface MasterTableProps {
 
 
 const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 10 }) => {
+  //Custom Parameters for App Styling Based on Theme
+  const { colorMode, glassBg, glassBorder, modeColor } = useAppTheme();
+
+  //Search Params to Save State (WIP)
   const [searchParams, setSearchParams] = useSearchParams();
+
+
   //Raw Data for Page
   const [data, setData] = useState<UniversityData[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -502,14 +510,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   //TODO: Add "Favorited" Functionality
   return (
-    <Box maxW={{ base: "100vw", md: "1000px" }} mx="auto" mt="8"
+    <GlassBox maxW={{ base: "100vw", md: "1000px" }} mx="auto" mt="8"
       position="relative"
-      bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
-      //backdropFilter="blur(16px)"  // Applies the frosted glass effect
-      borderRadius="lg"            // Rounds the corners of the box
-      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
-      border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
-      p={{ base: 2, md: 3, lg: 6 }}
+      p={{ base: 2, md: 3, lg: 4 }}
     >
       <Flex justifyContent="space-between" mb={4}>
 
@@ -523,12 +526,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         <Button
           onClick={() => { setExpandedIndex([]) }}
           isDisabled={Array.isArray(expandedIndex) ? !expandedIndex.length : true}
-          bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
-          color="white"
-          _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
-            color: 'white',
-          }}
+          variant={mode === 'undergrad' ? 'primary' : 'secondary'}
         >
           Collapse All
         </Button>
@@ -551,8 +549,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
             }
           },
         }}
+        width="100%"
       >
-        <Box minH={`${calculatedMinHeight}px`} minW={{ base: "300px", md: "600px", lg: "800px" }}>
+        <Box minH={`${calculatedMinHeight}px`} minW={{ base: "300px", md: "600px", lg: "800px" }} w="100">
           {isLoading ? ( // Show spinner when loading
             <Flex justifyContent="center" alignItems="center" minH="100px">
               <Spinner
@@ -705,7 +704,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                               )}
                               <Button
                                 mt={4}
-                                colorScheme="blue"
+                                variant = {mode === 'undergrad' ? 'primary' : 'secondary'}
                                 size="sm"
                                 onClick={applyAlphabeticalSort}
                               >
@@ -777,12 +776,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
       <Flex justifyContent="space-between" alignItems="center" mt="4">
         <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}
-          bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
-          color="white"
-          _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
-            color: 'white',
-          }}>
+          variant = {mode === 'undergrad' ? 'primary' : 'secondary'}>
           Back
         </Button>
 
@@ -809,27 +803,17 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
           </Tooltip>
           <Button onClick={goToPage} isDisabled={isLoading}
-            bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
-            color="white"
-            _hover={{
-              bg: mode === 'undergrad' ? "blue.600" : "gray.800",
-              color: 'white',
-            }}>
+            variant={mode === 'undergrad' ? 'primary' : 'secondary'}>
             Go
           </Button>
         </Flex>
 
         <Button onClick={nextPage} isDisabled={(currentPage + 1) * pageSize >= totalItems || isLoading}
-          bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
-          color="white"
-          _hover={{
-            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
-            color: 'white',
-          }}>
+          variant={mode === 'undergrad' ? 'primary' : 'secondary'}>
           Next
         </Button>
       </Flex>
-    </Box>
+    </GlassBox>
   );
 };
 

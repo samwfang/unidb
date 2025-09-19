@@ -4,7 +4,7 @@ import MasterTable from './MasterTable'
 import TopHeader from './components/TopHeader';
 import UGradGradToggle from './UGradGradToggle';
 import { MTControlPanel } from './MTControlPanel';
-import FrontPageInfo from './FrontPageInfo';
+import FrontPageInfo from './components/FrontPageInfo';
 import { useColorMode, useColorModeValue } from '@chakra-ui/react';
 import NavigationFooter from './components/NavigationFooter';
 import {
@@ -53,7 +53,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<string>('explore');
 
 
-  const { colorMode } = useColorMode(); // Get current color mode
+   const { colorMode, toggleColorMode } = useColorMode(); // Get current color mode
   // whether table will prioritize undergraduate or graduate information
   const [mode, setMode] = useState<ModeType>(ModeType.Undergrad);
   // number of entries mastertable shows
@@ -72,7 +72,7 @@ function App() {
   // Use color mode values for backgrounds
   const bgGradient = useColorModeValue(
     mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, gray.50, gray.200)",
-    mode === ModeType.Undergrad ? "linear(to-br, blue.900, blue.800)" : "linear(to-br, gray.900, gray.800)"
+    mode === ModeType.Undergrad ? "linear(to-br, blue.1000, blue.900)" : "linear(to-br, gray.900, gray.800)"
   );
 
   //handle showing or removing the front header based on user scroll location
@@ -113,6 +113,8 @@ function App() {
           mode={mode}
           showHeader={showHeader}
           onToggle={undergradGradToggle}
+          onColorModeToggle={toggleColorMode} 
+          colorMode={colorMode}
         />
 
         <Flex maxW="1000px"

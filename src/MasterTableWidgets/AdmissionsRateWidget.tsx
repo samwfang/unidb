@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import PercentileBar from 'src/helpers/PercentileBar';
 
@@ -10,6 +10,7 @@ interface AdmissionsRateProps {
 }
 
 const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, admissionsRate, admissionsRatePercentile}) => {
+  const { colorMode } = useColorMode();
   const rate = parseFloat(admissionsRate) || 0;
   const remaining = 100 - rate;
 
@@ -58,18 +59,18 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
   
     const { inner, outer } = getRadius();
 
-  return (
+  return  (
     <Box
       p={{ base: 2, md: 4 }}
-      borderWidth={1}
-      borderRadius="md"
-      minHeight="120px"
-      bg="rgba(255, 255, 255, 0.2)"
-      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
-      border="1px solid rgba(255, 255, 255, 0.2)"
+      borderRadius="lg"
+      minHeight="140px"
+      bg={colorMode === 'dark' ? 'gray.800' : 'white'}
+      border="2px solid"
+      borderColor={colorMode === 'dark' ? 'gray.700' : 'white'}
       height="100%"
+      position="relative"
     >
-      <Text fontSize={{base: "sm", sm: "md", lg: "lg"}} fontWeight="bold" mb={2}>Admissions Rate:</Text>
+      <Text fontSize={{base: "sm", sm: "md", lg: "lg"}} fontWeight="bold" mb={2}>Admissions Rate</Text>
 
       <Box height={{base: "100px", md: "140px"}} position="relative">
         <ResponsiveContainer width="100%" height="100%">

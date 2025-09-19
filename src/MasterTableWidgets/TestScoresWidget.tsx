@@ -84,8 +84,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore , univ
       borderWidth={1}
       borderRadius="md"
       minHeight="120px"
-      bg="rgba(255, 255, 255, 0.2)"
-      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
+      bg="white"
       border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
     >

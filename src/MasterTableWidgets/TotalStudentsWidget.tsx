@@ -330,8 +330,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       flexDirection="column"
       gap={4}
       minHeight="120px"
-      bg="rgba(255, 255, 255, 0.2)"
-      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
+      bg="white"
       border="1px solid rgba(255, 255, 255, 0.2)"
       position="relative"
     >
@@ -415,7 +414,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       </Box>
 
        {/* PercentileBar positioned above the tabs */}
-      <Flex justify="flex-end" mt={-10} mb={1}>
+      <Flex justify="center" mt={-10} mb={1}>
         <Box width="120px">
           <PercentileBar 
             value={parseFloat(totalStudentsPercentile)} 

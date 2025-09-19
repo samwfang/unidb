@@ -147,7 +147,7 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                     {sectorScorecard && (
                         <GridItem>
                             <Box
-                                bg={"gray.100"}
+                                bg={"white"}
                                 borderRadius="lg"
                                 p={1.5}
                                 minW="0"
@@ -162,7 +162,7 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                     {/* Region Box */}
                     <GridItem>
                         <Box
-                            bg="gray.100"
+                            bg="white"
                             borderRadius="lg"
                             p={1.5}
                             minW="0"
@@ -177,7 +177,7 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                     {/* City Size Box */}
                     <GridItem>
                         <Box
-                            bg='gray.100'
+                            bg='white'
                             borderRadius="lg"
                             p={1.5}
                             minW="0"
@@ -192,7 +192,7 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                     {/* College Size Box */}
                     <GridItem>
                         <Box
-                            bg={'gray.100'}
+                            bg={'white'}
                             borderRadius="lg"
                             p={1.5}
                             minW="0"

@@ -1,16 +1,23 @@
 import { Box, Flex, Text, Badge, Button, useColorMode } from '@chakra-ui/react';
 import { ModeType } from '../App';
 import UGradGradToggle from '../UGradGradToggle';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 
 interface TopHeaderProps {
     mode: ModeType;
     showHeader: boolean;
     onToggle: () => void;
+    onColorModeToggle: () => void;
+    colorMode: string;
 }
 
-export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps) {
-     const { toggleColorMode } = useColorMode(); // Add this line
+export default function TopHeader({ mode, showHeader, onToggle, onColorModeToggle, colorMode }: TopHeaderProps) {
+    const { toggleColorMode } = useColorMode(); // Add this line
+
+    const bgColor = colorMode === 'dark'
+        ? 'gray.900'  // Black background for dark mode
+        : mode === ModeType.Undergrad ? "blue.50" : "gray.50";
 
     return (
         <Box
@@ -22,7 +29,7 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
             opacity={showHeader ? 1 : 0}
             transition="opacity 0.3s ease"
             pointerEvents={showHeader ? 'auto' : 'none'}
-            bg={mode === ModeType.Undergrad ? "blue.50" : "gray.50"}
+            bg={bgColor}
             boxShadow="sm"
             p={1.5}
         >
@@ -45,13 +52,23 @@ export default function TopHeader({ mode, showHeader, onToggle }: TopHeaderProps
                     gap={2}
                 >
                     <Flex alignItems="center">
-                        <Text fontSize={{base: "lg", md: "2xl"}} fontWeight="bold">
+                        <Text fontSize={{ base: "lg", md: "2xl" }} fontWeight="bold">
                             unidb
                         </Text>
                     </Flex>
-                    <Box>
-                        <UGradGradToggle mode={mode} onToggle={onToggle} />
-                    </Box>
+                    <Flex alignItems="center" gap={2}>
+                        <Button
+                            onClick={onColorModeToggle}
+                            size="sm"
+                            variant="ghost"
+                            aria-label="Toggle color mode"
+                        >
+                            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+                        </Button>
+                        <Box>
+                            <UGradGradToggle mode={mode} onToggle={onToggle} />
+                        </Box>
+                    </Flex>
                 </Flex>
             </Flex>
         </Box>

@@ -1,6 +1,7 @@
 import { Box, Stack, Text, Select } from '@chakra-ui/react';
 import UGradGradToggle from './UGradGradToggle';
 import { ModeType } from './App';
+import GlassBox from './containers/GlassBox';
 
 interface MTControlPanelProps {
   pageSize: number;
@@ -14,14 +15,9 @@ Displays the Control Panel on the Left of the Master Table, to allow for Filteri
 */
 export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange }: MTControlPanelProps) => {
   return (
-    <Box 
+    <GlassBox 
       w={{ base: "100%", lg: "220px" }}
       mx="auto" mt="8"
-      bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
-      backdropFilter="blur(16px)"  // Applies the frosted glass effect
-      borderRadius="lg"            // Rounds the corners of the box
-      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
-      border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
       p={3}
     >
       <Stack spacing={4}>
@@ -50,6 +46,6 @@ export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange 
           </Box>
         </Box>
       </Stack>
-    </Box>
+    </GlassBox>
   );
 };

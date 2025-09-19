@@ -99,8 +99,7 @@ const CostAndAidWidget: React.FC<CostAndAidWidgetProps> = ({
             flexDirection="column"
             gap={4}
             minHeight="120px"
-            bg="rgba(255, 255, 255, 0.2)"
-            boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
+            bg="white"
             border="1px solid rgba(255, 255, 255, 0.2)"
             position="relative"
         >

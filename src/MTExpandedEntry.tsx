@@ -244,7 +244,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   };
 
   return (
-    <AccordionPanel pb={4} bg="white">
+    <AccordionPanel pb={4} bg="transparent">
       {isExpanded && (
         <Tabs index={activeTabIndex} isLazy onChange={setActiveTabIndex} overflowX="auto">
           <TabList flexWrap="wrap" minW="300px" overflowX="auto" css={{

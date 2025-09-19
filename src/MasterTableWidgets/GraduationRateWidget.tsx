@@ -67,12 +67,11 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
       borderWidth={1}
       borderRadius="md"
       minHeight="120px"
-      bg="rgba(255, 255, 255, 0.2)"
-      boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
+      bg="white"
       border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
     >
-      <Text fontSize={{base: "sm", sm: "md",  lg: "lg"}} fontWeight="bold" mb={2}>Graduation Rate:</Text>
+      <Text fontSize={{base: "sm", sm: "md",  lg: "lg"}} fontWeight="bold" mb={2}>Graduation Rate</Text>
 
       <Box height={{base: "100px", md: "140px"}} position="relative">
         <ResponsiveContainer width="100%" height="100%">

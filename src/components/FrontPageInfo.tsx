@@ -1,6 +1,6 @@
 import { Badge, Box, Button, Circle, Flex, Icon, List, ListIcon, ListItem, Switch, Text } from "@chakra-ui/react";
-import { ModeType } from "./App";
-import UGradGradToggle from "./UGradGradToggle";
+import { ModeType } from "../App";
+import UGradGradToggle from "../UGradGradToggle";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { FiCircle } from 'react-icons/fi';
 import { Grid, Avatar } from '@chakra-ui/react';

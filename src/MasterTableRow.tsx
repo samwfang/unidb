@@ -64,7 +64,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
           md: "75px 2fr 1fr 1fr 1fr"
         }}
           gap={{ base: 2, md: 4 }}
-          w="full"
+          width="100%"
           alignItems="center">
           {/* Logo for University */}
           <GridItem textAlign="center">
