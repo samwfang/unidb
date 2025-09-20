@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text, Popover, PopoverTrigger, PopoverContent, PopoverBody, Flex } from '@chakra-ui/react';
+import { Box, Text, Popover, PopoverTrigger, PopoverContent, PopoverBody, Flex, useColorMode } from '@chakra-ui/react';
 import { Cell, Pie, PieChart } from 'recharts';
 
 
@@ -103,6 +103,9 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
   const thresholds = colorSchemes[colorScheme];
   const barColor = thresholds.find(({ threshold }) => value <= threshold)?.color || thresholds[thresholds.length - 1].color;
 
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
+  
   // Create chart data based on the selected color scheme
   const chartData = thresholds.map((threshold, index) => {
     const prevThreshold = index === 0 ? 0 : thresholds[index - 1].threshold;
@@ -118,7 +121,7 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
 
 
   const textPosition = value > 30 ? 'outside' : 'inside';
-  const textColor = textPosition === 'outside' ? 'white' : barColor;
+  const textColor = isDark ? "white" : textPosition === 'outside' ? 'white' : barColor;
   const textOffset = '8px';
 
   // Mini chart dimensions
@@ -136,7 +139,7 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
     <Popover trigger="hover" placement="top">
       <PopoverTrigger>
         <Box width="100%" maxW="120px" mx="auto" mt={2} position="relative" cursor="pointer">
-          <Box width="100%" height="20px" bg="gray.200" borderRadius="full" position="relative" overflow="hidden">
+          <Box width="100%" height="20px" bg={isDark ? "gray.500" : "gray.200"} borderRadius="full" position="relative" overflow="hidden">
             <Box
               width={`${value}%`}
               height="100%"
@@ -190,7 +193,7 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
                   cy={cy}
                   iR={iR}
                   oR={oR}
-                  color="#333"
+                  color={isDark ? "white" : "#333"}
                 />
               </PieChart>
             </Box>
@@ -203,13 +206,13 @@ const PercentileBar: React.FC<PercentileBarProps> = ({ value, colorScheme = 'def
           </Flex>
 
           {/* Description */}
-          <Text fontSize="xs" color="gray.600" textAlign="left" mb={2}>
-            <Text as="span" fontWeight="bold" color="black">{name} </Text> has a higher <Text as="span" fontWeight="bold" color="black">{type}</Text> than <Text as="span" fontWeight="bold" color={barColor}>{value}%</Text> of all universities in UniDB
+          <Text fontSize="xs" color={isDark ? "gray.300" : "gray.600"} textAlign="left" mb={2}>
+            <Text as="span" fontWeight="bold" color={isDark ? "white" : "black"}>{name} </Text> has a higher <Text as="span" fontWeight="bold" color={isDark ? "white" : "black"}>{type}</Text> than <Text as="span" fontWeight="bold" color={barColor}>{value}%</Text> of all universities in UniDB
 
             
           </Text>
-          <Text fontSize="xs" color="gray.600" textAlign="left">
-            The average <Text as="span" fontWeight="bold" color="black">{type}</Text> is <Text as="span" fontWeight="bold" color={barColor}>{globalAvg}</Text>
+          <Text fontSize="xs" color={isDark ? "gray.300" : "gray.600"} textAlign="left">
+            The average <Text as="span" fontWeight="bold" color={isDark ? "white" : "black"}>{type}</Text> is <Text as="span" fontWeight="bold" color={barColor}>{globalAvg}</Text>
           </Text>
         </PopoverBody>
       </PopoverContent>

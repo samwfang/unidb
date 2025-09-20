@@ -351,7 +351,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
                     const color = COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length];
 
                     return (
-                      <GlassBox
+                      <WidgetBox
                         p={3}
                         border="1px solid"
                         borderColor="gray.200"
@@ -375,7 +375,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
                         <Text color="gray.600" fontSize="sm">
                           {percentage}% of Total
                         </Text>
-                      </GlassBox>
+                      </WidgetBox>
                     );
                   }
                   return null;
@@ -404,7 +404,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
                   style={{ fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 'bold' }} fill={isDark ? "white" : "black"} >
                   {getCenterText(activeTab, totalStudents, avgHouseholdIncome)}
                 </text>
-                <text x="50%" y="60%" textAnchor="middle" fill={isDark ? "gray.400" : "gray.600"}  style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
+                <text x="50%" y="60%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
                   {getCaption(activeTab)}
                 </text>
               </g>

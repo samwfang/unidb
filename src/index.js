@@ -31,15 +31,15 @@ const theme = extendTheme({
   components: {
     // Default Box Design 
     Box: {
-        baseStyle: (props) => ({
-          bg: props.colorMode === 'dark' ? 'rgba(26, 32, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-          border: '1px solid',
-          borderColor: props.colorMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)',
-          borderRadius: 'lg',
-          boxShadow: props.colorMode === 'dark'
-            ? '0 4px 30px rgba(0, 0, 0, 0.3)'
-            : '0 4px 30px rgba(0, 0, 0, 0.1)',
-        }),
+      baseStyle: (props) => ({
+        bg: props.colorMode === 'dark' ? 'rgba(26, 32, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+        border: '1px solid',
+        borderColor: props.colorMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)',
+        borderRadius: 'lg',
+        boxShadow: props.colorMode === 'dark'
+          ? '0 4px 30px rgba(0, 0, 0, 0.3)'
+          : '0 4px 30px rgba(0, 0, 0, 0.1)',
+      }),
     },
     Button: {
       variants: {
@@ -74,6 +74,27 @@ const theme = extendTheme({
         },
       }),
     },
+
+    Tabs: {
+      variants: {
+        'soft-rounded': (props) => ({
+          tab: {
+            borderRadius: 'full',
+            fontWeight: 'semibold',
+            color: props.colorMode === 'dark' ? 'gray.300' : 'gray.600',
+            _selected: {
+              color: props.colorMode === 'dark' ? 'white' : 'white',
+              bg: props.colorMode === 'dark' ? 'blue.500' : 'blue.500',
+            },
+            _hover: {
+              color: props.colorMode === 'dark' ? 'white' : 'gray.800',
+            },
+          },
+        }),
+      },
+    },
+
+
   },
 });
 
