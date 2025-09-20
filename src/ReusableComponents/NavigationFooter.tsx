@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Text, Icon } from '@chakra-ui/react';
+import { Box, Flex, Text, Icon, useColorMode } from '@chakra-ui/react';
 import { ModeType } from '../Root/App';
 import { ChatIcon, InfoIcon, StarIcon, SearchIcon } from '@chakra-ui/icons';
 import { FaHeart } from 'react-icons/fa';
@@ -11,6 +11,7 @@ interface NavigationFooterProps {
 }
 
 const NavigationFooter: React.FC<NavigationFooterProps> = ({ mode, activeTab, onTabChange }) => {
+  const { colorMode } = useColorMode();
   const navItems = [
     { id: 'explore', icon: SearchIcon, label: 'UniDB' },
     {id: 'favorites', icon: FaHeart, label: "Favorites"},
@@ -20,6 +21,9 @@ const NavigationFooter: React.FC<NavigationFooterProps> = ({ mode, activeTab, on
   ];
 
   const getBgColor = () => {
+    if (colorMode == "dark") {
+      return mode === ModeType.Undergrad ? "gray.900" : "gray.900";
+    }
     return mode === ModeType.Undergrad ? "blue.50" : "gray.50";
   };
 
@@ -36,7 +40,7 @@ const NavigationFooter: React.FC<NavigationFooterProps> = ({ mode, activeTab, on
       zIndex={10000}
       bg={getBgColor()}
       borderTop="1px solid"
-      borderColor="gray.200"
+      borderColor={colorMode == "dark" ? "gray.900" : "gray.100"}
       p={2}
       boxShadow="sm"
     >

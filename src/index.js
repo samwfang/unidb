@@ -31,7 +31,7 @@ const theme = extendTheme({
   components: {
     // Default Box Design 
     Box: {
-        glassBorder: (props) => ({
+        baseStyle: (props) => ({
           bg: props.colorMode === 'dark' ? 'rgba(26, 32, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)',
           border: '1px solid',
           borderColor: props.colorMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)',

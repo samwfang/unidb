@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image, Icon } from '@chakra-ui/react';
+import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image, Icon, useColorMode } from '@chakra-ui/react';
 import MTExpandedEntry from './MTExpandedEntry';
 import { UniversityData, UndergradContent, GradContent, Content } from '../MasterTable'; // Adjust the path as necessary
 import { ModeType } from '../../App';
@@ -20,6 +20,9 @@ interface MasterTableRowProps {
 const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, columnDepts, columnTypes, toggleMode, onExpand }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
 
   //Remove Content when Mode Change
   useEffect(() => {
@@ -43,8 +46,8 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
 
   return (
     <AccordionItem
-      _odd={{ bg: "rgba(255, 255, 255, 0.2)" }}  // Light grey for odd items
-      _even={{ bg: "rgba(255, 255, 255, 0.4)" }}
+       _odd={{ bg: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.2)" }}
+      _even={{ bg: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.4)" }}
       minH={{ base: "40px", md: "60px" }}   // White for even items
     >
       <AccordionButton

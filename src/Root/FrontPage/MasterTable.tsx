@@ -11,6 +11,7 @@ import ColumnPopover from '../../ReusableComponents/ColumnPopover';
 import SearchBar from '../../ReusableComponents/SearchBar';
 import { useAppTheme } from '../../containers/useTheme';
 import GlassBox from '../../containers/GlassBox';
+import ColumnPopoverButton from 'src/containers/ColumnPopoverButton';
 
 // Top level entry for University Data
 export interface UniversityData {
@@ -577,23 +578,12 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                     {({ isOpen }) => (
                       <>
                         <PopoverTrigger>
-                          <Button
-                            variant="outline"
-                            size={{ base: "xs", md: "sm" }}
-                            fontWeight="bold"
-                            rightIcon={<ChevronDownIcon />}
-                            bg={sortedByCol == 0 ? "green.500" : isOpen ? "gray.100" : "transparent"}
-                            color={sortedByCol == 0 ? "white" : "black"}
-                            borderColor={"gray.200"}
-                            borderRadius="md"
-                            _hover={{
-                              bg: sortedByCol == 0 ? 'green.700' : 'gray.100',
-                              color: sortedByCol == 0 ? 'white' : 'black'
-                            }}
-                            zIndex={isOpen ? "popover" : "auto"}
+                          <ColumnPopoverButton
+                            isActivated={sortedByCol === 0}
+                            isOpen={isOpen}
                           >
                             Score
-                          </Button>
+                          </ColumnPopoverButton>
                         </PopoverTrigger>
                         {isOpen && (
                           <Box
@@ -633,23 +623,12 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                     {({ isOpen }) => (
                       <>
                         <PopoverTrigger>
-                          <Button
-                            variant="outline"
-                            size={{ base: "xs", md: "sm" }}
-                            fontWeight="bold"
-                            rightIcon={<ChevronDownIcon />}
-                            bg={sortedByCol == 1 ? "green.500" : isOpen ? "gray.100" : "transparent"}
-                            color={sortedByCol == 1 ? "white" : "black"}
-                            borderColor={"gray.200"}
-                            borderRadius="md"
-                            _hover={{
-                              bg: sortedByCol == 1 ? 'green.700' : 'gray.100',
-                              color: sortedByCol == 1 ? 'white' : 'black'
-                            }}
-                            zIndex={isOpen ? "popover" : "auto"}
+                          <ColumnPopoverButton
+                            isActivated={sortedByCol === 1}
+                            isOpen={isOpen}
                           >
                             Name
-                          </Button>
+                          </ColumnPopoverButton>
                         </PopoverTrigger>
                         {isOpen && (
                           <Box
@@ -704,7 +683,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                               )}
                               <Button
                                 mt={4}
-                                variant = {mode === 'undergrad' ? 'primary' : 'secondary'}
+                                variant={mode === 'undergrad' ? 'primary' : 'secondary'}
                                 size="sm"
                                 onClick={applyAlphabeticalSort}
                               >
@@ -776,7 +755,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
       <Flex justifyContent="space-between" alignItems="center" mt="4">
         <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}
-          variant = {mode === 'undergrad' ? 'primary' : 'secondary'}>
+          variant={mode === 'undergrad' ? 'primary' : 'secondary'}>
           Back
         </Button>
 

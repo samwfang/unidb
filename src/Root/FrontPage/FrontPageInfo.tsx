@@ -1,11 +1,12 @@
 import { Badge, Box, Button, Circle, Flex, Icon, List, ListIcon, ListItem, Switch, Text } from "@chakra-ui/react";
-import { ModeType } from "../Root/App";
-import UGradGradToggle from "./UGradGradToggle";
+import { ModeType } from "../App";
+import UGradGradToggle from "../../ReusableComponents/UGradGradToggle";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { FiCircle } from 'react-icons/fi';
 import { Grid, Avatar } from '@chakra-ui/react';
 import { StarIcon, ViewIcon, SearchIcon, SmallAddIcon } from '@chakra-ui/icons';
 import React from "react";
+import GlassBox from "src/containers/GlassBox";
 
 interface FrontPageInfoProps {
     mode: ModeType;
@@ -40,31 +41,16 @@ const FrontPageInfo: React.FC<FrontPageInfoProps> = ({ mode, onModeChange, onFin
 
                 </Flex>
                 <Flex alignItems="center" gap={4}>
-                    <Button bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
-                        color="white"
-                        _hover={{
-                            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
-                            color: 'white',
-                        }}
+                    <Button variant={mode === 'undergrad' ? "primary" : "secondary"}
                         onClick={onFindCollegesClick}>
                         Find Colleges
                     </Button>
-                    <Button bg={mode === 'undergrad' ? "blue.500" : "gray.600"}
-                        color="white"
-                        _hover={{
-                            bg: mode === 'undergrad' ? "blue.600" : "gray.800",
-                            color: 'white',
-                        }}>
+                    <Button variant={mode === 'undergrad' ? "primary" : "secondary"}>
                         Find Faculty
                     </Button>
                 </Flex>
 
-                <Box w={{ base: "100%", md: "700px" }} mx="auto" mt="8"
-                    bg="rgba(255, 255, 255, 0.2)" // Semi-transparent white background
-                    backdropFilter="blur(16px)"  // Applies the frosted glass effect
-                    borderRadius="lg"            // Rounds the corners of the box
-                    boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" // Softer shadow
-                    border="1px solid rgba(255, 255, 255, 0.2)" // Lighter border
+                <GlassBox w={{ base: "100%", md: "700px" }} mx="auto" mt="8"
                     p={6}
                 >
                     <Flex direction="column" alignItems="center" gap={2}>
@@ -165,7 +151,7 @@ const FrontPageInfo: React.FC<FrontPageInfoProps> = ({ mode, onModeChange, onFin
                         />
                     </Flex>
 
-                </Box>
+                </GlassBox>
 
 
             </Flex>

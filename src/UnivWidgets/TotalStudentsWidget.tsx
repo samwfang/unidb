@@ -1,10 +1,12 @@
 // GraduationRateWidget.tsx
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab, Flex, Modal, ModalOverlay, ModalContent, ModalCloseButton, ModalBody, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody } from '@chakra-ui/react';
+import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab, Flex, Modal, ModalOverlay, ModalContent, ModalCloseButton, ModalBody, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, useColorMode } from '@chakra-ui/react';
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DemographicsData } from 'src/Root/FrontPage/MasterTable';
 import { HamburgerIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
+import WidgetBox from 'src/containers/WidgetBox';
+import GlassBox from 'src/containers/GlassBox';
 
 interface TotalStudentWidgetProps {
   universityName: string;
@@ -181,11 +183,14 @@ const processDepartmentData = (
   return topDepts;
 };
 
-const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome, 
+const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome,
   totalStudentsPercentile, universityName, demographics, departments }) => {
 
   const [activeTab, setActiveTab] = useState<DisplayMode>(DisplayMode.Department);
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
 
 
   const dataSets = [
@@ -322,16 +327,12 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
 
 
   return (
-    <Box
+    <WidgetBox
       p={4}
-      borderWidth={1}
-      borderRadius="md"
       display="flex"
       flexDirection="column"
       gap={4}
       minHeight="120px"
-      bg="white"
-      border="1px solid rgba(255, 255, 255, 0.2)"
       position="relative"
     >
       {renderLegendPopover()}
@@ -350,9 +351,8 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
                     const color = COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length];
 
                     return (
-                      <Box
+                      <GlassBox
                         p={3}
-                        bg="white"
                         border="1px solid"
                         borderColor="gray.200"
                         borderRadius="md"
@@ -375,7 +375,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
                         <Text color="gray.600" fontSize="sm">
                           {percentage}% of Total
                         </Text>
-                      </Box>
+                      </GlassBox>
                     );
                   }
                   return null;
@@ -401,10 +401,10 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
               </Pie>
               <g>
                 <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle"
-                  style={{ fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 'bold' }}>
+                  style={{ fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 'bold' }} fill={isDark ? "white" : "black"} >
                   {getCenterText(activeTab, totalStudents, avgHouseholdIncome)}
                 </text>
-                <text x="50%" y="60%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
+                <text x="50%" y="60%" textAnchor="middle" fill={isDark ? "gray.400" : "gray.600"}  style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
                   {getCaption(activeTab)}
                 </text>
               </g>
@@ -413,14 +413,14 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
         </Box>
       </Box>
 
-       {/* PercentileBar positioned above the tabs */}
+      {/* PercentileBar positioned above the tabs */}
       <Flex justify="center" mt={-10} mb={1}>
         <Box width="120px">
-          <PercentileBar 
-            value={parseFloat(totalStudentsPercentile)} 
-            name={universityName} 
-            type="total students" 
-            globalAvg="5,000" 
+          <PercentileBar
+            value={parseFloat(totalStudentsPercentile)}
+            name={universityName}
+            type="total students"
+            globalAvg="5,000"
           />
         </Box>
       </Flex>
@@ -448,7 +448,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
           </TabList>
         </Tabs>
       </Box>
-    </Box>
+    </WidgetBox>
   );
 };
 

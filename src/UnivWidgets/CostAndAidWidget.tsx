@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Text, Tabs, TabList, Tab, Flex, Badge } from '@chakra-ui/react';
+import { Box, Text, Tabs, TabList, Tab, Flex, Badge, useColorMode } from '@chakra-ui/react';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
+import WidgetBox from 'src/containers/WidgetBox';
 
 interface CostAndAidWidgetProps {
     inStateTuition?: string;
@@ -31,16 +32,19 @@ const CostAndAidWidget: React.FC<CostAndAidWidgetProps> = ({
 
     const [costDetailTab, setCostDetailTab] = useState<CostDetailTab>(CostDetailTab.Overall);
 
+    const { colorMode } = useColorMode();
+    const isDark = colorMode === 'dark';
+
     const renderCostTab = () => (
         <Flex direction="column" gap={3} height="100%" justifyContent="center">
             {costDetailTab === CostDetailTab.Overall ? (
                 <>
                     {/* In-State Tuition */}
                     <Box textAlign="center">
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color={isDark ? "gray.400" : "gray.600"}>
                             Avg. Net Cost (In-State)
                         </Text>
-                        <Text fontSize={{ base: "2xl", md: "5xl" }} fontWeight="bold" color="black">
+                        <Text fontSize={{ base: "2xl", md: "5xl" }} fontWeight="bold" color={isDark ? "white" : "black"}>
                             {inStateTuition}
                         </Text>
                         <PercentileBar value={inStatePercentile} />
@@ -48,10 +52,10 @@ const CostAndAidWidget: React.FC<CostAndAidWidgetProps> = ({
 
                     {/* Out-of-State Tuition */}
                     <Box textAlign="center">
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color={isDark ? "gray.400" : "gray.600"}>
                             Avg. Net Cost (Out-of-State)
                         </Text>
-                        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="gray.600">
+                        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color={isDark ? "gray.400" : "gray.600"}>
                             {outOfStateTuition}
                         </Text>
                         <PercentileBar value={outOfStatePercentile} />
@@ -91,16 +95,9 @@ const CostAndAidWidget: React.FC<CostAndAidWidgetProps> = ({
     );
 
     return (
-        <Box
-            p={4}
-            borderWidth={1}
-            borderRadius="md"
-            display="flex"
-            flexDirection="column"
-            gap={4}
-            minHeight="120px"
-            bg="white"
-            border="1px solid rgba(255, 255, 255, 0.2)"
+        <WidgetBox
+            p={{ base: 2, md: 4 }}
+            height="100%"
             position="relative"
         >
             <Box>
@@ -145,7 +142,7 @@ const CostAndAidWidget: React.FC<CostAndAidWidgetProps> = ({
 
                 {activeTab === CostAidTab.Cost && renderSecondaryTabs()}
             </Box>
-        </Box>
+        </WidgetBox>
     );
 };
 

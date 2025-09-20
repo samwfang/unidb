@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
+import GlassBox from 'src/containers/GlassBox';
+import WidgetBox from 'src/containers/WidgetBox';
 
 interface AdmissionsRateProps {
   universityName: string;
@@ -60,13 +62,8 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
     const { inner, outer } = getRadius();
 
   return  (
-    <Box
+    <WidgetBox
       p={{ base: 2, md: 4 }}
-      borderRadius="lg"
-      minHeight="140px"
-      bg={colorMode === 'dark' ? 'gray.800' : 'white'}
-      border="2px solid"
-      borderColor={colorMode === 'dark' ? 'gray.700' : 'white'}
       height="100%"
       position="relative"
     >
@@ -119,7 +116,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
         />
       </Box>
       
-    </Box>
+    </WidgetBox>
   );
 };
 

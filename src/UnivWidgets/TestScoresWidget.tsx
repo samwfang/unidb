@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Text, Tabs, TabList, Tab, Flex } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
+import WidgetBox from 'src/containers/WidgetBox';
 
 interface TestScoresProps {
   satScore?: string;
@@ -79,14 +80,10 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore , univ
 
 
   return (
-    <Box
+    <WidgetBox
       p={{ base: 2, md: 4 }}
-      borderWidth={1}
-      borderRadius="md"
-      minHeight="120px"
-      bg="white"
-      border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
+      position="relative"
     >
       <Flex alignItems="center" justifyContent="space-between" mb={1}>
         <Tabs variant="soft-rounded" onChange={(index) => setActiveTab(index === 0 ? 'SAT' : 'ACT')}>
@@ -148,7 +145,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore , univ
         />
       </Box>
       
-    </Box>
+    </WidgetBox>
   );
 };
 

@@ -6,6 +6,7 @@ import { CIP_TO_CLASSIFICATION, ColumnType, ExtraSortType, SortType, getColumnDe
 import ReactSelect from 'react-select';
 import DepartmentSelector from './DepartmentSelector';
 import GlassBox from 'src/containers/GlassBox';
+import ColumnPopoverButton from 'src/containers/ColumnPopoverButton';
 
 
 interface ColumnPopoverProps {
@@ -132,30 +133,12 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                     {departmentName}
                                 </Text>
                             )}
-                            <Button
-                                variant="outline"
-                                size={{ base: "xs", md: "sm" }}
-                                fontWeight="bold"
-                                rightIcon={<ChevronDownIcon boxSize={{ base: 3, md: 4 }} />}
-                                bg={isSortedBy ? "green.500" : isOpen ? "gray.100" : "transparent"}
-                                color={isSortedBy ? "white" : "black"}
-                                borderColor={"gray.200"}
-                                borderRadius="md"
-                                _hover={{
-                                    bg: isSortedBy ? 'green.700' : 'gray.100',
-                                    color: isSortedBy ? 'white' : 'black'
-                                }}
-                                zIndex={isOpen ? "popover" : "auto"}
-                                whiteSpace="normal"
-                                wordBreak="break-word"
-                                h="auto"
-                                minH={{ base: "36px", md: "42px" }}
-                                lineHeight="short"
-                                px={{ base: 1, md: 2 }}
-                                width="full"
+                            <ColumnPopoverButton
+                                isActivated={isSortedBy}
+                                isOpen={isOpen}
                             >
                                 {getColumnDisplayName(columnType)}
-                            </Button>
+                            </ColumnPopoverButton>
                         </Box>
                     </PopoverTrigger>
                     {isOpen && (
@@ -175,60 +158,27 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                     <Portal>
                         <PopoverContent zIndex="popover">
                             <GlassBox>
-                            <PopoverBody p={4}>
-                                <Text fontSize="xl" fontWeight="bold"> {getColumnDisplayName(columnType)}</Text>
-                                {isSortedBy &&
-                                    <Badge bg="green.200">Currently Sorted By</Badge>
-                                }
-                                <Text color="gray.600"> {getColumnDescription(columnType)} </Text>
+                                <PopoverBody p={4}>
+                                    <Text fontSize="xl" fontWeight="bold"> {getColumnDisplayName(columnType)}</Text>
+                                    {isSortedBy &&
+                                        <Badge bg="green.200">Currently Sorted By</Badge>
+                                    }
+                                    <Text color="gray.600"> {getColumnDescription(columnType)} </Text>
 
-                                {isOpen && (
-                                    <Box position="relative" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
-                                        <Text color="gray.600"> Select Department: </Text>
-                                        <Box position="relative" zIndex="popover">
-                                            <DepartmentSelector departmentName={currentDept} onDepartmentChange={handleDepartmentChange} isSelectOpen={isSelectOpen}
-                                                setIsSelectOpen={setIsSelectOpen} />
-                                        </Box>
-                                        <Text color="gray.600" mt={2}>Column Type:</Text>
-                                        <ReactSelect
-                                            onMenuOpen={() => setIsSelectOpen(true)}
-                                            onMenuClose={() => setIsSelectOpen(false)}
-                                            options={columnTypeOptions}
-                                            value={{ value: currentColumnType, label: getColumnDisplayName(currentColumnType) }}
-                                            onChange={handleColumnTypeChange}
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    backgroundColor: 'gray.50',
-                                                    borderColor: '#E2E8F0',
-                                                    _hover: { borderColor: '#CBD5E0' }
-                                                }),
-                                                option: (base) => ({
-                                                    ...base,
-                                                    backgroundColor: 'white',
-                                                    color: 'black',
-                                                    _hover: { backgroundColor: '#F7FAFC' }
-                                                }),
-                                                menu: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999 // Ensure dropdown appears above everything
-                                                })
-                                            }}
-                                        />
-                                        <Text fontSize="sm" color="gray.600" mb={4}>
-                                            {getColumnDescription(currentColumnType)}
-                                        </Text>
-                                        <Text color="gray.600" mt={2}>Sort From:</Text>
-                                        <FormControl>
+                                    {isOpen && (
+                                        <Box position="relative" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
+                                            <Text color="gray.600"> Select Department: </Text>
+                                            <Box position="relative" zIndex="popover">
+                                                <DepartmentSelector departmentName={currentDept} onDepartmentChange={handleDepartmentChange} isSelectOpen={isSelectOpen}
+                                                    setIsSelectOpen={setIsSelectOpen} />
+                                            </Box>
+                                            <Text color="gray.600" mt={2}>Column Type:</Text>
                                             <ReactSelect
-                                                options={[
-                                                    { value: "greatest", label: 'High to Low' },
-                                                    { value: "least", label: 'Low to High' }
-                                                ]}
-                                                defaultValue={{ value: "greatest", label: 'High to Low' }}
-                                                placeholder="Select sort option"
                                                 onMenuOpen={() => setIsSelectOpen(true)}
                                                 onMenuClose={() => setIsSelectOpen(false)}
+                                                options={columnTypeOptions}
+                                                value={{ value: currentColumnType, label: getColumnDisplayName(currentColumnType) }}
+                                                onChange={handleColumnTypeChange}
                                                 styles={{
                                                     control: (base) => ({
                                                         ...base,
@@ -247,39 +197,72 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                                         zIndex: 9999 // Ensure dropdown appears above everything
                                                     })
                                                 }}
-                                                onChange={(selected) => {
-                                                    setSortExtraOption(selected?.value || "greatest")
-                                                    setModifiedContent(true)
-                                                }}
-
                                             />
-                                        </FormControl>
-                                    </Box>
-                                )}
+                                            <Text fontSize="sm" color="gray.600" mb={4}>
+                                                {getColumnDescription(currentColumnType)}
+                                            </Text>
+                                            <Text color="gray.600" mt={2}>Sort From:</Text>
+                                            <FormControl>
+                                                <ReactSelect
+                                                    options={[
+                                                        { value: "greatest", label: 'High to Low' },
+                                                        { value: "least", label: 'Low to High' }
+                                                    ]}
+                                                    defaultValue={{ value: "greatest", label: 'High to Low' }}
+                                                    placeholder="Select sort option"
+                                                    onMenuOpen={() => setIsSelectOpen(true)}
+                                                    onMenuClose={() => setIsSelectOpen(false)}
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            backgroundColor: 'gray.50',
+                                                            borderColor: '#E2E8F0',
+                                                            _hover: { borderColor: '#CBD5E0' }
+                                                        }),
+                                                        option: (base) => ({
+                                                            ...base,
+                                                            backgroundColor: 'white',
+                                                            color: 'black',
+                                                            _hover: { backgroundColor: '#F7FAFC' }
+                                                        }),
+                                                        menu: (base) => ({
+                                                            ...base,
+                                                            zIndex: 9999 // Ensure dropdown appears above everything
+                                                        })
+                                                    }}
+                                                    onChange={(selected) => {
+                                                        setSortExtraOption(selected?.value || "greatest")
+                                                        setModifiedContent(true)
+                                                    }}
 
-                                <Box display="flex" gap={2} mt={4}>
-                                    <Button
-                                        flex={1}
-                                        variant="primary"
-                                        size="sm"
-                                        zIndex="overlay"
-                                        onClick={handleApplyAndSort}
-                                    >
-                                        {modifiedContent ? "Apply and Sort By" : "Sort By Column"}
-                                    </Button>
-                                    <Button
-                                        flex={1}
-                                        colorScheme="green"
-                                        size="sm"
-                                        disabled={modifiedContent ? false : true}
-                                        onClick={handleApply}
-                                        zIndex="overlay"
-                                    >
-                                        Apply
-                                    </Button>
-                                </Box>
-                            
-                            </PopoverBody>
+                                                />
+                                            </FormControl>
+                                        </Box>
+                                    )}
+
+                                    <Box display="flex" gap={2} mt={4}>
+                                        <Button
+                                            flex={1}
+                                            variant="primary"
+                                            size="sm"
+                                            zIndex="overlay"
+                                            onClick={handleApplyAndSort}
+                                        >
+                                            {modifiedContent ? "Apply and Sort By" : "Sort By Column"}
+                                        </Button>
+                                        <Button
+                                            flex={1}
+                                            colorScheme="green"
+                                            size="sm"
+                                            disabled={modifiedContent ? false : true}
+                                            onClick={handleApply}
+                                            zIndex="overlay"
+                                        >
+                                            Apply
+                                        </Button>
+                                    </Box>
+
+                                </PopoverBody>
                             </GlassBox>
                         </PopoverContent>
                     </Portal>

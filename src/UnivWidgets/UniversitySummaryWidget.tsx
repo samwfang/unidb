@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Text, Flex, Circle, Badge, Grid, GridItem } from '@chakra-ui/react';
 import { FaCity, FaMapMarkedAlt, FaUniversity } from 'react-icons/fa';
+import SmallAttributeBox from 'src/containers/SmallAttributesBox';
 
 interface UniversitySummaryWidgetProps {
     universityName: string;
@@ -146,62 +147,34 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
                 <Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }} gap={3} width="100%">
                     {sectorScorecard && (
                         <GridItem>
-                            <Box
-                                bg={"white"}
-                                borderRadius="lg"
-                                p={1.5}
-                                minW="0"
-                                textAlign="center"
-                                height="100%"
-                            >
+                            <SmallAttributeBox>
                                 <Text fontSize={{ base: "2xs", md: "sm" }}>Classification:</Text>
                                 <Text fontSize={{ base: "xs", md: "md" }} fontWeight="bold" wordBreak="break-word">{sectorLabels[sectorScorecard] || 'Unknown'}</Text>
-                            </Box>
+                            </SmallAttributeBox>
                         </GridItem>
                     )}
                     {/* Region Box */}
                     <GridItem>
-                        <Box
-                            bg="white"
-                            borderRadius="lg"
-                            p={1.5}
-                            minW="0"
-                            textAlign="center"
-                            height="100%"
-                        >
+                        <SmallAttributeBox>
                             <Text fontSize={{ base: "2xs", md: "sm" }}>Region:</Text>
                             <Text fontSize={{ base: "xs", md: "md" }} fontWeight="bold">{region || 'Unknown'}</Text>
-                        </Box>
+                        </SmallAttributeBox>
                     </GridItem>
 
                     {/* City Size Box */}
                     <GridItem>
-                        <Box
-                            bg='white'
-                            borderRadius="lg"
-                            p={1.5}
-                            minW="0"
-                            textAlign="center"
-                            height="100%"
-                        >
+                        <SmallAttributeBox>
                             <Text fontSize={{ base: "2xs", md: "sm" }}>Urban Index:</Text>
                             <Text fontSize={{ base: "xs", md: "md" }} fontWeight="bold">{citySize || 'Unknown'} City</Text>
-                        </Box>
+                        </SmallAttributeBox>
                     </GridItem>
 
                     {/* College Size Box */}
                     <GridItem>
-                        <Box
-                            bg={'white'}
-                            borderRadius="lg"
-                            p={1.5}
-                            minW="0"
-                            textAlign="center"
-                            height="100%"
-                        >
+                        <SmallAttributeBox>
                             <Text fontSize={{ base: "2xs", md: "sm" }}>College Size:</Text>
                             <Text fontSize={{ base: "xs", md: "md" }} fontWeight="bold">{collegeSize || 'Unknown'} College</Text>
-                        </Box>
+                        </SmallAttributeBox>
                     </GridItem>
                 </Grid>
             </Flex>

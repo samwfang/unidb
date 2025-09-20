@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
+import WidgetBox from 'src/containers/WidgetBox';
 
 interface GraduationRateWidgetProps {
   universityName: string;
@@ -62,14 +63,10 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
 
 
   return (
-    <Box
+    <WidgetBox
       p={{ base: 2, md: 4 }}
-      borderWidth={1}
-      borderRadius="md"
-      minHeight="120px"
-      bg="white"
-      border="1px solid rgba(255, 255, 255, 0.2)"
       height="100%"
+      position="relative"
     >
       <Text fontSize={{base: "sm", sm: "md",  lg: "lg"}} fontWeight="bold" mb={2}>Graduation Rate</Text>
 
@@ -119,7 +116,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
         />
       </Box>
 
-    </Box>
+    </WidgetBox>
   );
 };
 

@@ -4,7 +4,7 @@ import MasterTable from './FrontPage/MasterTable'
 import TopHeader from '../ReusableComponents/TopHeader';
 import UGradGradToggle from '../ReusableComponents/UGradGradToggle';
 import { MTControlPanel } from './FrontPage/MTControlPanel';
-import FrontPageInfo from '../ReusableComponents/FrontPageInfo';
+import FrontPageInfo from './FrontPage/FrontPageInfo';
 import { useColorMode, useColorModeValue } from '@chakra-ui/react';
 import NavigationFooter from '../ReusableComponents/NavigationFooter';
 import {
