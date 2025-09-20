@@ -626,6 +626,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                           <ColumnPopoverButton
                             isActivated={sortedByCol === 1}
                             isOpen={isOpen}
+                            maxWidth="120px"
                           >
                             Name
                           </ColumnPopoverButton>

@@ -11,8 +11,10 @@ interface AdmissionsRateProps {
   admissionsRatePercentile: string;
 }
 
-const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, admissionsRate, admissionsRatePercentile}) => {
+const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, admissionsRate, admissionsRatePercentile }) => {
   const { colorMode } = useColorMode();
+    const isDark = colorMode === 'dark';
+
   const rate = parseFloat(admissionsRate) || 0;
   const remaining = 100 - rate;
 
@@ -22,11 +24,11 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
   ];
 
   const colorThresholds = [
-    { threshold: 15, color: '#613ed2ff' }, 
-    { threshold: 25, color: '#1b6abeff' }, 
-    { threshold: 50, color: '#0b5f1fff' },    
-    { threshold: 75, color: '#10a508ff' },
-    { threshold: Infinity, color: '#424342ff' }
+    { threshold: 15, color: '#9B59B6' },    // Purple
+    { threshold: 25, color: '#7D6EC8' },    // Blue-purple
+    { threshold: 50, color: '#4E79A7' },    // Blue
+    { threshold: 75, color: '#59A14F' },    // Green
+    { threshold: Infinity, color: '#E15759' } // Red
   ];
 
   // Find the first threshold that matches
@@ -35,41 +37,41 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
 
 
   // DYNAMICALLY ADJUST PIE CHART SIZE ACCORDING TO WINDOW HEIGHT (SINCE RECHARTS DOESNT SUPPORT THIS GRRR)
-    const [windowSize, setWindowSize] = useState({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-  
-    useEffect(() => {
-      const handleResize = () => {
-        setWindowSize({
-          width: window.innerWidth,
-          height: window.innerHeight
-        });
-      };
-  
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-  
-    // Responsive radius based on window width
-    const getRadius = () => {
-      if (windowSize.width < 480) return { inner: 40, outer: 55 };
-      if (windowSize.width < 1000) return { inner: 50, outer: 65 };
-      return { inner: 60, outer: 80 };
-    };
-  
-    const { inner, outer } = getRadius();
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
 
-  return  (
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Responsive radius based on window width
+  const getRadius = () => {
+    if (windowSize.width < 480) return { inner: 40, outer: 55 };
+    if (windowSize.width < 1000) return { inner: 50, outer: 65 };
+    return { inner: 60, outer: 80 };
+  };
+
+  const { inner, outer } = getRadius();
+
+  return (
     <WidgetBox
       p={{ base: 2, md: 4 }}
       height="100%"
       position="relative"
     >
-      <Text fontSize={{base: "sm", sm: "md", lg: "lg"}} fontWeight="bold" mb={2}>Admissions Rate</Text>
+      <Text fontSize={{ base: "sm", sm: "md", lg: "lg" }} fontWeight="bold" mb={2}>Admissions Rate</Text>
 
-      <Box height={{base: "100px", md: "140px"}} position="relative">
+      <Box height={{ base: "100px", md: "140px" }} position="relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -84,8 +86,8 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
               paddingAngle={5}
               dataKey="value"
             >
-              <Cell fill={color} stroke={color} strokeWidth={1} />
-              <Cell fill="#EDF2F7" stroke="#E2E8F0" strokeWidth={1} />
+              <Cell fill={color} stroke={"white"} strokeWidth={1} />
+              <Cell fill="#EDF2F7" stroke={"white"} strokeWidth={1} />
             </Pie>
             <text
               x="50%"
@@ -99,7 +101,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
             >
               {admissionsRate}%
             </text>
-            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
+            <text x="50%" y="80%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
               <tspan x="50%" dy="0">Of Applicants</tspan>
               <tspan x="50%" dy="12">Admitted</tspan>
             </text>
@@ -108,14 +110,14 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
       </Box>
 
       <Box mt={2}>
-        <PercentileBar 
-          value={parseFloat(admissionsRatePercentile)} 
-          name={universityName} 
-          type="Admissions Rate" 
+        <PercentileBar
+          value={parseFloat(admissionsRatePercentile)}
+          name={universityName}
+          type="Admissions Rate"
           colorScheme="positive_only_inverted"
         />
       </Box>
-      
+
     </WidgetBox>
   );
 };

@@ -48,6 +48,7 @@ const ColumnPopoverButton: React.FC<ColumnPopoverButtonProps> = ({
       whiteSpace="normal"
       height="auto"
       minHeight={{ base: "36px", md: "42px" }}
+      maxWidth="160px"
       lineHeight="short"
       paddingX={{ base: 1, md: 2 }}
       width="full"

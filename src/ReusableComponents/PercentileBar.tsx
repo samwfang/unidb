@@ -22,40 +22,42 @@ interface PercentileBarProps {
   globalAvg?: string;
 }
 
+
 const colorSchemes = {
   default: [
-    { threshold: 30, color: '#f10c0cff' },
-    { threshold: 50, color: '#fca800' },
-    { threshold: 70, color: '#fcd200' },
-    { threshold: 80, color: '#10a508ff' },
-    { threshold: 90, color: '#0b5f1fff' },
-    { threshold: 95, color: '#1b6abeff' },
-    { threshold: Infinity, color: '#613ed2ff' }
+    { threshold: 30, color: '#E15759' },    // Muted red
+    { threshold: 50, color: '#F28E2B' },    // Muted orange
+    { threshold: 70, color: '#EDC949' },    // Muted yellow
+    { threshold: 80, color: '#59A14F' },    // Muted green
+    { threshold: 90, color: '#4E79A7' },    // Muted blue
+    { threshold: 95, color: '#7D6EC8' },    // Blue-purple transition
+    { threshold: Infinity, color: '#9B59B6' } // More vibrant purple
   ],
   inverted: [
-    { threshold: 30, color: '#613ed2ff' },
-    { threshold: 50, color: '#1b6abeff' },
-    { threshold: 70, color: '#0b5f1fff' },
-    { threshold: 80, color: '#10a508ff' },
-    { threshold: 90, color: '#fcd200' },
-    { threshold: 95, color: '#fca800' },
-    { threshold: Infinity, color: '#f10c0cff' }
+    { threshold: 30, color: '#9B59B6' },    // More vibrant purple
+    { threshold: 50, color: '#7D6EC8' },    // Blue-purple transition
+    { threshold: 70, color: '#4E79A7' },    // Muted blue
+    { threshold: 80, color: '#59A14F' },    // Muted green
+    { threshold: 90, color: '#EDC949' },    // Muted yellow
+    { threshold: 95, color: '#F28E2B' },    // Muted orange
+    { threshold: Infinity, color: '#E15759' } // Muted red
   ],
   positive_only: [
-    { threshold: 25, color: '#5b5b5bff' },
-    { threshold: 50, color: '#10a508ff' },
-    { threshold: 75, color: '#0b5f1fff' },
-    { threshold: 90, color: '#1b6abeff' },
-    { threshold: Infinity, color: '#613ed2ff' }
+    { threshold: 25, color: '#8C8C8C' },    // Muted gray
+    { threshold: 50, color: '#59A14F' },    // Muted green
+    { threshold: 75, color: '#4E79A7' },    // Muted blue
+    { threshold: 90, color: '#7D6EC8' },    // Blue-purple transition
+    { threshold: Infinity, color: '#9B59B6' } // More vibrant purple
   ],
   positive_only_inverted: [
-    { threshold: 15, color: '#613ed2ff'  },
-    { threshold: 25, color: '#1b6abeff' },
-    { threshold: 50, color: '#0b5f1fff' },
-    { threshold: 75, color: '#10a508ff' },
-    { threshold: Infinity, color: '#5b5b5bff' }
+    { threshold: 15, color: '#9B59B6' },    // More vibrant purple
+    { threshold: 25, color: '#7D6EC8' },    // Blue-purple transition
+    { threshold: 50, color: '#4E79A7' },    // Muted blue
+    { threshold: 75, color: '#59A14F' },    // Muted green
+    { threshold: Infinity, color: '#8C8C8C' } // Muted gray
   ]
 };
+
 
 const RADIAN = Math.PI / 180;
 

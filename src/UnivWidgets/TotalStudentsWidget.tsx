@@ -414,7 +414,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       </Box>
 
       {/* PercentileBar positioned above the tabs */}
-      <Flex justify="center" mt={-10} mb={1}>
+      <Flex justify="center" mt={-8} mb={1}>
         <Box width="120px">
           <PercentileBar
             value={parseFloat(totalStudentsPercentile)}

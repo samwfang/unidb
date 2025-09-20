@@ -86,9 +86,6 @@ const theme = extendTheme({
               color: props.colorMode === 'dark' ? 'white' : 'white',
               bg: props.colorMode === 'dark' ? 'blue.500' : 'blue.500',
             },
-            _hover: {
-              color: props.colorMode === 'dark' ? 'white' : 'gray.800',
-            },
           },
         }),
       },

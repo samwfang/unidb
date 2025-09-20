@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
@@ -11,6 +11,10 @@ interface GraduationRateWidgetProps {
 }
 
 const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityName, graduationRate, graduationRatePercentile }) => {
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
+
+
   const rate = parseFloat(graduationRate) || 0;
   const remaining = 100 - rate;
 
@@ -20,13 +24,13 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
   ];
 
   const colorThresholds = [
-    { threshold: 30, color: '#f10c0cff' },
-    { threshold: 50, color: '#fca800' },
-    { threshold: 70, color: '#fcd200' },
-    { threshold: 80, color: '#10a508ff' },
-    { threshold: 90, color: '#0b5f1fff' },
-    { threshold: 95, color: '#1b6abeff' },
-    { threshold: Infinity, color: '#613ed2ff' }
+    { threshold: 30, color: '#E15759' },    // Red
+    { threshold: 50, color: '#F28E2B' },    // Orange
+    { threshold: 70, color: '#EDC949' },    // Yellow
+    { threshold: 80, color: '#59A14F' },    // Green
+    { threshold: 90, color: '#4E79A7' },    // Blue
+    { threshold: 95, color: '#7D6EC8' },    // Blue-purple
+    { threshold: Infinity, color: '#9B59B6' } // Purple
   ];
 
   // Find the first threshold that matches
@@ -68,9 +72,9 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
       height="100%"
       position="relative"
     >
-      <Text fontSize={{base: "sm", sm: "md",  lg: "lg"}} fontWeight="bold" mb={2}>Graduation Rate</Text>
+      <Text fontSize={{ base: "sm", sm: "md", lg: "lg" }} fontWeight="bold" mb={2}>Graduation Rate</Text>
 
-      <Box height={{base: "100px", md: "140px"}} position="relative">
+      <Box height={{ base: "100px", md: "140px" }} position="relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -85,8 +89,8 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
               paddingAngle={5}  // Small gap between slices
               dataKey="value"
             >
-              <Cell fill={color} stroke={color} strokeWidth={1} />
-              <Cell fill="#EDF2F7" stroke="#E2E8F0" strokeWidth={1} />
+              <Cell fill={color} stroke={"white"} strokeWidth={1} />
+              <Cell fill="#EDF2F7" stroke={"white"} strokeWidth={1} />
             </Pie>
             <text
               x="50%"
@@ -100,7 +104,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
             >
               {graduationRate}%
             </text>
-            <text x="50%" y="80%" textAnchor="middle" fill="#666" style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
+            <text x="50%" y="80%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
               <tspan x="50%" dy="0">Graduated Within</tspan>
               <tspan x="50%" dy="12">6 Years</tspan>
             </text>
@@ -109,10 +113,10 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
       </Box>
 
       <Box mt={2}>
-        <PercentileBar 
-          value={parseFloat(graduationRatePercentile)} 
-          name={universityName} 
-          type="Graduation Rate" 
+        <PercentileBar
+          value={parseFloat(graduationRatePercentile)}
+          name={universityName}
+          type="Graduation Rate"
         />
       </Box>
 
