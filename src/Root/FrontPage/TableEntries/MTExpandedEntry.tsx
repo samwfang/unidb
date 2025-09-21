@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select, Input, List, ListItem } from '@chakra-ui/react';
+import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select, Input, List, ListItem, useColorMode } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
 import { Content, UndergradContent, UGradDeptContent, GradDeptContent, GradContent, UniversityData } from '../MasterTable';
 import { ModeType } from '../../App';
@@ -36,6 +36,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   const TOP_NUM_DEPTS = 5;
   //Maximum Number of Tabs User Can Create
   const MAX_TABS = 20;
+
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
 
 
   const deptContents = mode === ModeType.Undergrad
@@ -244,9 +247,9 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   };
 
   return (
-    <AccordionPanel pb={4} bg="transparent">
+    <AccordionPanel pb={4} bg={isDark ? "rgb(0, 0, 0, 0.3)" : "rgb(255, 255, 255, 0"}>
       {isExpanded && (
-        <Tabs index={activeTabIndex} isLazy onChange={setActiveTabIndex} overflowX="auto">
+        <Tabs variant="default" index={activeTabIndex} isLazy onChange={setActiveTabIndex} overflowX="auto">
           <TabList flexWrap="wrap" minW="300px" overflowX="auto" css={{
             '&::-webkit-scrollbar': {
               display: 'none', // Hide scrollbar for WebKit browsers

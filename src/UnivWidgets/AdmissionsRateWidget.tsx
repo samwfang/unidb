@@ -28,7 +28,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
     { threshold: 25, color: '#7D6EC8' },    // Blue-purple
     { threshold: 50, color: '#4E79A7' },    // Blue
     { threshold: 75, color: '#59A14F' },    // Green
-    { threshold: Infinity, color: '#E15759' } // Red
+    { threshold: Infinity, color: '#b1b1b1ff' } // Red
   ];
 
   // Find the first threshold that matches
