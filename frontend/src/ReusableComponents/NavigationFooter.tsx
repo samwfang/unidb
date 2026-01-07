@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Flex, Text, Icon, useColorMode } from '@chakra-ui/react';
-import { ModeType } from '../Root/App';
+import { ModeType } from "../helpers/types";
 import { ChatIcon, InfoIcon, StarIcon, SearchIcon } from '@chakra-ui/icons';
 import { FaHeart } from 'react-icons/fa';
 

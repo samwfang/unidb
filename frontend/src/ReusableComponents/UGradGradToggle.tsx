@@ -1,5 +1,5 @@
 import React from 'react';
-import { ModeType } from '../Root/App';
+import { ModeType } from "../helpers/types";
 import {Box, Text, Switch} from '@chakra-ui/react';
 
 interface ModeToggleProps {

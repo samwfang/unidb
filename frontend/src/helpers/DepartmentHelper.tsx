@@ -1,4 +1,4 @@
-import { ModeType } from "src/Root/App";
+import { ModeType } from "../helpers/types";
 import { GradContent, GradDeptContent, UGradDeptContent, UndergradContent, UniversityData } from "../Root/FrontPage/MasterTable";
 
 
@@ -25,9 +25,13 @@ export enum ExtraSortType {
 export type SortType = ColumnType | ExtraSortType;
 
 interface ColumnMetadata {
+  //name that shows up in GUI
   displayName: string;
+  //whether column type only shows up in General or whether Department-Specific content exists for column
   departmentSpecificAllowed: boolean;
   description: string;
+  //optionally restrict column to only undergrad or grad mode
+  allowedModes?: ModeType[];
 }
 
 export const ColumnMetadataMap: Record<ColumnType, ColumnMetadata> = {
@@ -54,12 +58,14 @@ export const ColumnMetadataMap: Record<ColumnType, ColumnMetadata> = {
   [ColumnType.SATScore]: {
     displayName: "SAT Score",
     departmentSpecificAllowed: false,
-    description: "The average SAT score of admitted students."
+    description: "The average SAT score of admitted students.",
+    allowedModes: [ModeType.Undergrad] 
   },
   [ColumnType.ACTScore]: {
     displayName: "ACT Score",
     departmentSpecificAllowed: false,
-    description: "The average ACT score of admitted students."
+    description: "The average ACT score of admitted students.",
+    allowedModes: [ModeType.Undergrad] 
   },
   [ColumnType.AdmissionsRate]: {
     displayName: "Admissions Rate",
@@ -88,6 +94,14 @@ export const getColumnDescription = (columnType: ColumnType): string => {
   return ColumnMetadataMap[columnType]?.description || "";
 };
 
+export const isColumnAllowedForMode = (columnType: ColumnType, mode: ModeType): boolean => {
+  const metadata = ColumnMetadataMap[columnType];
+  if (!metadata.allowedModes) {
+    return true; // No restrictions
+  }
+  return metadata.allowedModes.includes(mode);
+};
+
 // Returns The Right Data For A Row Depending on Type of Column Selected in ColumnType
 export const getColumnData = (
   item: UniversityData,
@@ -95,6 +109,11 @@ export const getColumnData = (
   mode: ModeType,
   departmentCip?: string
 ): string => {
+
+  if (!isColumnAllowedForMode(columnType, mode)) {
+    return 'N/A';
+  }
+
   let content: UndergradContent | GradContent | undefined;
   if (mode === ModeType.Undergrad) {
     content = item.content?.undergrad_content;
@@ -102,6 +121,7 @@ export const getColumnData = (
     content = item.content?.grad_content;
   }
 
+  //These are columns that can be retrieved for department-specific information
   if (departmentCip && departmentCip != "general") {
     //Find Department Based on Department CIP
     const dept = content?.dept_contents?.find(d => d.cip === departmentCip);
@@ -121,6 +141,7 @@ export const getColumnData = (
     }
   }
 
+  //These are columns that can be retrieved for general information
   switch (columnType) {
     case ColumnType.Location:
       return item.location || 'N/A';
@@ -130,10 +151,11 @@ export const getColumnData = (
       return content?.general_content.graduation_rate || 'N/A';
     case ColumnType.StudentFacultyRatio:
       return content?.general_content.average_class_size || 'N/A';
-    case ColumnType.SATScore:
-      return content?.general_content.sat_score || 'N/A';
+     case ColumnType.SATScore:
+      // Type assertion since we already checked mode restriction, stop bothering us please
+       return (content as any)?.general_content?.sat_score || 'N/A';
     case ColumnType.ACTScore:
-      return content?.general_content.act_score || 'N/A';
+       return (content as any)?.general_content?.sat_score || 'N/A';
     case ColumnType.AdmissionsRate:
       return content?.general_content.admissions_rate || 'N/A';
     case ColumnType.HouseholdIncome:

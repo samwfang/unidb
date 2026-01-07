@@ -41,11 +41,7 @@ import {
 import ThankYouPage from './FrontPage/ThankYouPage';
 
 
-export enum ModeType {
-  Undergrad = 'undergrad',
-  Grad = 'grad',
-  Law = 'law'
-}
+import {ModeType} from '../helpers/types';
 
 
 function App() {

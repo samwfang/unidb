@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem, Menu, FormControl, Select, Badge } from '@chakra-ui/react';
 import { Popover, PopoverTrigger, PopoverContent, PopoverBody, Portal } from '@chakra-ui/react';
 import MasterTableRow from './TableEntries/MasterTableRow';
-import { ModeType } from '../App';
+import { ModeType } from "../../helpers/types";
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons';
 import ReactSelect, { SingleValue } from 'react-select';
@@ -88,6 +88,9 @@ export interface GradContent {
     admissions_rate?: string;
     admissions_rate_percentile?: string;
     average_class_size: string;
+
+    avg_household_income?: string;
+    avg_household_income_percentile?: string;
   };
   demographics?: DemographicsData;
   dept_contents?: GradDeptContent[];

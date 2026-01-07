@@ -1,5 +1,5 @@
 import { Badge, Box, Button, Flex, Switch, Text } from "@chakra-ui/react";
-import { ModeType } from "../App";
+import { ModeType } from "../../helpers/types";
 import UGradGradToggle from "../../ReusableComponents/UGradGradToggle";
 
 interface ThankYouPageProps {

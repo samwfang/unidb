@@ -1,6 +1,6 @@
 import { Box, Stack, Text, Select } from '@chakra-ui/react';
 import UGradGradToggle from '../../ReusableComponents/UGradGradToggle';
-import { ModeType } from '../App';
+import { ModeType } from "../../helpers/types";
 import GlassBox from '../../containers/GlassBox';
 
 interface MTControlPanelProps {

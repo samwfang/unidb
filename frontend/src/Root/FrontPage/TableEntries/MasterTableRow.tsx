@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AccordionItem, AccordionButton, Box, Grid, GridItem, Image, Icon, useColorMode } from '@chakra-ui/react';
 import MTExpandedEntry from './MTExpandedEntry';
 import { UniversityData, UndergradContent, GradContent, Content } from '../MasterTable'; // Adjust the path as necessary
-import { ModeType } from '../../App';
+import { ModeType } from "../../../helpers/types";
 import { FaUniversity } from 'react-icons/fa';
 import { ColumnType, getColumnData } from '../../../helpers/DepartmentHelper';
 
