@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Text, Tabs, TabList, Tab, Flex, useColorMode } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
+import { useResponsive } from 'src/containers/useResponsive';
 
 interface TestScoresProps {
   satScore?: string;
@@ -54,32 +55,8 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore, unive
     { color: '#F44336' };
 
 
-  // DYNAMICALLY ADJUST PIE CHART SIZE ACCORDING TO WINDOW HEIGHT (SINCE RECHARTS DOESNT SUPPORT THIS GRRR)
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Responsive radius based on window width
-  const getRadius = () => {
-    if (windowSize.width < 480) return { inner: 40, outer: 55 };
-    if (windowSize.width < 1000) return { inner: 50, outer: 65 };
-    return { inner: 60, outer: 80 };
-  };
-
-  const { inner, outer } = getRadius();
+  const { chartRadius } = useResponsive();
+  const { inner, outer } = chartRadius;
 
 
   return (

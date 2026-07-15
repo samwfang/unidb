@@ -53,6 +53,7 @@ function App() {
         minH="100vh"
         height="100%"
         position="relative"
+        overflowX="hidden"
         bgGradient={bgGradient}
         pb="80px"
       >

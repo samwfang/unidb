@@ -10,6 +10,7 @@ import { ColumnType, ExtraSortType, SortType } from '../../helpers/DepartmentHel
 import ColumnPopover from '../../ReusableComponents/ColumnPopover';
 import SearchBar from '../../ReusableComponents/SearchBar';
 import { useAppTheme } from '../../containers/useTheme';
+import { useResponsive } from '../../containers/useResponsive';
 import GlassBox from '../../containers/GlassBox';
 import ColumnPopoverButton from 'src/containers/ColumnPopoverButton';
 
@@ -142,7 +143,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const initialExpanded = searchParams.get('expanded')?.split(',').map(Number) || [];
 
   // Estimate the height required for each row. This might need adjustment based on your actual design.
-  const [rowHeightEstimate, setRowHeightEstimate] = useState(61); // Default desktop height
+  const responsive = useResponsive();
+  const { rowHeightEstimate, visibleColumnCount } = responsive;
   const calculatedMinHeight = pageSize * rowHeightEstimate;
 
   //Selected Column Options
@@ -154,8 +156,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   { value: "general", label: "General" }, { value: "general", label: "General" }]);
   //Which column is sorted by
   const [sortedByCol, setSortedByCol] = useState<number>(1);
-  //Amt of Columns Visible due to Screen Size
-  const [visibleColumnCount, setVisibleColumnCount] = useState(3);
+
 
   //Current Parameter With Which To Sort Page Data With
   const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
@@ -371,31 +372,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   }, [searchQuery]);
 
 
-  // Detect screen size and adjust column count
-  // <768px is one column
-  // 768-1024 is two columns
-  // >1024px is three columns
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 480) {
-        setVisibleColumnCount(1);
-      }
-      else if (window.innerWidth < 768) {
-        setVisibleColumnCount(2);
-        setRowHeightEstimate(45);
-      } else if (window.innerWidth < 1024) {
-        setVisibleColumnCount(3);
-        setRowHeightEstimate(55);
-      } else {
-        setVisibleColumnCount(3);
-        setRowHeightEstimate(61);
-      }
-    };
 
-    handleResize(); // Initial call
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
 
 
@@ -515,7 +492,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   //TODO: Add "Favorited" Functionality
   return (
     <GlassBox
-      maxW={{ base: "100vw", md: "1100px" }}
+      maxW={{ base: "100%", md: "1100px" }}
       mx="auto"
       position="relative"
       p={{ base: 3, md: 5 }}
@@ -547,7 +524,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       >
         <Box
           minH={`${calculatedMinHeight}px`}
-          minW={{ base: "300px" }}
+          minW={{ base: "320px" }}
           w="100%"
         >
           {isLoading ? (

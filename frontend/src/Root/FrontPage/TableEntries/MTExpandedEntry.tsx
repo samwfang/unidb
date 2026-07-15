@@ -107,7 +107,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
 
   // Separate rendering functions for undergrad and grad
   const renderUndergradContent = (general: UndergradContent | undefined) => (
-    <Box p={2} width="100%" overflow="hidden">
+    <Box p={2} width="100%" overflow="visible">
       <UniversitySummaryWidget
         universityName={item?.name || 'Unknown University'}
         rank={rank.toString()}

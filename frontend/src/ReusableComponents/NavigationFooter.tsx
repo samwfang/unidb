@@ -56,7 +56,9 @@ const NavigationFooter: React.FC<NavigationFooterProps> = ({ mode, activeTab, on
               transition="color 0.15s ease"
               flex={1}
               position="relative"
-              gap={0.5}
+              gap={{ base: 0.5, md: 1 }}
+              minH={{ base: "44px" }}
+              py={{ base: 0.5, md: 1 }}
             >
               {isActive && (
                 <Box
@@ -70,9 +72,9 @@ const NavigationFooter: React.FC<NavigationFooterProps> = ({ mode, activeTab, on
                   bg={getActiveColor()}
                 />
               )}
-              <Icon as={item.icon} boxSize={4} />
+              <Icon as={item.icon} boxSize={{ base: 4, md: 5 }} />
               <Text
-                fontSize="10px"
+                fontSize={{ base: "9px", sm: "10px", md: "11px" }}
                 fontWeight={isActive ? '600' : '400'}
                 letterSpacing="tight"
               >

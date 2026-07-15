@@ -1,5 +1,4 @@
-// GraduationRateWidget.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab, Flex, Modal, ModalOverlay, ModalContent, ModalCloseButton, ModalBody, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, useColorMode } from '@chakra-ui/react';
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DemographicsData } from 'src/Root/FrontPage/MasterTable';
@@ -7,6 +6,7 @@ import { HamburgerIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
 import GlassBox from 'src/containers/GlassBox';
+import { useResponsive } from 'src/containers/useResponsive';
 
 interface TotalStudentWidgetProps {
   universityName: string;
@@ -216,35 +216,8 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   const findDataSet = (mode: DisplayMode) => dataSets.find(set => set.name === DATA_SET_NAMES[mode])!;
   const currentData = findDataSet(activeTab);
 
-  // DYNAMICALLY ADJUST PIE CHART SIZE ACCORDING TO WINDOW HEIGHT (SINCE RECHARTS DOESNT SUPPORT THIS GRRR)
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
-  });
-
-
-
-  // Responsive radius based on window width
-  const getRadius = () => {
-    if (windowSize.width < 768) return { inner: 60, outer: 80 };
-    if (windowSize.width < 1024) return { inner: 60, outer: 80 };
-    return { inner: 75, outer: 100 };
-  };
-
-  const { inner, outer } = getRadius();
-
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const { chartRadius } = useResponsive();
+  const { inner: inner, outer } = chartRadius;
 
   if (!currentData) return <Alert status="error">Data not available</Alert>;
 
@@ -338,7 +311,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       {renderLegendPopover()}
       <Box>
         <Text fontSize={{ base: "sm", sm: "md", md: "lg" }} fontWeight="bold">Total Students:</Text>
-        <Box height="250px" position="relative" overflow="visible">
+        <Box height={{ base: "200px", md: "250px" }} position="relative" overflow="visible">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip

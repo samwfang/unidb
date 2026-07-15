@@ -125,7 +125,7 @@ const CostAndAidWidget: React.FC<CostAndAidWidgetProps> = ({
                 </Tabs>
 
                 {/* Content area with same dimensions as TotalStudentsWidget */}
-                <Box height="250px" position="relative" overflow="visible">
+                <Box height={{ base: "200px", md: "250px" }} position="relative" overflow="visible">
                     {/* Content will be added based on active tab */}
                     <Flex
                         height="100%"

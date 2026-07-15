@@ -198,7 +198,7 @@ export const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({ departme
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent zIndex="popover" bg="gray.100" borderRadius="lg"
-                        boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" width="350px" border="none">
+                        boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)" width={{ base: "calc(100vw - 32px)", md: "350px" }} maxWidth="350px" border="none">
                         <PopoverBody>
                             {isOpen && (
                                 <Box m={4}>

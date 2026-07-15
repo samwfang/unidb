@@ -12,7 +12,7 @@ export default function SearchBar({ value, onChange, placeholder = "Search..." }
   const isDark = colorMode === 'dark';
 
   return (
-    <Flex flex="1" maxWidth="600px" mr={4}>
+    <Flex flex="1" maxWidth="600px">
       <InputGroup size="lg">
         <InputLeftElement
           pointerEvents="none"
