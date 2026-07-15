@@ -1,8 +1,7 @@
-import { Box, Flex, Text, Badge, Button, useColorMode } from '@chakra-ui/react';
+import { Box, Flex, Text, Button } from '@chakra-ui/react';
 import { ModeType } from "../helpers/types";
 import UGradGradToggle from './UGradGradToggle';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
-
 
 interface TopHeaderProps {
     mode: ModeType;
@@ -13,11 +12,7 @@ interface TopHeaderProps {
 }
 
 export default function TopHeader({ mode, showHeader, onToggle, onColorModeToggle, colorMode }: TopHeaderProps) {
-    const { toggleColorMode } = useColorMode(); // Add this line
-
-    const bgColor = colorMode === 'dark'
-        ? 'gray.900'  // Black background for dark mode
-        : mode === ModeType.Undergrad ? "blue.50" : "gray.50";
+    const isDark = colorMode === 'dark';
 
     return (
         <Box
@@ -27,48 +22,46 @@ export default function TopHeader({ mode, showHeader, onToggle, onColorModeToggl
             right={0}
             zIndex={10000}
             opacity={showHeader ? 1 : 0}
-            transition="opacity 0.3s ease"
+            transition="all 0.3s ease"
             pointerEvents={showHeader ? 'auto' : 'none'}
-            bg={bgColor}
-            boxShadow="sm"
-            p={1.5}
+            transform={showHeader ? 'translateY(0)' : 'translateY(-4px)'}
+            bg={isDark ? 'rgba(15, 17, 23, 0.8)' : 'rgba(248, 250, 252, 0.85)'}
+            backdropFilter="blur(16px)"
+            borderBottom="1px solid"
+            borderColor={isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
+            boxShadow={isDark ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.05)'}
         >
             <Flex
-                display="flex"
-                flexDirection="column"
-                alignItems="flex-start"
-                justifyContent="space-around"
-                textAlign="left"
-                pl={8}
-                mt={2}
+                maxW="1300px"
+                mx="auto"
+                px={{ base: 4, md: 8 }}
+                py={2.5}
+                alignItems="center"
+                justifyContent="space-between"
             >
-                <Flex
-                    width="100%"
-                    flexDirection="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    position="relative"
-                    flexWrap="wrap"  // Added to allow wrapping
-                    gap={2}
-                >
-                    <Flex alignItems="center">
-                        <Text fontSize={{ base: "lg", md: "2xl" }} fontWeight="bold">
-                            unidb
-                        </Text>
-                    </Flex>
-                    <Flex alignItems="center" gap={2}>
-                        <Button
-                            onClick={onColorModeToggle}
-                            size="sm"
-                            variant="ghost"
-                            aria-label="Toggle color mode"
-                        >
-                            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-                        </Button>
-                        <Box>
-                            <UGradGradToggle mode={mode} onToggle={onToggle} />
-                        </Box>
-                    </Flex>
+                <Flex alignItems="center" gap={2}>
+                    <Text
+                        fontSize={{ base: "lg", md: "xl" }}
+                        fontWeight="bold"
+                        bgGradient="linear(to-r, brand.400, brand.600)"
+                        bgClip="text"
+                        letterSpacing="tight"
+                    >
+                        unidb
+                    </Text>
+                </Flex>
+                <Flex alignItems="center" gap={3}>
+                    <Button
+                        onClick={onColorModeToggle}
+                        size="sm"
+                        variant="ghost"
+                        aria-label="Toggle color mode"
+                        borderRadius="full"
+                        p={2}
+                    >
+                        {isDark ? <SunIcon boxSize={4} /> : <MoonIcon boxSize={4} />}
+                    </Button>
+                    <UGradGradToggle mode={mode} onToggle={onToggle} />
                 </Flex>
             </Flex>
         </Box>

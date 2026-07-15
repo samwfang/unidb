@@ -1,6 +1,6 @@
 import React from 'react';
 import { ModeType } from "../helpers/types";
-import {Box, Text, Switch} from '@chakra-ui/react';
+import { Box, Text, Switch, useColorMode } from '@chakra-ui/react';
 
 interface ModeToggleProps {
   mode: ModeType;
@@ -9,19 +9,24 @@ interface ModeToggleProps {
 
 const ModeToggle: React.FC<ModeToggleProps> = ({ mode, onToggle }) => {
   const isUndergrad = mode === ModeType.Undergrad;
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
 
   return (
-    <Box display="flex" alignItems="center" justifyContent="flex-end"  width="170px">
-      <Text mr={2} whiteSpace="nowrap">{isUndergrad ? 'Undergraduate' : 'Graduate'}</Text>
+    <Box display="flex" alignItems="center" gap={2}>
+      <Text
+        fontSize="xs"
+        fontWeight="500"
+        whiteSpace="nowrap"
+        color={isDark ? 'gray.400' : 'gray.500'}
+      >
+        {isUndergrad ? 'Undergrad' : 'Grad'}
+      </Text>
       <Switch
         isChecked={!isUndergrad}
         onChange={onToggle}
-        colorScheme={isUndergrad ? 'blue' : 'green'}
-        sx={{
-          '.chakra-switch__track': {
-            bg: isUndergrad ? 'blue.500' : 'gray.500',
-          },
-        }}
+        size="sm"
+        colorScheme="blue"
       />
     </Box>
   );

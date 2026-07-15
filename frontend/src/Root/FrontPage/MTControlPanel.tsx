@@ -1,4 +1,4 @@
-import { Box, Stack, Text, Select } from '@chakra-ui/react';
+import { Box, Stack, Text, Select, useColorMode } from '@chakra-ui/react';
 import UGradGradToggle from '../../ReusableComponents/UGradGradToggle';
 import { ModeType } from "../../helpers/types";
 import GlassBox from '../../containers/GlassBox';
@@ -10,25 +10,36 @@ interface MTControlPanelProps {
   onModeChange: () => void;
 }
 
-/*
-Displays the Control Panel on the Left of the Master Table, to allow for Filtering and Searching
-*/
 export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange }: MTControlPanelProps) => {
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
+
   return (
-    <GlassBox 
-      w={{ base: "100%", lg: "220px" }}
-      mx="auto" mt="8"
-      p={3}
+    <GlassBox
+      w={{ base: "100%", lg: "200px" }}
+      mx="auto"
+      p={4}
+      position={{ base: "static", lg: "sticky" }}
+      top={{ base: "auto", lg: "80px" }}
     >
       <Stack spacing={4}>
         <Box>
-          <Text fontSize="sm" fontWeight="semibold" mb={2}>
+          <Text
+            fontSize="xs"
+            fontWeight="600"
+            color={isDark ? 'gray.400' : 'gray.500'}
+            mb={2}
+            textTransform="uppercase"
+            letterSpacing="wider"
+          >
             Items per page
           </Text>
-          <Select 
+          <Select
             value={pageSize}
             onChange={(e) => onPageSizeChange(parseInt(e.target.value, 10))}
             size="sm"
+            borderRadius="lg"
+            fontWeight="500"
           >
             <option value={5}>5</option>
             <option value={10}>10</option>
@@ -36,14 +47,19 @@ export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange 
             <option value={50}>50</option>
           </Select>
         </Box>
-        
+
         <Box>
-          <Text fontSize="sm" fontWeight="semibold" mb={2}>
+          <Text
+            fontSize="xs"
+            fontWeight="600"
+            color={isDark ? 'gray.400' : 'gray.500'}
+            mb={2}
+            textTransform="uppercase"
+            letterSpacing="wider"
+          >
             View Mode
           </Text>
-          <Box>
-            <UGradGradToggle mode={mode} onToggle={onModeChange} />
-          </Box>
+          <UGradGradToggle mode={mode} onToggle={onModeChange} />
         </Box>
       </Stack>
     </GlassBox>

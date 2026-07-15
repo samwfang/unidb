@@ -117,7 +117,7 @@ export interface MasterTableProps {
 
 const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 10 }) => {
   //Custom Parameters for App Styling Based on Theme
-  const { colorMode, glassBg, glassBorder, modeColor } = useAppTheme();
+  const { colorMode, glassBg, glassBorder, modeColor, isDark } = useAppTheme();
 
   //Search Params to Save State (WIP)
   const [searchParams, setSearchParams] = useSearchParams();
@@ -514,77 +514,69 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
   //TODO: Add "Favorited" Functionality
   return (
-    <GlassBox maxW={{ base: "100vw", md: "1000px" }} mx="auto" mt="8"
+    <GlassBox
+      maxW={{ base: "100vw", md: "1100px" }}
+      mx="auto"
       position="relative"
-      p={{ base: 2, md: 3, lg: 4 }}
+      p={{ base: 3, md: 5 }}
     >
-      <Flex justifyContent="space-between" mb={4}>
-
-        <Flex flex="1" maxWidth="600px" mr={4}>
+      {/* Toolbar */}
+      <Flex justifyContent="space-between" alignItems="center" mb={5} gap={3}>
+        <Flex flex="1" maxWidth="500px">
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder="Search Universities..."
+            placeholder="Search universities..."
           />
         </Flex>
         <Button
           onClick={() => { setExpandedIndex([]) }}
           isDisabled={Array.isArray(expandedIndex) ? !expandedIndex.length : true}
-          variant={mode === 'undergrad' ? 'primary' : 'secondary'}
+          variant="secondary"
+          size="sm"
         >
           Collapse All
         </Button>
       </Flex>
 
+      {/* Table */}
       <Box
         overflowX="auto"
-        css={{
-          '&::-webkit-scrollbar': {
-            height: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: mode === ModeType.Undergrad ? '#3182ce' : '#888',
-            borderRadius: '4px',
-            _hover: {
-              background: mode === ModeType.Undergrad ? '#2c5282' : '#555',
-            }
-          },
-        }}
+        borderRadius="xl"
         width="100%"
       >
-        <Box minH={`${calculatedMinHeight}px`} minW={{ base: "300px", md: "600px", lg: "800px" }} w="100">
-          {isLoading ? ( // Show spinner when loading
-            <Flex justifyContent="center" alignItems="center" minH="100px">
-              <Spinner
-                size="xl"
-                color={mode === 'undergrad' ? "blue.500" : "gray.600"}
-                thickness='4px'
-              />
+        <Box
+          minH={`${calculatedMinHeight}px`}
+          minW={{ base: "300px", md: "600px", lg: "800px" }}
+          w="100%"
+        >
+          {isLoading ? (
+            <Flex justifyContent="center" alignItems="center" minH="200px">
+              <Spinner size="lg" thickness="3px" />
             </Flex>
           ) : (
             <>
               {/* Column Headers */}
-              <Grid templateColumns={{
-                base: `60px minmax(100px, 1fr) ${'minmax(50px, 1fr) '.repeat(visibleColumnCount)}`,
-                md: "75px 2fr 1fr 1fr 1fr"
-              }}
+              <Grid
+                templateColumns={{
+                  base: `50px minmax(100px, 1fr) ${'minmax(50px, 1fr) '.repeat(visibleColumnCount)}`,
+                  md: "60px 2fr 1fr 1fr 1fr"
+                }}
                 gap={{ base: 2, md: 4 }}
                 w="full"
-                alignItems="flex-end"
-                mb={2}
-                px={{ base: 2, md: 4 }}>
+                alignItems="center"
+                mb={1}
+                px={{ base: 2, md: 3 }}
+                py={2}
+                borderBottom="1px solid"
+                borderColor={colorMode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}
+              >
                 <GridItem textAlign="center">
                   <Popover>
                     {({ isOpen }) => (
                       <>
                         <PopoverTrigger>
-                          <ColumnPopoverButton
-                            isActivated={sortedByCol === 0}
-                            isOpen={isOpen}
-                          >
+                          <ColumnPopoverButton isActivated={sortedByCol === 0} isOpen={isOpen}>
                             Score
                           </ColumnPopoverButton>
                         </PopoverTrigger>
@@ -598,22 +590,20 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                             backdropFilter="blur(12px)"
                             bg="rgba(0, 0, 0, 0.1)"
                             zIndex="overlay"
-                            borderRadius="lg"
+                            borderRadius="xl"
                             pointerEvents="none"
                           />
                         )}
                         <Portal>
                           <PopoverContent>
-                              <GlassBox p={4}>
-                              <Text fontSize="xl" fontWeight="bold">Score</Text>
-                              <Badge variant="subtle" colorScheme="pink" ml={1}>
-                                WIP
-                              </Badge>
-                              {sortedByCol == 0 &&
-                                <Badge bg="green.200">Currently Sorted By</Badge>
-                              }
-                              <Text>Custom Scoring is currently a feature in progress!</Text>
-                              </GlassBox>
+                            <GlassBox p={4}>
+                              <Text fontSize="lg" fontWeight="600">Score</Text>
+                              <Badge variant="subtle" colorScheme="pink" ml={1} fontSize="2xs">WIP</Badge>
+                              {sortedByCol === 0 && <Badge colorScheme="green" ml={2} fontSize="2xs">Sorted</Badge>}
+                              <Text fontSize="sm" mt={2} color={colorMode === 'dark' ? 'gray.400' : 'gray.500'}>
+                                Custom scoring is currently in progress!
+                              </Text>
+                            </GlassBox>
                           </PopoverContent>
                         </Portal>
                       </>
@@ -625,11 +615,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                     {({ isOpen }) => (
                       <>
                         <PopoverTrigger>
-                          <ColumnPopoverButton
-                            isActivated={sortedByCol === 1}
-                            isOpen={isOpen}
-                            maxWidth="120px"
-                          >
+                          <ColumnPopoverButton isActivated={sortedByCol === 1} isOpen={isOpen} maxWidth="120px">
                             Name
                           </ColumnPopoverButton>
                         </PopoverTrigger>
@@ -643,19 +629,19 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                             backdropFilter="blur(12px)"
                             bg="rgba(0, 0, 0, 0.1)"
                             zIndex="overlay"
-                            borderRadius="lg"
+                            borderRadius="xl"
                             pointerEvents="none"
                           />
                         )}
                         <Portal>
                           <PopoverContent zIndex="popover">
                             <GlassBox p={4}>
-                              <Text fontSize="xl" fontWeight="bold"> University Name</Text>
-                              {sortedByCol == 1 &&
-                                <Badge bg="green.200">Currently Sorted By</Badge>
-                              }
-                              <Text>The most common name for each university.</Text>
-                              <Text fontWeight="bold"> Sort By: </Text>
+                              <Text fontSize="lg" fontWeight="600">University Name</Text>
+                              {sortedByCol === 1 && <Badge colorScheme="green" ml={2} fontSize="2xs">Sorted</Badge>}
+                              <Text fontSize="sm" color={colorMode === 'dark' ? 'gray.400' : 'gray.500'} mt={1}>
+                                The most common name for each university.
+                              </Text>
+                              <Text fontWeight="600" fontSize="sm" mt={3}>Sort by:</Text>
                               {isOpen && (
                                 <FormControl mt={2}>
                                   <ReactSelect
@@ -668,30 +654,25 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                                     styles={{
                                       control: (base) => ({
                                         ...base,
-                                        backgroundColor: 'gray.50',
-                                        borderColor: '#E2E8F0',
-                                        _hover: { borderColor: '#CBD5E0' }
+                                        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'white',
+                                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
+                                        borderRadius: '8px',
+                                        minHeight: '36px',
                                       }),
                                       option: (base) => ({
                                         ...base,
-                                        backgroundColor: 'white',
-                                        color: 'black',
-                                        _hover: { backgroundColor: '#F7FAFC' }
+                                        backgroundColor: isDark ? '#1a202c' : 'white',
+                                        color: isDark ? 'white' : 'black',
+                                        fontSize: '14px',
                                       })
                                     }}
                                     onChange={onUniversityNameSelectChange}
                                   />
                                 </FormControl>
                               )}
-                              <Button
-                                mt={4}
-                                variant={mode === 'undergrad' ? 'primary' : 'secondary'}
-                                size="sm"
-                                onClick={applyAlphabeticalSort}
-                              >
+                              <Button mt={3} variant="primary" size="sm" onClick={applyAlphabeticalSort}>
                                 Apply Sort
                               </Button>
-
                             </GlassBox>
                           </PopoverContent>
                         </Portal>
@@ -700,9 +681,9 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                   </Popover>
                 </GridItem>
 
-                {/* Dynamic columns based on visibleColumnCount */}
                 {Array.from({ length: visibleColumnCount }).map((_, index) => (
-                  <GridItem key={index} textAlign="center" fontWeight="bold">
+                  <GridItem key={index} textAlign="center" fontWeight="600" fontSize="sm"
+                    color={colorMode === 'dark' ? 'gray.300' : 'gray.500'}>
                     <ColumnPopover
                       departmentCID={columnDepts[index].value}
                       sortedByCol={sortedByCol}
@@ -716,25 +697,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
                 ))}
               </Grid>
 
+              {/* Table Rows */}
               <Accordion
                 allowMultiple
-                borderRadius="lg"
                 index={expandedIndex}
                 onChange={(index) => setExpandedIndex(index)}
-                sx={{
-                  '& > div': {
-                    borderRadius: 'lg',
-                    overflow: 'hidden',
-                    '&:first-of-type': {
-                      borderTopRadius: 'lg'
-                    },
-                    '&:last-of-type': {
-                      borderBottomRadius: 'lg'
-                    }
-                  }
-                }}
+                border="none"
               >
-                {/* MasterTableRow will only display the columns currently stated to be visible */}
                 {data.map((item, index) => (
                   <MasterTableRow
                     key={item.id}
@@ -753,44 +722,59 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         </Box>
       </Box>
 
-
-
-      <Flex justifyContent="space-between" alignItems="center" mt="4">
-        <Button onClick={prevPage} isDisabled={currentPage === 0 || isLoading}
-          variant={mode === 'undergrad' ? 'primary' : 'secondary'}>
+      {/* Pagination */}
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        mt={4}
+        pt={4}
+        borderTop="1px solid"
+        borderColor={colorMode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}
+      >
+        <Button
+          onClick={prevPage}
+          isDisabled={currentPage === 0 || isLoading}
+          variant="secondary"
+          size="sm"
+        >
           Back
         </Button>
 
-        <Flex alignItems="center">
-
-          {/* Tooltip only shows if ShowInvalidPageTooltip is true, shows if user inputs a bad page number */}
+        <Flex alignItems="center" gap={2}>
           <Tooltip
             isOpen={showInvalidPageTooltip}
-            label={`Please enter a valid page number between 1 and ${Math.ceil(totalItems / pageSize)}`}
+            label={`Enter a page between 1 and ${Math.ceil(totalItems / pageSize)}`}
             placement="top"
             hasArrow
             bg="red.500"
             color="white"
           >
-            <Text mx={2}>
-              Page <Input
+            <Flex alignItems="center" gap={1.5} fontSize="sm" color={colorMode === 'dark' ? 'gray.400' : 'gray.500'}>
+              <Text>Page</Text>
+              <Input
                 value={pageInput}
                 onChange={handlePageInputChange}
-                width="60px"
+                width="50px"
                 textAlign="center"
-                mr={2}
-              /> of {Math.ceil(totalItems / pageSize)}
-            </Text>
-
+                size="sm"
+                borderRadius="md"
+                fontSize="sm"
+                fontWeight="500"
+              />
+              <Text>of {Math.ceil(totalItems / pageSize)}</Text>
+            </Flex>
           </Tooltip>
-          <Button onClick={goToPage} isDisabled={isLoading}
-            variant={mode === 'undergrad' ? 'primary' : 'secondary'}>
+          <Button onClick={goToPage} isDisabled={isLoading} variant="primary" size="sm">
             Go
           </Button>
         </Flex>
 
-        <Button onClick={nextPage} isDisabled={(currentPage + 1) * pageSize >= totalItems || isLoading}
-          variant={mode === 'undergrad' ? 'primary' : 'secondary'}>
+        <Button
+          onClick={nextPage}
+          isDisabled={(currentPage + 1) * pageSize >= totalItems || isLoading}
+          variant="secondary"
+          size="sm"
+        >
           Next
         </Button>
       </Flex>

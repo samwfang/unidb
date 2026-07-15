@@ -1,81 +1,39 @@
-import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import MasterTable from './FrontPage/MasterTable'
 import TopHeader from '../ReusableComponents/TopHeader';
-import UGradGradToggle from '../ReusableComponents/UGradGradToggle';
 import { MTControlPanel } from './FrontPage/MTControlPanel';
 import FrontPageInfo from './FrontPage/FrontPageInfo';
 import { useColorMode, useColorModeValue } from '@chakra-ui/react';
 import NavigationFooter from '../ReusableComponents/NavigationFooter';
-import {
-  Box,
-  Image,
-  Badge,
-  Text,
-  Icon,
-  Stack,
-  Avatar,
-  AvatarBadge,
-  Alert,
-  AlertTitle,
-  AlertDescription,
-  FormLabel,
-  Input,
-  FormHelperText,
-  FormErrorMessage,
-  Grid,
-  Switch,
-  InputGroup,
-  InputRightElement,
-  Flex,
-  Tag,
-  Heading,
-  Select
-} from '@chakra-ui/react'
-import {
-  StarIcon,
-  EmailIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon
-} from '@chakra-ui/icons'
+import { Box, Flex, Text } from '@chakra-ui/react';
 import ThankYouPage from './FrontPage/ThankYouPage';
-
-
-import {ModeType} from '../helpers/types';
-
+import { ModeType } from '../helpers/types';
 
 function App() {
-
   const [activeTab, setActiveTab] = useState<string>('explore');
-
-
-   const { colorMode, toggleColorMode } = useColorMode(); // Get current color mode
-  // whether table will prioritize undergraduate or graduate information
+  const { colorMode, toggleColorMode } = useColorMode();
   const [mode, setMode] = useState<ModeType>(ModeType.Undergrad);
-  // number of entries mastertable shows
   const [pageSize, setPageSize] = useState<number>(10);
-  //set whether to show the top header or not
   const [showHeader, setShowHeader] = useState<boolean>(false);
   const frontPageInfoRef = useRef<HTMLDivElement>(null);
-
-
   const masterTableRef = useRef<HTMLDivElement>(null);
 
   const scrollToMasterTable = () => {
     masterTableRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Use color mode values for backgrounds
   const bgGradient = useColorModeValue(
-    mode === ModeType.Undergrad ? "linear(to-br, blue.50, blue.100)" : "linear(to-br, gray.50, gray.200)",
-    mode === ModeType.Undergrad ? "linear(to-br, blue.1000, blue.900)" : "linear(to-br, gray.900, gray.800)"
+    mode === ModeType.Undergrad
+      ? "linear(160deg, #f0f7ff 0%, #e8f0fe 30%, #f8fafc 70%, #f0f4ff 100%)"
+      : "linear(160deg, #f5f3ff 0%, #ede9fe 30%, #f8fafc 70%, #faf5ff 100%)",
+    mode === ModeType.Undergrad
+      ? "linear(160deg, #0a0e1a 0%, #0d1225 40%, #0f1117 70%, #111827 100%)"
+      : "linear(160deg, #0f0a1a 0%, #120d25 40%, #0f1117 70%, #1a1025 100%)"
   );
 
-  //handle showing or removing the front header based on user scroll location
   useEffect(() => {
     const handleScroll = () => {
       if (frontPageInfoRef.current) {
-        // Show header after scrolling past 50% of FrontPageInfo height
         const threshold = frontPageInfoRef.current.offsetHeight * 0.1;
         setShowHeader(window.scrollY > threshold);
       }
@@ -87,46 +45,50 @@ function App() {
 
   const undergradGradToggle = () => {
     setMode((prevMode) => (prevMode === ModeType.Undergrad ? ModeType.Grad : ModeType.Undergrad));
-    console.log(mode)
-  };
-
-  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPageSize(parseInt(e.target.value, 10));
   };
 
   return (
     <div className="App">
-      {/* Gradient Background to make it look nice and spiffy! */}
-      <Box minH="100vh"
+      <Box
+        minH="100vh"
         height="100%"
         position="relative"
-        overflow="hidden"
-        bgGradient={bgGradient} // Chakra's gradient syntax
-        p={{ base: 1, md: 4 }}
+        bgGradient={bgGradient}
+        pb="80px"
       >
-        {/* Top Header: Only Display when ShowHeader == True */}
         <TopHeader
           mode={mode}
           showHeader={showHeader}
           onToggle={undergradGradToggle}
-          onColorModeToggle={toggleColorMode} 
+          onColorModeToggle={toggleColorMode}
           colorMode={colorMode}
         />
 
-        <Flex maxW="1000px"
-          w="100%" // Ensure it takes full width on mobile
-          px={{ base: 2, md: 0 }} // Add padding on mobile
-          alignItems="center"
+        <Flex
+          maxW="1100px"
+          w="100%"
+          px={{ base: 4, md: 8 }}
           mx="auto"
-          ref={frontPageInfoRef}>
-          <FrontPageInfo mode={mode}
+          ref={frontPageInfoRef}
+        >
+          <FrontPageInfo
+            mode={mode}
             onModeChange={undergradGradToggle}
-            onFindCollegesClick={scrollToMasterTable} />
+            onFindCollegesClick={scrollToMasterTable}
+          />
         </Flex>
-        {/* Master Table and Control Panel */}
+
         <Box ref={masterTableRef}>
-          <Flex direction={{ base: "column", lg: "row" }} gap={2} mt={6} maxW="1300px" mx="auto" w="100%"
-            px={{ base: 0, md: 0 }}>
+          <Flex
+            direction={{ base: "column", lg: "row" }}
+            gap={6}
+            mt={8}
+            maxW="1300px"
+            mx="auto"
+            w="100%"
+            px={{ base: 4, md: 8 }}
+            alignItems="flex-start"
+          >
             <MTControlPanel
               pageSize={pageSize}
               onPageSizeChange={setPageSize}
@@ -134,31 +96,27 @@ function App() {
               onModeChange={undergradGradToggle}
             />
 
-            {/* MasterTable - updated to use pageSize prop */}
-            <Box
-              flex={1}
-              w="100%"
-              overflowX="auto"
-            >
+            <Box flex={1} w="100%" minW={0}>
               <MasterTable mode={mode} toggleMode={undergradGradToggle} pageSize={pageSize} />
             </Box>
           </Flex>
-          <Flex maxW="1000px" alignItems="center" mx="auto" ref={frontPageInfoRef}>
+
+          <Flex maxW="1100px" alignItems="center" mx="auto" px={{ base: 4, md: 8 }}>
             <ThankYouPage mode={mode} onModeChange={undergradGradToggle} />
           </Flex>
         </Box>
 
-        <Box mt="auto" py={4} textAlign="center" color="gray.600">
-          <Text fontSize="sm">
-            By Samuel Fang | Built with React & Chakra UI
+        <Box mt={12} py={6} textAlign="center">
+          <Text fontSize="xs" color="gray.400" fontWeight="400">
+            By Samuel Fang · Built with React & Chakra UI
           </Text>
         </Box>
 
-        <NavigationFooter 
-            mode={mode} 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab} 
-          />
+        <NavigationFooter
+          mode={mode}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </Box>
     </div>
   );

@@ -220,7 +220,17 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           <Box key={columnIndex}>
             {columnGroups.map(([cip, depts]) => (
               <Box key={cip} mb={4}>
-                <Text fontWeight="bold" mt={2} mb={2} fontSize={{ base: "sm", md: "md" }}>{cipToClassificationName(cip)}</Text>
+                <Text
+                  fontWeight="600"
+                  mt={3}
+                  mb={2}
+                  fontSize={{ base: "xs", md: "sm" }}
+                  color={isDark ? 'gray.300' : 'gray.600'}
+                  textTransform="uppercase"
+                  letterSpacing="wider"
+                >
+                  {cipToClassificationName(cip)}
+                </Text>
                 <List>
                   {depts.map((dept, i) => (
                     <ListItem
@@ -229,10 +239,13 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
                         handleDeptSelection(activeTabIndex - 1, dept.department_name);
                       }}
                       cursor="pointer"
-                      _hover={{ bg: "gray.100" }}
-                      p={1}
+                      _hover={{
+                        bg: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                      }}
+                      p={1.5}
                       borderRadius="md"
                       fontSize={{ base: "xs", md: "sm" }}
+                      transition="background 0.1s ease"
                     >
                       {dept.department_name}
                     </ListItem>
@@ -246,81 +259,107 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
     );
   };
 
+  const activeColor = mode === ModeType.Undergrad ? 'brand.500' : 'purple.500';
+
   return (
-    <AccordionPanel pb={4} bg={isDark ? "rgb(0, 0, 0, 0.3)" : "rgb(255, 255, 255, 0"}>
+    <AccordionPanel pb={4} px={{ base: 2, md: 3 }} borderTop="none">
       {isExpanded && (
         <Tabs variant="default" index={activeTabIndex} isLazy onChange={setActiveTabIndex} overflowX="auto">
-          <TabList flexWrap="wrap" minW="300px" overflowX="auto" css={{
-            '&::-webkit-scrollbar': {
-              display: 'none', // Hide scrollbar for WebKit browsers
-            },
-            '-ms-overflow-style': 'none',  // Hide scrollbar for IE and Edge
-            'scrollbar-width': 'none',     // Hide scrollbar for Firefox
-          }}>
-            <Tab _selected={{
-              color: mode === 'undergrad' ? "blue.500" : "gray.600", // Change text color
-              borderBottom: '2px solid', // Ensure there is an underline
-              borderColor: mode === 'undergrad' ? "blue.500" : "gray.600", // Change underline color
+          <TabList
+            flexWrap="wrap"
+            minW="300px"
+            overflowX="auto"
+            borderBottom="1px solid"
+            borderColor={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}
+            gap={0.5}
+            mb={3}
+            css={{
+              '&::-webkit-scrollbar': { display: 'none' },
+              '-ms-overflow-style': 'none',
+              'scrollbar-width': 'none',
             }}
+          >
+            <Tab
+              _selected={{
+                color: activeColor,
+                borderBottom: '2px solid',
+                borderColor: activeColor,
+              }}
+              _hover={{ color: isDark ? 'gray.200' : 'gray.700' }}
               fontSize={{ base: "xs", md: "sm" }}
-              px={{ base: 2, md: 4 }}
-              py={{ base: 1, md: 2 }}
+              fontWeight="500"
+              px={{ base: 3, md: 4 }}
+              py={{ base: 2, md: 2.5 }}
               whiteSpace="nowrap"
-              minW="auto"><b>General</b></Tab>
-            {/* Render Tabs with names of Selected Departments*/}
+              minW="auto"
+              transition="all 0.15s ease"
+            >
+              General
+            </Tab>
             {selectedDepts.map((deptName, index) => (
               <Box display="flex" alignItems="center" key={index}>
                 <Tab
                   whiteSpace="nowrap"
                   _selected={{
-                    color: mode === 'undergrad' ? "blue.500" : "gray.600",
+                    color: activeColor,
                     borderBottom: '2px solid',
-                    borderColor: mode === 'undergrad' ? "#blue.500" : "gray.600",
+                    borderColor: activeColor,
                   }}
+                  _hover={{ color: isDark ? 'gray.200' : 'gray.700' }}
                   fontSize={{ base: "xs", md: "sm" }}
-                  px={{ base: 2, md: 4 }}
-                  py={{ base: 1, md: 2 }}
+                  fontWeight="500"
+                  px={{ base: 3, md: 4 }}
+                  py={{ base: 2, md: 2.5 }}
                   minW="auto"
                   maxW={{ base: "120px", md: "none" }}
                   overflow="hidden"
                   textOverflow="ellipsis"
+                  transition="all 0.15s ease"
                 >
-                  {deptName || <i>New Tab</i>}
+                  {deptName || <Text as="span" fontStyle="italic" opacity={0.5}>New Tab</Text>}
                 </Tab>
-                {/* Close Button Outside of Tab Clickable Area */}
                 <Box
                   as="span"
-                  ml={1}
+                  ml={0.5}
                   mr={1}
-                  fontSize={{ base: "sm", md: "md" }}
+                  fontSize="sm"
+                  color={isDark ? 'gray.600' : 'gray.400'}
                   onClick={(e: any) => {
                     e.stopPropagation();
                     handleCloseTab(index);
                   }}
-                  _hover={{ color: "red.500" }}
+                  _hover={{ color: 'red.400' }}
                   cursor="pointer"
                   flexShrink={0}
+                  transition="color 0.15s ease"
                 >
                   ×
                 </Box>
               </Box>
             ))}
-            {/* Allow User to Add New Tab If Not At Maximum */}
             {selectedDepts.length < MAX_TABS ? (
-              <Tab onClick={handleAddTab} _hover={{ bg: "gray.100" }} fontSize={{ base: "xs", md: "sm" }}
-                px={{ base: 2, md: 4 }}
-                py={{ base: 1, md: 2 }}
+              <Tab
+                onClick={handleAddTab}
+                _hover={{ bg: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}
+                fontSize={{ base: "xs", md: "sm" }}
+                px={{ base: 2, md: 3 }}
+                py={{ base: 2, md: 2.5 }}
                 minW="auto"
-                flexShrink={0}>
+                flexShrink={0}
+                color={isDark ? 'gray.500' : 'gray.400'}
+                transition="all 0.15s ease"
+              >
                 +
               </Tab>
             ) : (
               <Tooltip label="Maximum tabs reached" placement="top" hasArrow>
-                <Tab isDisabled _hover={{ cursor: "not-allowed" }} fontSize={{ base: "xs", md: "sm" }}
-                  px={{ base: 2, md: 4 }}
-                  py={{ base: 1, md: 2 }}
+                <Tab isDisabled fontSize={{ base: "xs", md: "sm" }}
+                  px={{ base: 2, md: 3 }}
+                  py={{ base: 2, md: 2.5 }}
                   minW="auto"
-                  flexShrink={0}>
+                  flexShrink={0}
+                  color="gray.300"
+                >
                   +
                 </Tab>
               </Tooltip>
@@ -328,29 +367,29 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
           </TabList>
 
           <TabPanels>
-            <TabPanel p={{ base: 2, md: 4 }}>
-              <Box p={0}>{renderGeneralContent() || "No general content available"}</Box>
+            <TabPanel p={{ base: 2, md: 3 }}>
+              <Box>{renderGeneralContent() || "No general content available"}</Box>
             </TabPanel>
 
             {selectedDepts.map((selectedDept, index) => (
-              <TabPanel key={index} p={{ base: 2, md: 4 }}>
-                <Box p={0}>
+              <TabPanel key={index} p={{ base: 2, md: 3 }}>
+                <Box>
                   {selectedDept === "" ? (
-                    // Show Input for autocomplete selection
                     <Box>
-                      <Text fontSize={{ base: "sm", md: "md" }}>Select a department to display information on this tab.</Text>
+                      <Text fontSize="sm" color={isDark ? 'gray.400' : 'gray.500'} mb={3}>
+                        Select a department to display information on this tab.
+                      </Text>
                       <Input
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        placeholder="Type to search..."
-                        size={{ base: "sm", md: "md" }}
-                        mb={3}
-                        borderRadius="full"
+                        placeholder="Type to search departments..."
+                        size="sm"
+                        mb={4}
+                        borderRadius="lg"
                       />
                       {renderFilteredGroupedDepartments()}
                     </Box>
                   ) : (
-                    // Display Department Content if a department is selected
                     <DepartmentContent
                       content={
                         deptContents?.find(dept => dept.department_name === selectedDept)?.content || "No content available"

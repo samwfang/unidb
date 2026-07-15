@@ -1,5 +1,6 @@
-import { Input, Button, Flex, InputGroup, InputLeftElement } from '@chakra-ui/react';
+import { Input, Flex, InputGroup, InputLeftElement, useColorMode } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
+
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
@@ -7,39 +8,43 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ value, onChange, placeholder = "Search..." }: SearchBarProps) {
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
+
   return (
     <Flex flex="1" maxWidth="600px" mr={4}>
-      <InputGroup>
+      <InputGroup size="lg">
         <InputLeftElement
           pointerEvents="none"
           height="100%"
-          pl={3}
-          color="gray.500"
+          pl={4}
+          color={isDark ? 'gray.500' : 'gray.400'}
         >
-          <SearchIcon />
+          <SearchIcon boxSize={4} />
         </InputLeftElement>
         <Input
           placeholder={placeholder}
           flex="1"
-          borderColor="gray.300"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          height="48px"
-          borderRadius="full"
-          paddingX={6}
-          paddingLeft={12} // Add extra padding to accommodate the icon
-          fontSize="lg"
-          bg="rgba(255, 255, 255, 0.43)"
-          borderWidth="1px"
+          height="44px"
+          borderRadius="xl"
+          pl={12}
+          pr={4}
+          fontSize="sm"
+          fontWeight="400"
+          bg={isDark ? 'rgba(255, 255, 255, 0.05)' : 'white'}
+          border="1px solid"
+          borderColor={isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}
           _hover={{
-            borderColor: "blue.400",
-            boxShadow: "0 0 0 1px blue.400"
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'gray.300',
           }}
           _focus={{
-            borderColor: "blue.500",
-            boxShadow: "0 0 0 2px blue.500",
-            bg: "white"
+            borderColor: 'brand.400',
+            boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.12)',
+            bg: isDark ? 'rgba(255, 255, 255, 0.08)' : 'white',
           }}
+          transition="all 0.15s ease"
         />
       </InputGroup>
     </Flex>

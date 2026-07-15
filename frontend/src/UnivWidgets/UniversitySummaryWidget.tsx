@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Text, Flex, Circle, Badge, Grid, GridItem } from '@chakra-ui/react';
-import { FaCity, FaMapMarkedAlt, FaUniversity } from 'react-icons/fa';
+import { Box, Text, Flex, Circle, Badge, Grid, GridItem, useColorMode } from '@chakra-ui/react';
 import SmallAttributeBox from 'src/containers/SmallAttributesBox';
 
 interface UniversitySummaryWidgetProps {
@@ -57,149 +56,147 @@ const sizeBadgeColors: Record<string, string> = {
 
 const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ universityName, rank, isPublic,
     sectorScorecard, region = "Midwest", citySize = "Medium", collegeSize = "Large" }) => {
+    const { colorMode } = useColorMode();
+    const isDark = colorMode === 'dark';
+
     return (
         <Box
-            p={{ base: 2, md: 4 }}
-            borderRadius="md"
-            minHeight="120px"
+            p={{ base: 3, md: 5 }}
+            borderRadius="xl"
             mb={4}
+            bg={isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)'}
+            border="1px solid"
+            borderColor={isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}
         >
-            <Flex alignItems="center" justifyContent="space-between" gap={{ base: 4, md: 0 }} flexDirection={{ base: "column", md: "row" }}>
-                <Flex alignItems="flex-start" gap={{ base: 2, md: 8 }}>
+            <Flex alignItems="center" justifyContent="space-between" gap={4} flexDirection={{ base: "column", md: "row" }}>
+                <Flex alignItems="flex-start" gap={{ base: 3, md: 6 }}>
                     <Circle
-                        size={{ base: "30px", md: "60px" }}
-                        bg={"blue.500"}
+                        size={{ base: "36px", md: "48px" }}
+                        bg="brand.500"
                         color="white"
+                        flexShrink={0}
                     >
-                        <Text fontSize={{ base: "lg", md: "2xl" }} fontWeight="bold">{rank || 'N/A'}</Text>
+                        <Text fontSize={{ base: "sm", md: "lg" }} fontWeight="700">{rank || 'N/A'}</Text>
                     </Circle>
                     <Box>
-                        <Text fontSize={{ base: "lg", md: "3xl" }} fontWeight="bold">{universityName}</Text>
+                        <Text
+                            fontSize={{ base: "md", md: "xl" }}
+                            fontWeight="600"
+                            color={isDark ? 'gray.100' : 'gray.800'}
+                            lineHeight="short"
+                        >
+                            {universityName}
+                        </Text>
                         <Flex
-                            gap={{ base: 1, md: 4 }}
+                            gap={3}
                             mt={1}
                             alignItems="center"
                             flexDirection={{ base: "column", md: "row" }}
-                            display={{ base: "flex", md: "flex" }}
                         >
-                            <Text fontSize={{ base: "xs", md: "md" }} color="gray.600">123 University Ave, City, State</Text>
+                            <Text
+                                fontSize={{ base: "xs", md: "sm" }}
+                                color={isDark ? 'gray.400' : 'gray.500'}
+                            >
+                                123 University Ave, City, State
+                            </Text>
                             <Badge
                                 colorScheme="green"
                                 borderRadius="full"
                                 px={2}
-                                py={1}
-                                fontSize={{ base: "2xs", md: "sm" }}
-                                whiteSpace="nowrap"
-                                display={{ base: "none", md: "flex" }} // Hide on mobile, show on desktop
+                                py={0.5}
+                                fontSize="xs"
+                                fontWeight="500"
+                                display={{ base: "none", md: "inline-flex" }}
                             >
-                                <Flex alignItems="center" gap={1}>
-                                    <Box fontSize={{ base: "2xs", md: "sm" }}>✓</Box>
-                                    <Text fontSize={{ base: "2xs", md: "sm" }}>Middle States Commission</Text>
-                                </Flex>
-                            </Badge>
-                        </Flex>
-
-                        {/* Accreditation badge - only shown on mobile as separate row */}
-                        <Flex
-                            mt={{ base: 1, md: 0 }}
-                            justifyContent={{ base: "center", md: "flex-start" }}
-                            display={{ base: "flex", md: "none" }} // Show on mobile, hide on desktop
-                        >
-                            <Badge colorScheme="green" borderRadius="full" px={2} py={1} fontSize="2xs" whiteSpace="nowrap">
-                                <Flex alignItems="center" gap={1}>
-                                    <Box fontSize="2xs">✓</Box>
-                                    <Text fontSize="2xs">Middle States Commission</Text>
-                                </Flex>
+                                ✓ Accredited
                             </Badge>
                         </Flex>
                     </Box>
                 </Flex>
 
-                <Flex direction="column" gap={2} alignItems={{ base: "flex-start", md: "flex-end" }} mt={{ base: 2, md: 0 }} flexDirection={{ md: "column", base: "row" }}>
+                <Flex direction="column" gap={2} alignItems={{ base: "flex-start", md: "flex-end" }}>
                     <Badge
                         borderRadius="full"
-                        px={4}
-                        py={1}
+                        px={3}
+                        py={0.5}
                         colorScheme={isPublic ? 'blue' : 'purple'}
-                        fontSize={{ base: "xs", md: "sm" }}
+                        fontSize="xs"
+                        fontWeight="500"
                     >
                         {isPublic ? 'Public' : 'Private'}
                     </Badge>
                     <Box
                         as="button"
-                        bg="blue.500"
+                        bg="brand.500"
                         color="white"
                         px={3}
-                        py={1.5}
+                        py={1}
                         borderRadius="full"
-                        _hover={{ bg: "blue.600" }}
-                        maxW="200px"
+                        _hover={{ bg: 'brand.600' }}
                         textAlign="center"
-                        fontSize={{ base: "xs", md: "sm" }}
-                        onClick={() => window.open('https://www.university.edu', '_blank')}
+                        fontSize="xs"
+                        fontWeight="500"
+                        transition="all 0.15s ease"
                     >
                         Website
                     </Box>
                 </Flex>
             </Flex>
 
-            <Flex gap={3} mt={4} width="100%" flexWrap="wrap" justifyContent="center">
-                <Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }} gap={3} width="100%">
-                    {sectorScorecard && (
-                        <GridItem>
-                            <SmallAttributeBox>
-                                <Text fontSize={{ base: "2xs", md: "sm" }}>Classification:</Text>
-                                <Text fontSize={{ base: "xs", md: "md" }} fontWeight="bold" wordBreak="break-word">{sectorLabels[sectorScorecard] || 'Unknown'}</Text>
-                            </SmallAttributeBox>
-                        </GridItem>
-                    )}
-                    {/* Region Box */}
+            <Grid
+                templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }}
+                gap={2}
+                mt={4}
+                w="100%"
+            >
+                {sectorScorecard && (
                     <GridItem>
                         <SmallAttributeBox>
-                            <Text fontSize={{ base: "2xs", md: "sm" }}>Region:</Text>
-                            <Text fontSize={{ base: "xs", md: "md" }} fontWeight="bold">{region || 'Unknown'}</Text>
+                            <Text fontSize="2xs" color={isDark ? 'gray.500' : 'gray.400'}>Classification</Text>
+                            <Text fontSize="xs" fontWeight="600" wordBreak="break-word" mt={0.5}>
+                                {sectorLabels[sectorScorecard] || 'Unknown'}
+                            </Text>
                         </SmallAttributeBox>
                     </GridItem>
+                )}
+                <GridItem>
+                    <SmallAttributeBox>
+                        <Text fontSize="2xs" color={isDark ? 'gray.500' : 'gray.400'}>Region</Text>
+                        <Text fontSize="xs" fontWeight="600" mt={0.5}>{region || 'Unknown'}</Text>
+                    </SmallAttributeBox>
+                </GridItem>
+                <GridItem>
+                    <SmallAttributeBox>
+                        <Text fontSize="2xs" color={isDark ? 'gray.500' : 'gray.400'}>Urban Index</Text>
+                        <Text fontSize="xs" fontWeight="600" mt={0.5}>{citySize || 'Unknown'}</Text>
+                    </SmallAttributeBox>
+                </GridItem>
+                <GridItem>
+                    <SmallAttributeBox>
+                        <Text fontSize="2xs" color={isDark ? 'gray.500' : 'gray.400'}>College Size</Text>
+                        <Text fontSize="xs" fontWeight="600" mt={0.5}>{collegeSize || 'Unknown'}</Text>
+                    </SmallAttributeBox>
+                </GridItem>
+            </Grid>
 
-                    {/* City Size Box */}
-                    <GridItem>
-                        <SmallAttributeBox>
-                            <Text fontSize={{ base: "2xs", md: "sm" }}>Urban Index:</Text>
-                            <Text fontSize={{ base: "xs", md: "md" }} fontWeight="bold">{citySize || 'Unknown'} City</Text>
-                        </SmallAttributeBox>
-                    </GridItem>
-
-                    {/* College Size Box */}
-                    <GridItem>
-                        <SmallAttributeBox>
-                            <Text fontSize={{ base: "2xs", md: "sm" }}>College Size:</Text>
-                            <Text fontSize={{ base: "xs", md: "md" }} fontWeight="bold">{collegeSize || 'Unknown'} College</Text>
-                        </SmallAttributeBox>
-                    </GridItem>
-                </Grid>
-            </Flex>
-            
-
-            <Flex gap={8} mt={4} width="100%" justifyContent="center">
-                <Box
-                    as="button"
-                    bg="blue.500"
-                    color="white"
-                    px={3}
-                    py={1.5}
-                    borderRadius="full"
-                    _hover={{ bg: "blue.600" }}
-                    flex="1"
-                    minH="40px"
-                    textAlign="center"
-                    fontSize={{ base: "xs", md: "sm" }}
-                    opacity={0.7}
-                    cursor="not-allowed"
-                    title="Coming soon"
-                >
-                    View Details
-                </Box>
-            </Flex>
+            <Box
+                as="button"
+                w="100%"
+                mt={4}
+                py={2}
+                borderRadius="lg"
+                bg={isDark ? 'rgba(255,255,255,0.05)' : 'gray.50'}
+                border="1px solid"
+                borderColor={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'}
+                color={isDark ? 'gray.400' : 'gray.500'}
+                fontSize="xs"
+                fontWeight="500"
+                cursor="not-allowed"
+                opacity={0.7}
+                transition="all 0.15s ease"
+            >
+                View Details
+            </Box>
         </Box>
     );
 };

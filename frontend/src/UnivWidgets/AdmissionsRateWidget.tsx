@@ -86,8 +86,8 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
               paddingAngle={5}
               dataKey="value"
             >
-              <Cell fill={color} stroke={"white"} strokeWidth={1} />
-              <Cell fill="#EDF2F7" stroke={"white"} strokeWidth={1} />
+              <Cell fill={color} stroke={isDark ? 'rgba(20,24,36,0.5)' : 'white'} strokeWidth={1} />
+              <Cell fill={isDark ? 'rgba(255,255,255,0.06)' : '#EDF2F7'} stroke={isDark ? 'rgba(20,24,36,0.5)' : 'white'} strokeWidth={1} />
             </Pie>
             <text
               x="50%"
