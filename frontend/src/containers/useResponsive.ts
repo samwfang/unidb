@@ -44,7 +44,7 @@ const getScreenInfo = (width: number): Omit<ResponsiveInfo, 'width' | 'height'> 
       isTablet: true,
       isDesktop: false,
       visibleColumnCount: 3,
-      chartRadius: { inner: 60, outer: 80 },
+      chartRadius: { inner: 50, outer: 65 },
       rowHeightEstimate: 55,
     };
   }
@@ -65,7 +65,7 @@ const getScreenInfo = (width: number): Omit<ResponsiveInfo, 'width' | 'height'> 
     isTablet: false,
     isDesktop: true,
     visibleColumnCount: 3,
-    chartRadius: { inner: 75, outer: 100 },
+    chartRadius: { inner: 60, outer: 80 },
     rowHeightEstimate: 61,
   };
 };
