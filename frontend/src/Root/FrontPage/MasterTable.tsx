@@ -541,13 +541,13 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
 
       {/* Table */}
       <Box
-        overflowX="auto"
+        overflowX={{ base: "auto", md: "hidden" }}
         borderRadius="xl"
         width="100%"
       >
         <Box
           minH={`${calculatedMinHeight}px`}
-          minW={{ base: "300px", md: "600px", lg: "800px" }}
+          minW={{ base: "300px" }}
           w="100%"
         >
           {isLoading ? (
