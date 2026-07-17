@@ -79,7 +79,15 @@ CREATE TABLE university_grad_stats (
 -- One row per university.
 -- ============================================================
 
-CREATE TABLE university_demographics (
+CREATE TABLE university_undergrad_demographics (
+    id              SERIAL PRIMARY KEY,
+    university_id   INT NOT NULL UNIQUE REFERENCES universities(id),
+    gender_data     JSONB,
+    ethnicity_data  JSONB,
+    income_data     JSONB
+);
+
+CREATE TABLE university_grad_demographics (
     id              SERIAL PRIMARY KEY,
     university_id   INT NOT NULL UNIQUE REFERENCES universities(id),
     gender_data     JSONB,
