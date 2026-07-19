@@ -1,10 +1,40 @@
 import argparse
 import csv
+import json
 import os
 import sys
 
 import psycopg2
 from dotenv import load_dotenv
+
+
+# ──────────────────────────────────────────────────────────────
+# Helpers
+# ──────────────────────────────────────────────────────────────
+
+def parse_float(val):
+    """Parse a CSV value to float, returning None for non-numeric entries."""
+    if val in (None, "", "NA", "NULL", "PrivacySuppressed", "PS"):
+        return None
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return None
+
+
+def parse_int(val):
+    """Parse a CSV value to int, returning None for non-numeric entries."""
+    f = parse_float(val)
+    if f is None:
+        return None
+    return int(f)
+
+
+CONTROL_MAP = {
+    "1": "public",
+    "2": "private_nonprofit",
+    "3": "private_forprofit",
+}
 
 
 # ──────────────────────────────────────────────────────────────
@@ -52,23 +82,123 @@ def map_row(row):
             "cost_aid": { ... },
         }
     """
-    # TODO: Map CSV columns to table fields.
-    # The CSV columns come from the College Scorecard data dictionary
-    # (see CollegeScorecardDataDictionary.xlsx, institution_data_dictionary sheet).
-    #
-    # Example mapping stub:
-    #   "universities": {
-    #       "name": row.get("INSTNM"),
-    #       "location": row.get("CITY") + ", " + row.get("STABBR"),
-    #       ...
-    #   }
+    control = row.get("CONTROL", "")
+
+    # --- universities ---
+    universities = {
+        "unit_id": parse_int(row.get("UNITID")),
+        "name": row.get("INSTNM") or None,
+        "location": (f"{row['CITY']}, {row['STABBR']}" if row.get("CITY") and row.get("STABBR") else None),
+        "website": row.get("INSTURL") or None,
+        "is_public": control == "1",
+        "sector_type": CONTROL_MAP.get(control),
+    }
+
+    # --- shared institution-level values ---
+    admissions_rate = parse_float(row.get("ADM_RATE")) or parse_float(row.get("ADM_RATE_SUPP"))
+    student_faculty_ratio = parse_float(row.get("STUFACR"))
+    avg_household_income = parse_float(row.get("FAMINC"))
+    avg_household_income_int = int(avg_household_income) if avg_household_income is not None else None
+
+    # SAT is verbal + math midpoints summed
+    sat_vr = parse_float(row.get("SATVRMID"))
+    sat_mt = parse_float(row.get("SATMTMID"))
+    sat_score = int(sat_vr + sat_mt) if sat_vr is not None and sat_mt is not None else None
+
+    # --- undergrad_stats ---
+    undergrad_stats = {
+        "total_students": parse_int(row.get("UGDS")),
+        "graduation_rate": parse_float(row.get("C150_4")),
+        "admissions_rate": admissions_rate,
+        "student_faculty_ratio": student_faculty_ratio,
+        "average_class_size": None,
+        "avg_household_income": avg_household_income_int,
+        "sat_score": sat_score,
+        "act_score": parse_int(row.get("ACTCM50")),
+    }
+
+    # --- grad_stats ---
+    # Scorecard does not have separate grad admission rates or student-faculty
+    # ratios — these are institution-level, so we reuse the same values.
+    grad_stats = {
+        "total_students": parse_int(row.get("GRADS")),
+        "graduation_rate": parse_float(row.get("C150_4")),
+        "admissions_rate": admissions_rate,
+        "student_faculty_ratio": student_faculty_ratio,
+        "average_class_size": None,
+        "avg_household_income": avg_household_income_int,
+    }
+
+    # --- undergrad_demographics ---
+    # Assemble JSONB arrays from individual percentage columns.
+    # Values are decimals (0.0-1.0); multiply by 100 for display.
+    def pct(val):
+        f = parse_float(val)
+        return round(f * 100, 2) if f is not None else None
+
+    gender_entries = [
+        {"name": "Male", "value": pct(row.get("UGDS_MEN"))},
+        {"name": "Female", "value": pct(row.get("UGDS_WOMEN"))},
+    ]
+    gender_data = [e for e in gender_entries if e["value"] is not None] or None
+
+    ethnicity_map = [
+        ("White", "UGDS_WHITE"),
+        ("Black", "UGDS_BLACK"),
+        ("Hispanic", "UGDS_HISP"),
+        ("Asian", "UGDS_ASIAN"),
+        ("American Indian", "UGDS_AIAN"),
+        ("Native Hawaiian/Pacific Islander", "UGDS_NHPI"),
+        ("Two or More Races", "UGDS_2MOR"),
+        ("Non-resident Alien", "UGDS_NRA"),
+        ("Unknown", "UGDS_UNKN"),
+    ]
+    ethnicity_entries = [{"name": name, "value": pct(row.get(col))} for name, col in ethnicity_map]
+    ethnicity_data = [e for e in ethnicity_entries if e["value"] is not None] or None
+
+    income_map = [
+        ("< $30k", "INC_PCT_LO"),
+        ("$30k - $48k", "INC_PCT_M1"),
+        ("$48k - $75k", "INC_PCT_M2"),
+        ("$75k - $110k", "INC_PCT_H1"),
+        ("> $110k", "INC_PCT_H2"),
+    ]
+    income_entries = [{"name": name, "value": pct(row.get(col))} for name, col in income_map]
+    income_data = [e for e in income_entries if e["value"] is not None] or None
+
+    undergrad_demographics = {
+        "gender_data": gender_data,
+        "ethnicity_data": ethnicity_data,
+        "income_data": income_data,
+    }
+
+    # --- grad_demographics ---
+    # Scorecard does not provide separate grad demographic breakdowns.
+    grad_demographics = {
+        "gender_data": None,
+        "ethnicity_data": None,
+        "income_data": None,
+    }
+
+    # --- cost_aid ---
+    cost_aid = {
+        "tuition_in_state": parse_int(row.get("TUITIONFEE_IN")),
+        "tuition_out_state": parse_int(row.get("TUITIONFEE_OUT")),
+        "room_board": None,
+        "avg_grantaid": None,
+        "avg_net_price_overall": parse_int(row.get("COSTT4_A")),
+        "avg_net_price_by_income": None,
+        "median_debt_overall": parse_int(row.get("DEBT_MDN")),
+        "median_debt_by_income": None,
+    }
+
     return {
-        "universities": {},
-        "undergrad_stats": {},
-        "grad_stats": {},
-        "undergrad_demographics": {},
-        "grad_demographics": {},
-        "cost_aid": {},
+        "universities": universities,
+        "undergrad_stats": undergrad_stats,
+        "grad_stats": grad_stats,
+        "undergrad_demographics": undergrad_demographics,
+        "grad_demographics": grad_demographics,
+        "cost_aid": cost_aid,
     }
 
 
@@ -157,7 +287,6 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Parse and map rows without writing to the database")
     args = parser.parse_args()
 
-    db_url = load_config()
     rows = read_csv(args.csv_path)
     print(f"Read {len(rows)} rows from {args.csv_path}")
 
@@ -166,9 +295,11 @@ def main():
             mapped = map_row(row)
             print(f"\nRow {i}:")
             for table, fields in mapped.items():
-                print(f"  {table}: {fields}")
+                print(f"  {table}: {json.dumps(fields, indent=4)}")
         print(f"\nDry run complete. {len(rows)} rows would be imported.")
         return
+
+    db_url = load_config()
 
     conn = get_connection(db_url)
     try:
