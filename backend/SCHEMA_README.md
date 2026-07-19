@@ -15,8 +15,11 @@ One row per university. Contains undergraduate-level statistics with paired perc
 ### `university_grad_stats`
 Same structure as undergrad stats but without SAT/ACT fields. Separate table because the two modes have different column sets.
 
-### `university_demographics`
-One row per university. Stores gender, ethnicity, and income breakdowns as JSONB arrays of `{"name": "...", "value": N}` objects.
+### `university_undergrad_demographics`
+One row per university. Stores undergraduate gender, ethnicity, and income breakdowns as JSONB arrays of `{"name": "...", "value": N}` objects.
+
+### `university_grad_demographics`
+Same structure as undergrad demographics but for graduate students.
 
 ### `university_cost_aid`
 One row per university. Tuition, room & board, grant/aid averages, and debt figures. Bracket-level breakdowns (e.g. cost by income bracket) are stored as JSONB.
@@ -39,7 +42,8 @@ Per-department metrics linked to a specific `department_id` and `mode` (`undergr
 universities
 ├── university_undergrad_stats  (1:1)
 ├── university_grad_stats       (1:1)
-├── university_demographics     (1:1)
+├── university_undergrad_demographics  (1:1)
+├── university_grad_demographics       (1:1)
 ├── university_cost_aid         (1:1)
 └── departments                 (1:N)
     └── department_statistics   (1:N)
@@ -52,7 +56,7 @@ universities
 SELECT u.*, s.*, d.*, c.*
 FROM universities u
 JOIN university_undergrad_stats s ON s.university_id = u.id
-LEFT JOIN university_demographics d ON d.university_id = u.id
+LEFT JOIN university_undergrad_demographics d ON d.university_id = u.id
 LEFT JOIN university_cost_aid c ON c.university_id = u.id
 WHERE u.id = ?;
 ```

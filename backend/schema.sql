@@ -160,7 +160,8 @@ CREATE INDEX idx_universities_sector ON universities(sector_type);
 CREATE INDEX idx_undergrad_university ON university_undergrad_stats(university_id);
 CREATE INDEX idx_grad_university ON university_grad_stats(university_id);
 
-CREATE INDEX idx_demographics_university ON university_demographics(university_id);
+CREATE INDEX idx_undergrad_demographics_university ON university_undergrad_demographics(university_id);
+CREATE INDEX idx_grad_demographics_university ON university_grad_demographics(university_id);
 CREATE INDEX idx_cost_aid_university ON university_cost_aid(university_id);
 
 CREATE INDEX idx_departments_university ON departments(university_id);
