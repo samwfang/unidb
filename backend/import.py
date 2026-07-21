@@ -441,6 +441,18 @@ def insert_cost_aid(conn, university_id, data):
 
 # ──────────────────────────────────────────────────────────────
 # Field of Study Import
+#
+# Imports department-level data from the College Scorecard Field
+# of Study CSV. The main goal is to estimate per-department
+# undergraduate enrollment by computing each department's share
+# of total awards and multiplying by the institution's UGDS.
+#
+# Pipeline:
+#   read_fos_csv()         → parse the raw CSV
+#   group_fos_rows()       → aggregate by (unit_id, cip_code, cred_lev)
+#   compute_awards_by_level() → sum total awards per (unit_id, cred_lev)
+#   estimate_enrollment()  → compute percentage × enrollment base
+#   insert_department() + insert_department_statistics() → write to DB
 # ──────────────────────────────────────────────────────────────
 
 # CREDLEV mapping: credential level → mode (undergrad/grad)
@@ -463,7 +475,11 @@ CREDLEV_INCLUDE_DEBT_EARNINGS = {3, 5, 6}
 
 
 def read_fos_csv(path):
-    """Read Field of Study CSV and return list of row dicts."""
+    """Read Field of Study CSV and return a list of row dicts.
+
+    The CSV contains one row per institution × CIP code × credential level,
+    with columns for award counts, debt, and earnings data.
+    """
     with open(path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         return list(reader)
@@ -472,13 +488,22 @@ def read_fos_csv(path):
 def group_fos_rows(rows):
     """Group Field of Study rows by (UNITID, CIPCODE, CREDLEV).
 
+    Aggregates award counts across all rows sharing the same institution,
+    CIP code, and credential level. Skips rows with no awards (IPEDSCOUNT2)
+    or unrecognized credential levels.
+
+    Debt and earnings are only captured from Bachelor's (CREDLEV=3) for
+    undergrad, and Master's/Doctoral (CREDLEV=5,6) for grad. Certificate
+    and associate's degree rows are excluded from debt/earnings because
+    those credential levels have different financial profiles.
+
     Returns:
         {
             (unit_id, cip_code, cred_lev): {
-                "cip_desc": str,
-                "total_awards": int,          # sum of IPEDSCOUNT2
-                "median_debt": int or None,
-                "median_earnings_4yr": int or None,
+                "cip_desc": str,               # CIP field description
+                "total_awards": int,            # sum of IPEDSCOUNT2
+                "median_debt": int or None,     # from DEBT_ALL_STGP_ANY_MDN
+                "median_earnings_4yr": int or None,  # from EARN_MDN_4YR
             }
         }
     """
@@ -521,6 +546,10 @@ def group_fos_rows(rows):
 def compute_awards_by_level(grouped):
     """Compute total awards per (unit_id, cred_lev) for percentage calculation.
 
+    This is used as the denominator when computing each department's share
+    of total awards at a given credential level (e.g., all Bachelor's awards
+    at a university).
+
     Returns:
         {
             (unit_id, cred_lev): total_awards
@@ -536,19 +565,30 @@ def compute_awards_by_level(grouped):
 def estimate_enrollment(grouped, level_totals, ugds_map, grads_map):
     """Estimate per-department student counts using awards-based percentages.
 
+    The estimation formula is:
+        percentage = department_awards / total_awards_at_level
+        estimated_students = round(percentage × enrollment_base)
+
+    where enrollment_base is UGDS for undergrad or GRADS for grad.
+
+    Note: This is an approximation. Awards ≠ enrollment — students who
+    don't complete their degree don't appear in the awards data. Programs
+    with low completion rates will appear smaller than they actually are.
+
     Args:
         grouped: Output of group_fos_rows()
         level_totals: Output of compute_awards_by_level()
         ugds_map: {unit_id: UGDS} from institution CSV
-        grads_map: {unit_id: GRADS} from institution CSV
+        grads_map: {unit_id: GRADS} from institution CSV (currently unused)
 
     Returns:
         list of {
             "unit_id": int,
             "cip_code": str,
-            "mode": str,
-            "total_students": int,
-            "total_awards": int,
+            "cip_desc": str,
+            "mode": str,                 # "undergrad" or "grad"
+            "total_students": int,        # estimated enrollment
+            "total_awards": int,          # department's award count
             "median_debt": int or None,
             "median_earnings_4yr": int or None,
         }
@@ -589,7 +629,12 @@ def estimate_enrollment(grouped, level_totals, ugds_map, grads_map):
 
 
 def insert_department(conn, university_id, cip_code, name):
-    """Insert or get a department row. Returns department_id."""
+    """Insert or get a department row. Returns department_id.
+
+    Uses ON CONFLICT (university_id, cip_code) to handle re-imports:
+    if the department already exists, it updates the name and returns
+    the existing id.
+    """
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -605,7 +650,12 @@ def insert_department(conn, university_id, cip_code, name):
 
 
 def insert_department_statistics(conn, department_id, data):
-    """Insert or update department statistics for undergrad only."""
+    """Insert or update department statistics for undergrad only.
+
+    Currently skips grad data — the awards-based estimation approach
+    does not work well for graduate programs because GRADS counts are
+    less reliable and the award-to-enrollment ratio varies widely.
+    """
     if data["mode"] != "undergrad":
         return  # Skip grad for now
     with conn.cursor() as cur:
@@ -677,7 +727,19 @@ def import_institution_csv(csv_path, db_url, dry_run=False):
 
 
 def import_fos_csv(fos_path, db_url, dry_run=False):
-    """Import Field of Study data: estimate department enrollment from awards."""
+    """Import Field of Study data: estimate department enrollment from awards.
+
+    Reads the Field of Study CSV, aggregates award counts by CIP code and
+    credential level, then estimates per-department enrollment using the
+    formula: (department_awards / total_awards) × UGDS.
+
+    Requires that institution data has already been imported (for UGDS values).
+
+    Args:
+        fos_path: Path to Most-Recent-Cohorts-Field-of-Study.csv
+        db_url: PostgreSQL connection string
+        dry_run: If True, print top estimates without writing to DB
+    """
     rows = read_fos_csv(fos_path)
     print(f"Read {len(rows)} Field of Study rows from {fos_path}")
 

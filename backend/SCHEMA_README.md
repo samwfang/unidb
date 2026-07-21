@@ -33,13 +33,19 @@ One row per university. Tuition, room & board, grant/aid averages, and debt figu
 Central registry of all departments across all universities. Each row ties a university to a CIP field classification code.
 
 - `UNIQUE(university_id, cip_code)` — one department per CIP field per university
-- `cip_code` is a short string like `"11"` (Computer & Info Sciences), `"14"` (Engineering), etc.
-- `name` is the university-specific department name (e.g. "Computer Science", "EECS")
+- `cip_code` is a short string like `"1101"` (Computer & Info Sciences, General), `"1419"` (Mechanical Engineering), etc.
+- `name` is the CIP description from the Field of Study CSV (e.g. "Computer Science", "Biology, General")
 
-### `department_statistics`
-Per-department metrics linked to a specific `department_id` and `mode` (`undergrad` or `grad`). Contains student count, graduation rate, and class size with percentiles.
+### `department_undergrad_statistics`
+Per-department undergraduate metrics. One row per department.
 
-- `UNIQUE(department_id, mode)` — one stat row per department per mode
+- `total_students` — estimated enrollment, computed as `(department_awards / total_awards_at_level) × UGDS`
+- `total_awards` — number of Bachelor's degrees awarded (IPEDSCOUNT2 sum for CREDLEV=3)
+- `median_debt` — median student debt for Bachelor's completers (`DEBT_ALL_STGP_ANY_MDN`)
+- `median_earnings_4yr` — median earnings 4 years after entry for Bachelor's completers (`EARN_MDN_4YR`)
+
+### `department_grad_statistics`
+Per-department graduate metrics. Same structure as undergrad but for grad programs. Currently not populated — the awards-based estimation approach needs review for graduate programs.
 
 ## Relationships
 
@@ -51,7 +57,8 @@ universities
 ├── university_grad_demographics       (1:1)
 ├── university_cost_aid         (1:1)
 └── departments                 (1:N)
-    └── department_statistics   (1:N)
+    ├── department_undergrad_statistics  (1:1)
+    └── department_grad_statistics       (1:1)
 ```
 
 ## Key Queries
@@ -71,15 +78,15 @@ WHERE u.id = ?;
 SELECT ds.*, u.name AS university_name
 FROM departments ds
 JOIN universities u ON u.id = ds.university_id
-WHERE ds.cip_code = '11';
+WHERE ds.cip_code = '1101';
 ```
 
-**Get department stats for a specific university:**
+**Get undergrad department stats for a specific university:**
 ```sql
-SELECT ds.*, d.name AS dept_name
-FROM department_statistics ds
-JOIN departments d ON d.id = ds.department_id
-WHERE d.university_id = ? AND d.cip_code = ?;
+SELECT d.cip_code, d.name, s.total_students, s.total_awards, s.median_debt, s.median_earnings_4yr
+FROM department_undergrad_statistics s
+JOIN departments d ON d.id = s.department_id
+WHERE d.university_id = ?;
 ```
 
 **Find unreliable graduation rates (small sample sizes):**

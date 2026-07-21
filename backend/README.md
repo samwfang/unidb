@@ -6,18 +6,33 @@
 cd backend
 cp .env.example .env   # then edit with your PostgreSQL credentials
 pip install -r requirements.txt
-python import.py data.csv
 ```
 
-Use `--dry-run` to preview parsed rows without writing to the database:
+## Commands
+
+### Import institution data
 
 ```bash
-python import.py data.csv --dry-run
+python import.py institution data.csv
+python import.py institution data.csv --dry-run
 ```
 
-## Data Source
+Imports from the [College Scorecard](https://collegescorecard.ed.gov/) institution CSV (`Most-Recent-Cohorts-Institution.csv`). Reads ~30 columns out of the 3,300+ available. See `COLUMN_MAPPING.md` for a full catalog.
 
-Imports from the [College Scorecard](https://collegescorecard.ed.gov/) CSV file (`Most-Recent-Cohorts-Institution.csv`). The import reads ~30 columns out of the 3,300+ available in the Scorecard. See `COLUMN_MAPPING.md` for a full catalog of available variables.
+### Import department-level statistics (Field of Study)
+
+```bash
+python import.py fos data.csv
+python import.py fos data.csv --dry-run
+```
+
+Imports from the Field of Study CSV (`Most-Recent-Cohorts-Field-of-Study.csv`). Estimates per-department undergraduate enrollment by:
+
+1. Aggregating `IPEDSCOUNT2` (awards granted) per CIP code and credential level
+2. Computing each department's share of total awards at that credential level
+3. Multiplying that percentage by the institution's total undergrad enrollment (`UGDS`)
+
+Also captures median debt and median 4-year earnings, but only from Bachelor's degree completers (CREDLEV=3). Graduate department statistics are not imported yet — the estimation approach needs review for grad programs.
 
 ## How the PostgreSQL Environment Works
 
@@ -52,21 +67,33 @@ Transforms a single CSV row dict into a structured dict keyed by table name. Han
 
 ### `main()` transaction flow
 
-```
-load_config()          → gets DATABASE_URL from .env
-read_csv(path)         → parses CSV into list of dicts
-get_connection(db_url) → opens the PostgreSQL connection
+The CLI uses subparsers (`institution` and `fos`). Each calls its own import function:
 
-try:
-    for each row:
-        map_row(row)            → transforms CSV columns into table-specific dicts
-        insert_university()     → inserts into universities, returns the new id
-        insert_*()              → inserts into each related table using that id
-    conn.commit()               → saves all changes permanently
-except:
-    conn.rollback()             → undoes everything on any error
-finally:
-    conn.close()                → always releases the connection
+```
+institution subcommand:
+  load_config()          → gets DATABASE_URL from .env
+  read_csv(path)         → parses CSV into list of dicts
+  get_connection(db_url) → opens the PostgreSQL connection
+
+  try:
+      for each row:
+          map_row(row)            → transforms CSV columns into table-specific dicts
+          insert_university()     → inserts into universities, returns the new id
+          insert_*()              → inserts into each related table using that id
+      conn.commit()               → saves all changes permanently
+  except:
+      conn.rollback()             → undoes everything on any error
+  finally:
+      conn.close()                → always releases the connection
+
+fos subcommand:
+  load_config()              → gets DATABASE_URL from .env
+  read_fos_csv(path)         → parses Field of Study CSV
+  group_fos_rows()           → groups by (unit_id, cip_code, cred_lev), sums awards
+  compute_awards_by_level()  → totals awards per (unit_id, cred_lev)
+  estimate_enrollment()      → computes per-department student estimates
+
+  (same transaction pattern as above)
 ```
 
 Key points about this flow:
@@ -80,21 +107,29 @@ Key points about this flow:
 The inserts follow the foreign key dependency chain:
 
 ```
+institution import:
 universities  (must go first — other tables reference its id)
   ├── university_undergrad_stats
   ├── university_grad_stats
   ├── university_undergrad_demographics
   ├── university_grad_demographics
   └── university_cost_aid
+
+fos import:
+universities  (must already exist)
+  └── departments                (created/upserted per CIP code)
+      └── department_undergrad_statistics  (estimated enrollment, debt, earnings)
 ```
 
 All `insert_*` functions use `INSERT ... ON CONFLICT` for idempotent upserts — re-running the import on the same CSV updates existing rows instead of failing with a duplicate key error.
 
 ### Insert functions
 
-Each function opens its own cursor within the caller's transaction. `insert_university` uses `RETURNING id` to provide the foreign key for child table inserts. The remaining five functions insert/update using `ON CONFLICT (university_id)`.
+Each function opens its own cursor within the caller's transaction. `insert_university` uses `RETURNING id` to provide the foreign key for child table inserts. The remaining functions insert/update using `ON CONFLICT`.
 
 - `insert_university` — conflicts on `unit_id` (College Scorecard's unique institution identifier)
 - `insert_undergrad_stats` / `insert_grad_stats` — conflicts on `university_id`
 - `insert_undergrad_demographics` / `insert_grad_demographics` — conflicts on `university_id`
 - `insert_cost_aid` — conflicts on `university_id`
+- `insert_department` — conflicts on `(university_id, cip_code)`
+- `insert_department_statistics` — conflicts on `department_id`; currently only writes to `department_undergrad_statistics` (grad is skipped)
