@@ -105,10 +105,19 @@ def map_row(row):
     sat_mt = parse_float(row.get("SATMTMID"))
     sat_score = int(sat_vr + sat_mt) if sat_vr is not None and sat_mt is not None else None
 
+    # Graduation rate: prefer pooled (2-year rolling avg) over raw single-year.
+    # Reliable flag: True unless the _SUPP column is "PS" (suppressed, n<30).
+    graduation_rate = parse_float(row.get("C150_4_POOLED")) or parse_float(row.get("C150_4"))
+    graduation_rate_extended = parse_float(row.get("C200_4_POOLED")) or parse_float(row.get("C200_4"))
+    supp_val = row.get("C150_4_POOLED_SUPP", "")
+    graduation_rate_reliable = supp_val not in ("PS", "PrivacySuppressed", "")
+
     # --- undergrad_stats ---
     undergrad_stats = {
         "total_students": parse_int(row.get("UGDS")),
-        "graduation_rate": parse_float(row.get("C150_4")),
+        "graduation_rate": graduation_rate,
+        "graduation_rate_extended": graduation_rate_extended,
+        "graduation_rate_reliable": graduation_rate_reliable,
         "admissions_rate": admissions_rate,
         "student_faculty_ratio": student_faculty_ratio,
         "average_class_size": None,
@@ -122,7 +131,9 @@ def map_row(row):
     # ratios — these are institution-level, so we reuse the same values.
     grad_stats = {
         "total_students": parse_int(row.get("GRADS")),
-        "graduation_rate": parse_float(row.get("C150_4")),
+        "graduation_rate": graduation_rate,
+        "graduation_rate_extended": graduation_rate_extended,
+        "graduation_rate_reliable": graduation_rate_reliable,
         "admissions_rate": admissions_rate,
         "student_faculty_ratio": student_faculty_ratio,
         "average_class_size": None,
@@ -211,6 +222,8 @@ def insert_university(conn, data):
 
     Columns: id, unit_id, name, location, website, is_public, sector_type, icon,
              created_at, updated_at
+    
+    Return the id of the inserted or updated university.
     """
     with conn.cursor() as cur:
         cur.execute(
@@ -242,7 +255,8 @@ def insert_undergrad_stats(conn, university_id, data):
     """Insert into university_undergrad_stats table.
 
     Columns: id, university_id, total_students, total_students_percentile,
-             graduation_rate, graduation_rate_percentile, admissions_rate,
+             graduation_rate, graduation_rate_extended, graduation_rate_reliable,
+             graduation_rate_percentile, admissions_rate,
              admissions_rate_percentile, student_faculty_ratio,
              student_faculty_ratio_percentile, average_class_size,
              avg_household_income, avg_household_income_percentile,
@@ -253,25 +267,30 @@ def insert_undergrad_stats(conn, university_id, data):
         cur.execute(
             """
             INSERT INTO university_undergrad_stats
-                (university_id, total_students, graduation_rate, admissions_rate,
-                 student_faculty_ratio, average_class_size, avg_household_income,
-                 sat_score, act_score)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                (university_id, total_students, graduation_rate,
+                 graduation_rate_extended, graduation_rate_reliable,
+                 admissions_rate, student_faculty_ratio, average_class_size,
+                 avg_household_income, sat_score, act_score)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (university_id) DO UPDATE SET
-                total_students       = EXCLUDED.total_students,
-                graduation_rate      = EXCLUDED.graduation_rate,
-                admissions_rate      = EXCLUDED.admissions_rate,
-                student_faculty_ratio = EXCLUDED.student_faculty_ratio,
-                average_class_size   = EXCLUDED.average_class_size,
-                avg_household_income = EXCLUDED.avg_household_income,
-                sat_score            = EXCLUDED.sat_score,
-                act_score            = EXCLUDED.act_score,
-                updated_at           = now()
+                total_students            = EXCLUDED.total_students,
+                graduation_rate           = EXCLUDED.graduation_rate,
+                graduation_rate_extended  = EXCLUDED.graduation_rate_extended,
+                graduation_rate_reliable  = EXCLUDED.graduation_rate_reliable,
+                admissions_rate           = EXCLUDED.admissions_rate,
+                student_faculty_ratio     = EXCLUDED.student_faculty_ratio,
+                average_class_size        = EXCLUDED.average_class_size,
+                avg_household_income      = EXCLUDED.avg_household_income,
+                sat_score                 = EXCLUDED.sat_score,
+                act_score                 = EXCLUDED.act_score,
+                updated_at                = now()
             """,
             (
                 university_id,
                 data["total_students"],
                 data["graduation_rate"],
+                data["graduation_rate_extended"],
+                data["graduation_rate_reliable"],
                 data["admissions_rate"],
                 data["student_faculty_ratio"],
                 data["average_class_size"],
@@ -286,7 +305,8 @@ def insert_grad_stats(conn, university_id, data):
     """Insert into university_grad_stats table.
 
     Columns: id, university_id, total_students, total_students_percentile,
-             graduation_rate, graduation_rate_percentile, admissions_rate,
+             graduation_rate, graduation_rate_extended, graduation_rate_reliable,
+             graduation_rate_percentile, admissions_rate,
              admissions_rate_percentile, student_faculty_ratio,
              student_faculty_ratio_percentile, average_class_size,
              avg_household_income, avg_household_income_percentile,
@@ -296,22 +316,28 @@ def insert_grad_stats(conn, university_id, data):
         cur.execute(
             """
             INSERT INTO university_grad_stats
-                (university_id, total_students, graduation_rate, admissions_rate,
-                 student_faculty_ratio, average_class_size, avg_household_income)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                (university_id, total_students, graduation_rate,
+                 graduation_rate_extended, graduation_rate_reliable,
+                 admissions_rate, student_faculty_ratio, average_class_size,
+                 avg_household_income)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (university_id) DO UPDATE SET
-                total_students       = EXCLUDED.total_students,
-                graduation_rate      = EXCLUDED.graduation_rate,
-                admissions_rate      = EXCLUDED.admissions_rate,
-                student_faculty_ratio = EXCLUDED.student_faculty_ratio,
-                average_class_size   = EXCLUDED.average_class_size,
-                avg_household_income = EXCLUDED.avg_household_income,
-                updated_at           = now()
+                total_students            = EXCLUDED.total_students,
+                graduation_rate           = EXCLUDED.graduation_rate,
+                graduation_rate_extended  = EXCLUDED.graduation_rate_extended,
+                graduation_rate_reliable  = EXCLUDED.graduation_rate_reliable,
+                admissions_rate           = EXCLUDED.admissions_rate,
+                student_faculty_ratio     = EXCLUDED.student_faculty_ratio,
+                average_class_size        = EXCLUDED.average_class_size,
+                avg_household_income      = EXCLUDED.avg_household_income,
+                updated_at                = now()
             """,
             (
                 university_id,
                 data["total_students"],
                 data["graduation_rate"],
+                data["graduation_rate_extended"],
+                data["graduation_rate_reliable"],
                 data["admissions_rate"],
                 data["student_faculty_ratio"],
                 data["average_class_size"],

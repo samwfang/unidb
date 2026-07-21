@@ -15,9 +15,13 @@ Use `--dry-run` to preview parsed rows without writing to the database:
 python import.py data.csv --dry-run
 ```
 
+## Data Source
+
+Imports from the [College Scorecard](https://collegescorecard.ed.gov/) CSV file (`Most-Recent-Cohorts-Institution.csv`). The import reads ~30 columns out of the 3,300+ available in the Scorecard. See `COLUMN_MAPPING.md` for a full catalog of available variables.
+
 ## How the PostgreSQL Environment Works
 
-### `load_config()` (import.py:14-20)
+### `load_config()` (import.py)
 
 This function handles all configuration before a database connection is made. It does two things in sequence:
 
@@ -33,21 +37,20 @@ postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
 
 psycopg2 parses this URL internally to extract the host, port, database name, username, and password.
 
-### `get_connection(db_url)` (import.py:23-24)
+### `get_connection(db_url)`
 
-Takes the validated connection string and passes it directly to `psycopg2.connect()`. This single call:
+Takes the validated connection string and passes it directly to `psycopg2.connect()`. The connection is **not** autocommit by default, so every `INSERT`/`UPDATE` runs inside a transaction that must be explicitly committed or rolled back.
 
-1. **Resolves the host** — DNS lookup on the hostname from the URL.
-2. **Opens a TCP socket** — Connects to the port (default 5432).
-3. **Authenticates** — Sends the username/password to PostgreSQL's authentication system.
-4. **Selects the database** — Issues a startup packet with the database name.
-5. **Returns a connection object** — This object represents a persistent session to the database. All queries and transactions go through it.
+### `map_row(row)`
 
-The connection is **not** autocommit by default. This means every `INSERT`/`UPDATE` runs inside a transaction that must be explicitly committed or rolled back — which is exactly how `main()` uses it (see below).
+Transforms a single CSV row dict into a structured dict keyed by table name. Handles:
 
-### `main()` transaction flow (import.py:154-197)
+- **Graduation rates**: Uses `C150_4_POOLED` (2-year rolling average) as the primary rate, with `C150_4` as fallback. `C200_4_POOLED` is used for the extended (8-year) rate. The `C150_4_POOLED_SUPP` column determines reliability — if the value is `PS` (suppressed, n<30), the rate is flagged as unreliable.
+- **Admissions rate**: Uses `ADM_RATE` with `ADM_RATE_SUPP` as fallback.
+- **SAT score**: Sum of verbal (`SATVRMID`) and math (`SATMTMID`) midpoints.
+- **Demographics**: Assembles JSONB arrays from individual percentage columns, multiplied by 100 for display.
 
-The `main()` function ties everything together:
+### `main()` transaction flow
 
 ```
 load_config()          → gets DATABASE_URL from .env
@@ -71,7 +74,6 @@ Key points about this flow:
 - **All inserts happen in one transaction.** Nothing is saved to the database until `conn.commit()` is called after all rows are processed. If the script crashes on row 500 out of 7000, zero rows are persisted — you can fix the issue and re-run without duplicates.
 - **`rollback()` on error** ensures a partial import doesn't leave the database in an inconsistent state.
 - **`finally: conn.close()`** guarantees the connection is released even if an unexpected exception (like `KeyboardInterrupt`) occurs.
-- **`conn.cursor()`** is used as a context manager (`with` block), which automatically closes the cursor when the block exits, even on exceptions.
 
 ### Table insertion order
 
@@ -86,4 +88,13 @@ universities  (must go first — other tables reference its id)
   └── university_cost_aid
 ```
 
-Each `insert_*` function (once implemented) will use `INSERT ... ON CONFLICT` so that re-running the import on the same CSV updates existing rows instead of failing with a duplicate key error.
+All `insert_*` functions use `INSERT ... ON CONFLICT` for idempotent upserts — re-running the import on the same CSV updates existing rows instead of failing with a duplicate key error.
+
+### Insert functions
+
+Each function opens its own cursor within the caller's transaction. `insert_university` uses `RETURNING id` to provide the foreign key for child table inserts. The remaining five functions insert/update using `ON CONFLICT (university_id)`.
+
+- `insert_university` — conflicts on `unit_id` (College Scorecard's unique institution identifier)
+- `insert_undergrad_stats` / `insert_grad_stats` — conflicts on `university_id`
+- `insert_undergrad_demographics` / `insert_grad_demographics` — conflicts on `university_id`
+- `insert_cost_aid` — conflicts on `university_id`
