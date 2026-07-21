@@ -8,6 +8,7 @@
 
 CREATE TABLE universities (
     id          SERIAL PRIMARY KEY,
+    unit_id     INT UNIQUE,
     name        TEXT NOT NULL,
     location    TEXT NOT NULL,
     website     TEXT,

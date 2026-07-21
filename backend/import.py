@@ -209,11 +209,33 @@ def map_row(row):
 def insert_university(conn, data):
     """Insert into universities table.
 
-    Columns: id, name, location, website, is_public, sector_type, icon,
+    Columns: id, unit_id, name, location, website, is_public, sector_type, icon,
              created_at, updated_at
     """
-    # TODO: Implement INSERT ... ON CONFLICT
-    pass
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO universities (unit_id, name, location, website, is_public, sector_type)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (unit_id) DO UPDATE SET
+                name        = EXCLUDED.name,
+                location    = EXCLUDED.location,
+                website     = EXCLUDED.website,
+                is_public   = EXCLUDED.is_public,
+                sector_type = EXCLUDED.sector_type,
+                updated_at  = now()
+            RETURNING id
+            """,
+            (
+                data["unit_id"],
+                data["name"],
+                data["location"],
+                data["website"],
+                data["is_public"],
+                data["sector_type"],
+            ),
+        )
+        return cur.fetchone()[0]
 
 
 def insert_undergrad_stats(conn, university_id, data):
@@ -227,8 +249,37 @@ def insert_undergrad_stats(conn, university_id, data):
              sat_score, sat_score_percentile, act_score, act_score_percentile,
              created_at, updated_at
     """
-    # TODO: Implement INSERT ... ON CONFLICT
-    pass
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO university_undergrad_stats
+                (university_id, total_students, graduation_rate, admissions_rate,
+                 student_faculty_ratio, average_class_size, avg_household_income,
+                 sat_score, act_score)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (university_id) DO UPDATE SET
+                total_students       = EXCLUDED.total_students,
+                graduation_rate      = EXCLUDED.graduation_rate,
+                admissions_rate      = EXCLUDED.admissions_rate,
+                student_faculty_ratio = EXCLUDED.student_faculty_ratio,
+                average_class_size   = EXCLUDED.average_class_size,
+                avg_household_income = EXCLUDED.avg_household_income,
+                sat_score            = EXCLUDED.sat_score,
+                act_score            = EXCLUDED.act_score,
+                updated_at           = now()
+            """,
+            (
+                university_id,
+                data["total_students"],
+                data["graduation_rate"],
+                data["admissions_rate"],
+                data["student_faculty_ratio"],
+                data["average_class_size"],
+                data["avg_household_income"],
+                data["sat_score"],
+                data["act_score"],
+            ),
+        )
 
 
 def insert_grad_stats(conn, university_id, data):
@@ -241,8 +292,32 @@ def insert_grad_stats(conn, university_id, data):
              avg_household_income, avg_household_income_percentile,
              created_at, updated_at
     """
-    # TODO: Implement INSERT ... ON CONFLICT
-    pass
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO university_grad_stats
+                (university_id, total_students, graduation_rate, admissions_rate,
+                 student_faculty_ratio, average_class_size, avg_household_income)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (university_id) DO UPDATE SET
+                total_students       = EXCLUDED.total_students,
+                graduation_rate      = EXCLUDED.graduation_rate,
+                admissions_rate      = EXCLUDED.admissions_rate,
+                student_faculty_ratio = EXCLUDED.student_faculty_ratio,
+                average_class_size   = EXCLUDED.average_class_size,
+                avg_household_income = EXCLUDED.avg_household_income,
+                updated_at           = now()
+            """,
+            (
+                university_id,
+                data["total_students"],
+                data["graduation_rate"],
+                data["admissions_rate"],
+                data["student_faculty_ratio"],
+                data["average_class_size"],
+                data["avg_household_income"],
+            ),
+        )
 
 
 def insert_undergrad_demographics(conn, university_id, data):
@@ -251,8 +326,24 @@ def insert_undergrad_demographics(conn, university_id, data):
     Columns: id, university_id, gender_data (JSONB), ethnicity_data (JSONB),
              income_data (JSONB)
     """
-    # TODO: Implement INSERT ... ON CONFLICT
-    pass
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO university_undergrad_demographics
+                (university_id, gender_data, ethnicity_data, income_data)
+            VALUES (%s, %s::jsonb, %s::jsonb, %s::jsonb)
+            ON CONFLICT (university_id) DO UPDATE SET
+                gender_data    = EXCLUDED.gender_data,
+                ethnicity_data = EXCLUDED.ethnicity_data,
+                income_data    = EXCLUDED.income_data
+            """,
+            (
+                university_id,
+                json.dumps(data["gender_data"]),
+                json.dumps(data["ethnicity_data"]),
+                json.dumps(data["income_data"]),
+            ),
+        )
 
 
 def insert_grad_demographics(conn, university_id, data):
@@ -261,8 +352,24 @@ def insert_grad_demographics(conn, university_id, data):
     Columns: id, university_id, gender_data (JSONB), ethnicity_data (JSONB),
              income_data (JSONB)
     """
-    # TODO: Implement INSERT ... ON CONFLICT
-    pass
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO university_grad_demographics
+                (university_id, gender_data, ethnicity_data, income_data)
+            VALUES (%s, %s::jsonb, %s::jsonb, %s::jsonb)
+            ON CONFLICT (university_id) DO UPDATE SET
+                gender_data    = EXCLUDED.gender_data,
+                ethnicity_data = EXCLUDED.ethnicity_data,
+                income_data    = EXCLUDED.income_data
+            """,
+            (
+                university_id,
+                json.dumps(data["gender_data"]),
+                json.dumps(data["ethnicity_data"]),
+                json.dumps(data["income_data"]),
+            ),
+        )
 
 
 def insert_cost_aid(conn, university_id, data):
@@ -273,8 +380,37 @@ def insert_cost_aid(conn, university_id, data):
              avg_net_price_by_income (JSONB), median_debt_overall,
              median_debt_by_income (JSONB), created_at, updated_at
     """
-    # TODO: Implement INSERT ... ON CONFLICT
-    pass
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO university_cost_aid
+                (university_id, tuition_in_state, tuition_out_state, room_board,
+                 avg_grantaid, avg_net_price_overall, avg_net_price_by_income,
+                 median_debt_overall, median_debt_by_income)
+            VALUES (%s, %s, %s, %s, %s, %s, %s::jsonb, %s, %s::jsonb)
+            ON CONFLICT (university_id) DO UPDATE SET
+                tuition_in_state      = EXCLUDED.tuition_in_state,
+                tuition_out_state     = EXCLUDED.tuition_out_state,
+                room_board            = EXCLUDED.room_board,
+                avg_grantaid          = EXCLUDED.avg_grantaid,
+                avg_net_price_overall = EXCLUDED.avg_net_price_overall,
+                avg_net_price_by_income = EXCLUDED.avg_net_price_by_income,
+                median_debt_overall   = EXCLUDED.median_debt_overall,
+                median_debt_by_income = EXCLUDED.median_debt_by_income,
+                updated_at            = now()
+            """,
+            (
+                university_id,
+                data["tuition_in_state"],
+                data["tuition_out_state"],
+                data["room_board"],
+                data["avg_grantaid"],
+                data["avg_net_price_overall"],
+                json.dumps(data["avg_net_price_by_income"]),
+                data["median_debt_overall"],
+                json.dumps(data["median_debt_by_income"]),
+            ),
+        )
 
 
 # ──────────────────────────────────────────────────────────────
