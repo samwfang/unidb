@@ -440,19 +440,207 @@ def insert_cost_aid(conn, university_id, data):
 
 
 # ──────────────────────────────────────────────────────────────
+# Field of Study Import
+# ──────────────────────────────────────────────────────────────
+
+# CREDLEV mapping: credential level → mode (undergrad/grad)
+# 1 = Undergraduate Certificate, 2 = Associate's, 3 = Bachelor's, 4 = Postbaccalaureate
+# 5 = Master's, 6 = Doctoral, 7 = First Professional, 8 = Graduate/Professional Certificate
+CREDLEV_MODE = {
+    1: "undergrad",
+    2: "undergrad",
+    3: "undergrad",
+    4: "undergrad",
+    5: "grad",
+    6: "grad",
+    7: "grad",
+    8: "grad",
+}
+
+# Debt/earnings only from these credential levels:
+# Bachelor's (3) for undergrad, Master's (5) and Doctoral (6) for grad
+CREDLEV_INCLUDE_DEBT_EARNINGS = {3, 5, 6}
+
+
+def read_fos_csv(path):
+    """Read Field of Study CSV and return list of row dicts."""
+    with open(path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        return list(reader)
+
+
+def group_fos_rows(rows):
+    """Group Field of Study rows by (UNITID, CIPCODE, CREDLEV).
+
+    Returns:
+        {
+            (unit_id, cip_code, cred_lev): {
+                "cip_desc": str,
+                "total_awards": int,          # sum of IPEDSCOUNT2
+                "median_debt": int or None,
+                "median_earnings_4yr": int or None,
+            }
+        }
+    """
+    grouped = {}
+    for row in rows:
+        unit_id = parse_int(row.get("UNITID"))
+        cip_code = row.get("CIPCODE")
+        cred_lev = parse_int(row.get("CREDLEV"))
+
+        if not all([unit_id, cip_code, cred_lev]):
+            continue
+        if cred_lev not in CREDLEV_MODE:
+            continue
+
+        awards = parse_int(row.get("IPEDSCOUNT2"))
+        if awards is None or awards <= 0:
+            continue
+
+        key = (unit_id, cip_code, cred_lev)
+        if key not in grouped:
+            grouped[key] = {
+                "cip_desc": row.get("CIPDESC", "").rstrip("."),
+                "total_awards": 0,
+                "median_debt": None,
+                "median_earnings_4yr": None,
+            }
+
+        grouped[key]["total_awards"] += awards
+
+        # Only include debt/earnings from Bachelor's (undergrad) or Master's/Doctoral (grad)
+        if cred_lev in CREDLEV_INCLUDE_DEBT_EARNINGS:
+            if grouped[key]["median_debt"] is None:
+                grouped[key]["median_debt"] = parse_int(row.get("DEBT_ALL_STGP_ANY_MDN"))
+            if grouped[key]["median_earnings_4yr"] is None:
+                grouped[key]["median_earnings_4yr"] = parse_int(row.get("EARN_MDN_4YR"))
+
+    return grouped
+
+
+def compute_awards_by_level(grouped):
+    """Compute total awards per (unit_id, cred_lev) for percentage calculation.
+
+    Returns:
+        {
+            (unit_id, cred_lev): total_awards
+        }
+    """
+    totals = {}
+    for (unit_id, cip_code, cred_lev), data in grouped.items():
+        key = (unit_id, cred_lev)
+        totals[key] = totals.get(key, 0) + data["total_awards"]
+    return totals
+
+
+def estimate_enrollment(grouped, level_totals, ugds_map, grads_map):
+    """Estimate per-department student counts using awards-based percentages.
+
+    Args:
+        grouped: Output of group_fos_rows()
+        level_totals: Output of compute_awards_by_level()
+        ugds_map: {unit_id: UGDS} from institution CSV
+        grads_map: {unit_id: GRADS} from institution CSV
+
+    Returns:
+        list of {
+            "unit_id": int,
+            "cip_code": str,
+            "mode": str,
+            "total_students": int,
+            "total_awards": int,
+            "median_debt": int or None,
+            "median_earnings_4yr": int or None,
+        }
+    """
+    results = []
+    for (unit_id, cip_code, cred_lev), data in grouped.items():
+        mode = CREDLEV_MODE[cred_lev]
+        level_key = (unit_id, cred_lev)
+        total_awards = level_totals.get(level_key, 0)
+
+        if total_awards == 0:
+            continue
+
+        # Get enrollment base
+        if mode == "undergrad":
+            enrollment_base = ugds_map.get(unit_id)
+        else:
+            enrollment_base = grads_map.get(unit_id)
+
+        if not enrollment_base or enrollment_base <= 0:
+            continue
+
+        percentage = data["total_awards"] / total_awards
+        estimated_students = max(1, round(percentage * enrollment_base))
+
+        results.append({
+            "unit_id": unit_id,
+            "cip_code": cip_code,
+            "cip_desc": data["cip_desc"],
+            "mode": mode,
+            "total_students": estimated_students,
+            "total_awards": data["total_awards"],
+            "median_debt": data["median_debt"],
+            "median_earnings_4yr": data["median_earnings_4yr"],
+        })
+
+    return results
+
+
+def insert_department(conn, university_id, cip_code, name):
+    """Insert or get a department row. Returns department_id."""
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO departments (university_id, cip_code, name)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (university_id, cip_code) DO UPDATE SET
+                name = EXCLUDED.name
+            RETURNING id
+            """,
+            (university_id, cip_code, name),
+        )
+        return cur.fetchone()[0]
+
+
+def insert_department_statistics(conn, department_id, data):
+    """Insert or update department statistics for undergrad only."""
+    if data["mode"] != "undergrad":
+        return  # Skip grad for now
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO department_undergrad_statistics
+                (department_id, total_students, total_awards,
+                 median_debt, median_earnings_4yr)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (department_id) DO UPDATE SET
+                total_students      = EXCLUDED.total_students,
+                total_awards        = EXCLUDED.total_awards,
+                median_debt         = EXCLUDED.median_debt,
+                median_earnings_4yr = EXCLUDED.median_earnings_4yr
+            """,
+            (
+                department_id,
+                data["total_students"],
+                data["total_awards"],
+                data["median_debt"],
+                data["median_earnings_4yr"],
+            ),
+        )
+
+
+# ──────────────────────────────────────────────────────────────
 # Main
 # ──────────────────────────────────────────────────────────────
 
-def main():
-    parser = argparse.ArgumentParser(description="Import College Scorecard CSV data into uniDB")
-    parser.add_argument("csv_path", help="Path to the CSV file to import")
-    parser.add_argument("--dry-run", action="store_true", help="Parse and map rows without writing to the database")
-    args = parser.parse_args()
+def import_institution_csv(csv_path, db_url, dry_run=False):
+    """Import institution-level data from the main Scorecard CSV."""
+    rows = read_csv(csv_path)
+    print(f"Read {len(rows)} rows from {csv_path}")
 
-    rows = read_csv(args.csv_path)
-    print(f"Read {len(rows)} rows from {args.csv_path}")
-
-    if args.dry_run:
+    if dry_run:
         for i, row in enumerate(rows[:5]):
             mapped = map_row(row)
             print(f"\nRow {i}:")
@@ -460,8 +648,6 @@ def main():
                 print(f"  {table}: {json.dumps(fields, indent=4)}")
         print(f"\nDry run complete. {len(rows)} rows would be imported.")
         return
-
-    db_url = load_config()
 
     conn = get_connection(db_url)
     try:
@@ -488,6 +674,110 @@ def main():
         sys.exit(1)
     finally:
         conn.close()
+
+
+def import_fos_csv(fos_path, db_url, dry_run=False):
+    """Import Field of Study data: estimate department enrollment from awards."""
+    rows = read_fos_csv(fos_path)
+    print(f"Read {len(rows)} Field of Study rows from {fos_path}")
+
+    # Group and aggregate
+    grouped = group_fos_rows(rows)
+    level_totals = compute_awards_by_level(grouped)
+    print(f"Aggregated to {len(grouped)} unique (unit_id, cip_code, cred_lev) combinations")
+
+    # Load enrollment bases from institution data
+    # We query the DB for existing UGDS values
+    conn = get_connection(db_url)
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT u.unit_id, us.total_students
+                FROM university_undergrad_stats us
+                JOIN universities u ON u.id = us.university_id
+            """)
+            ugds_map = {uid: ts for uid, ts in cur.fetchall() if ts}
+
+            grads_map = {}  # Not used for now
+    finally:
+        conn.close()
+
+    print(f"Loaded enrollment data for {len(ugds_map)} undergrad institutions")
+
+    # Estimate
+    estimates = estimate_enrollment(grouped, level_totals, ugds_map, grads_map)
+    print(f"Computed {len(estimates)} department-level enrollment estimates")
+
+    if dry_run:
+        # Show top 20 estimates by total_students
+        estimates.sort(key=lambda x: x["total_students"], reverse=True)
+        for e in estimates[:20]:
+            print(f"  {e['unit_id']} | {e['cip_code']} ({e['cip_desc'][:40]}) | "
+                  f"{e['mode']:10s} | {e['total_students']:>6,} students | "
+                  f"{e['total_awards']:>5,} awards")
+        return
+
+    # Write to database
+    conn = get_connection(db_url)
+    try:
+        with conn.cursor() as cur:
+            # Build unit_id → universities.id lookup
+            cur.execute("SELECT unit_id, id FROM universities")
+            uid_to_university_id = dict(cur.fetchall())
+
+            inserted = 0
+            for i, est in enumerate(estimates):
+                university_id = uid_to_university_id.get(est["unit_id"])
+                if not university_id:
+                    continue
+
+                dept_id = insert_department(
+                    conn, university_id, est["cip_code"], est["cip_desc"]
+                )
+                insert_department_statistics(conn, dept_id, est)
+                inserted += 1
+
+                if (i + 1) % 5000 == 0:
+                    print(f"  Processed {i + 1}/{len(estimates)}...")
+
+            conn.commit()
+            print(f"Successfully imported {inserted} department statistics.")
+    except Exception as e:
+        conn.rollback()
+        print(f"Error: {e}")
+        sys.exit(1)
+    finally:
+        conn.close()
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Import College Scorecard CSV data into uniDB")
+    subparsers = parser.add_subparsers(dest="command", help="Import command")
+
+    # institution subcommand
+    inst_parser = subparsers.add_parser("institution", help="Import institution-level CSV")
+    inst_parser.add_argument("csv_path", help="Path to Most-Recent-Cohorts-Institution.csv")
+    inst_parser.add_argument("--dry-run", action="store_true",
+                             help="Parse and map rows without writing to the database")
+
+    # fos subcommand (Field of Study)
+    fos_parser = subparsers.add_parser("fos", help="Import Field of Study CSV")
+    fos_parser.add_argument("csv_path", help="Path to Most-Recent-Cohorts-Field-of-Study.csv")
+    fos_parser.add_argument("--dry-run", action="store_true",
+                            help="Compute estimates without writing to the database")
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        sys.exit(1)
+
+    db_url = load_config()
+
+    if args.command == "institution":
+        import_institution_csv(args.csv_path, db_url, dry_run=args.dry_run)
+    elif args.command == "fos":
+        import_fos_csv(args.csv_path, db_url, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

@@ -138,20 +138,34 @@ CREATE TABLE departments (
 );
 
 -- ============================================================
--- DEPARTMENT STATISTICS
--- Per-department metrics, split by mode.
+-- DEPARTMENT UNDERGRADUATE STATISTICS
+-- Per-department metrics for undergraduate programs.
+-- total_students is estimated from Field of Study awards:
+--   (field_awards / total_awards_at_level) × UGDS
 -- ============================================================
 
-CREATE TABLE department_statistics (
-    id                          SERIAL PRIMARY KEY,
-    department_id               INT NOT NULL REFERENCES departments(id),
-    mode                        TEXT NOT NULL CHECK (mode IN ('undergrad', 'grad')),
-    total_students              INT,
-    total_students_percentile   INT,
-    graduation_rate             NUMERIC(5,2),
-    graduation_rate_percentile  INT,
-    average_class_size          INT,
-    UNIQUE (department_id, mode)
+CREATE TABLE department_undergrad_statistics (
+    id              SERIAL PRIMARY KEY,
+    department_id   INT NOT NULL UNIQUE REFERENCES departments(id),
+    total_students  INT,
+    total_awards    INT,
+    median_debt     INT,
+    median_earnings_4yr INT
+);
+
+-- ============================================================
+-- DEPARTMENT GRADUATE STATISTICS
+-- Per-department metrics for graduate programs.
+-- (Currently not imported - estimation approach needs review)
+-- ============================================================
+
+CREATE TABLE department_grad_statistics (
+    id              SERIAL PRIMARY KEY,
+    department_id   INT NOT NULL UNIQUE REFERENCES departments(id),
+    total_students  INT,
+    total_awards    INT,
+    median_debt     INT,
+    median_earnings_4yr INT
 );
 
 -- ============================================================
@@ -171,5 +185,5 @@ CREATE INDEX idx_cost_aid_university ON university_cost_aid(university_id);
 
 CREATE INDEX idx_departments_university ON departments(university_id);
 CREATE INDEX idx_departments_cip ON departments(cip_code);
-CREATE INDEX idx_dept_stats_department ON department_statistics(department_id);
-CREATE INDEX idx_dept_stats_mode ON department_statistics(mode);
+CREATE INDEX idx_dept_undergrad_stats_department ON department_undergrad_statistics(department_id);
+CREATE INDEX idx_dept_grad_stats_department ON department_grad_statistics(department_id);
