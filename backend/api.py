@@ -49,7 +49,7 @@ def get_db():
 
 
 # ──────────────────────────────────────────────────────────────
-# Sort Maps
+# Sort & Filter Maps
 # ──────────────────────────────────────────────────────────────
 
 SORT_MAP = {
@@ -74,6 +74,46 @@ DEPT_SORT_MAP = {
     "median_debt": "dus_sort.median_debt",
     "median_earnings": "dus_sort.median_earnings_4yr",
 }
+
+# Filter fields: param_name → (sql_column, cast_function, optional_transform)
+# transform converts user-facing input to DB value (e.g. 0-100 → 0.0-1.0 for rates)
+FILTER_FIELDS = {
+    "total_students":       ("us.total_students",       int,   None),
+    "graduation_rate":      ("us.graduation_rate",      float, lambda v: v * 0.01),
+    "admissions_rate":      ("us.admissions_rate",      float, lambda v: v * 0.01),
+    "sat_score":            ("us.sat_score",            int,   None),
+    "act_score":            ("us.act_score",            int,   None),
+    "student_faculty_ratio":("us.student_faculty_ratio",float, None),
+    "avg_household_income": ("us.avg_household_income", int,   None),
+    "tuition_in_state":     ("ca.tuition_in_state",     int,   None),
+    "tuition_out_state":    ("ca.tuition_out_state",    int,   None),
+    "avg_net_price_overall":("ca.avg_net_price_overall",int,   None),
+}
+
+DEPT_FILTER_FIELDS = {
+    "dept_total_students":  ("dus_filter.total_students",     int, None),
+    "dept_median_debt":     ("dus_filter.median_debt",        int, None),
+    "dept_median_earnings": ("dus_filter.median_earnings_4yr",int, None),
+}
+
+
+# ──────────────────────────────────────────────────────────────
+# WhereClause – accumulates SQL conditions + params
+# ──────────────────────────────────────────────────────────────
+
+class WhereClause:
+    def __init__(self):
+        self._conditions = []
+        self._params = []
+
+    def add(self, condition, *params):
+        self._conditions.append(condition)
+        self._params.extend(params)
+
+    def build(self):
+        if not self._conditions:
+            return "", []
+        return "WHERE " + " AND ".join(self._conditions), self._params
 
 
 # ──────────────────────────────────────────────────────────────
@@ -106,45 +146,72 @@ def parse_jsonb(value):
     return value
 
 
+def _add_field_filters(where, fields):
+    for field_name, (sql_col, cast_fn, transform) in fields.items():
+        min_val = request.args.get(f"min_{field_name}", type=float)
+        max_val = request.args.get(f"max_{field_name}", type=float)
+
+        if min_val is not None or max_val is not None:
+            where.add(f"{sql_col} IS NOT NULL")
+
+        if min_val is not None:
+            val = transform(min_val) if transform else min_val
+            where.add(f"{sql_col} >= %s", cast_fn(val))
+
+        if max_val is not None:
+            val = transform(max_val) if transform else max_val
+            where.add(f"{sql_col} <= %s", cast_fn(val))
+
+
+def parse_filters(where, filter_dept=""):
+    _add_field_filters(where, FILTER_FIELDS)
+    if filter_dept:
+        _add_field_filters(where, DEPT_FILTER_FIELDS)
+
+
 # ──────────────────────────────────────────────────────────────
 # Query Builders
 # ──────────────────────────────────────────────────────────────
 
-def build_count_query(search, sector):
-    conditions = []
-    params = []
+def build_count_query(where, filter_dept=""):
+    where_sql, where_params = where.build()
+    filter_join = ""
+    if filter_dept:
+        filter_join = (
+            " LEFT JOIN departments d_filter"
+            " ON d_filter.university_id = u.id AND d_filter.cip_code = %s"
+            " LEFT JOIN department_undergrad_statistics dus_filter"
+            " ON dus_filter.department_id = d_filter.id"
+        )
+    sql = (
+        "SELECT COUNT(*) FROM universities u"
+        " LEFT JOIN university_undergrad_stats us ON us.university_id = u.id"
+        " LEFT JOIN university_cost_aid ca ON ca.university_id = u.id"
+        f" {filter_join}"
+        f" {where_sql}"
+    )
+    params = [filter_dept] if filter_dept else []
+    params.extend(where_params)
+    return sql, params
 
-    if search:
-        conditions.append("(u.name ILIKE %s OR u.location ILIKE %s)")
-        params.extend([f"%{search}%", f"%{search}%"])
 
-    if sector:
-        conditions.append("u.sector_type = %s")
-        params.append(sector)
-
-    where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
-    return f"SELECT COUNT(*) FROM universities u {where}", params
-
-
-def build_id_query(search, sector, sort_col, sort_dir, sort_dept, limit, offset):
-    conditions = []
-    params = []
-
-    if search:
-        conditions.append("(u.name ILIKE %s OR u.location ILIKE %s)")
-        params.extend([f"%{search}%", f"%{search}%"])
-
-    if sector:
-        conditions.append("u.sector_type = %s")
-        params.append(sector)
-
-    where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+def build_id_query(where, sort_col, sort_dir, sort_dept, filter_dept, limit, offset):
+    where_sql, where_params = where.build()
 
     order = "u.name ASC"
     if sort_dept and sort_col in DEPT_SORT_MAP:
         order = f"{DEPT_SORT_MAP[sort_col]} {sort_dir} NULLS LAST"
     elif sort_col in SORT_MAP:
         order = f"{SORT_MAP[sort_col]} {sort_dir} NULLS LAST"
+
+    filter_join = ""
+    if filter_dept:
+        filter_join = """
+            LEFT JOIN departments d_filter
+                ON d_filter.university_id = u.id AND d_filter.cip_code = %s
+            LEFT JOIN department_undergrad_statistics dus_filter
+                ON dus_filter.department_id = d_filter.id
+        """
 
     query = f"""
         SELECT u.id
@@ -155,12 +222,17 @@ def build_id_query(search, sector, sort_col, sort_dir, sort_dept, limit, offset)
             ON d_sort.university_id = u.id AND d_sort.cip_code = %s
         LEFT JOIN department_undergrad_statistics dus_sort
             ON dus_sort.department_id = d_sort.id
-        {where}
+        {filter_join}
+        {where_sql}
         ORDER BY {order}
         LIMIT %s OFFSET %s
     """
 
-    params = [sort_dept or ""] + params + [limit, offset]
+    params = [sort_dept or ""]
+    if filter_dept:
+        params.append(filter_dept)
+    params.extend(where_params)
+    params.extend([limit, offset])
     return query, params
 
 
@@ -320,6 +392,35 @@ class UniversityList(Resource):
                 "description": "Filter by sector",
                 "enum": ["public", "private_nonprofit", "private_forprofit"],
             },
+            "filterDept": {"description": "CIP code for department-specific min/max filters (required for dept_* filters)"},
+            # Institution-level filters
+            "min_total_students": {"description": "Minimum total undergraduate students"},
+            "max_total_students": {"description": "Maximum total undergraduate students"},
+            "min_graduation_rate": {"description": "Minimum graduation rate (0-100)"},
+            "max_graduation_rate": {"description": "Maximum graduation rate (0-100)"},
+            "min_admissions_rate": {"description": "Minimum admissions rate (0-100)"},
+            "max_admissions_rate": {"description": "Maximum admissions rate (0-100)"},
+            "min_sat_score": {"description": "Minimum SAT score"},
+            "max_sat_score": {"description": "Maximum SAT score"},
+            "min_act_score": {"description": "Minimum ACT score"},
+            "max_act_score": {"description": "Maximum ACT score"},
+            "min_student_faculty_ratio": {"description": "Minimum student-to-faculty ratio"},
+            "max_student_faculty_ratio": {"description": "Maximum student-to-faculty ratio"},
+            "min_avg_household_income": {"description": "Minimum average household income"},
+            "max_avg_household_income": {"description": "Maximum average household income"},
+            "min_tuition_in_state": {"description": "Minimum in-state tuition"},
+            "max_tuition_in_state": {"description": "Maximum in-state tuition"},
+            "min_tuition_out_state": {"description": "Minimum out-of-state tuition"},
+            "max_tuition_out_state": {"description": "Maximum out-of-state tuition"},
+            "min_avg_net_price_overall": {"description": "Minimum average net price"},
+            "max_avg_net_price_overall": {"description": "Maximum average net price"},
+            # Department-level filters (require filterDept)
+            "min_dept_total_students": {"description": "Min dept enrollment (requires filterDept)"},
+            "max_dept_total_students": {"description": "Max dept enrollment (requires filterDept)"},
+            "min_dept_median_debt": {"description": "Min dept median debt (requires filterDept)"},
+            "max_dept_median_debt": {"description": "Max dept median debt (requires filterDept)"},
+            "min_dept_median_earnings": {"description": "Min dept median earnings after 4yr (requires filterDept)"},
+            "max_dept_median_earnings": {"description": "Max dept median earnings after 4yr (requires filterDept)"},
         }
     )
     def get(self):
@@ -330,6 +431,7 @@ class UniversityList(Resource):
         sort_dir = request.args.get("sortDir", "asc", type=str).upper()
         sort_dept = request.args.get("sortDept", "", type=str)
         sector = request.args.get("sector", "", type=str)
+        filter_dept = request.args.get("filterDept", "", type=str)
 
         if sort_dir not in ("ASC", "DESC"):
             sort_dir = "ASC"
@@ -339,15 +441,27 @@ class UniversityList(Resource):
         page_size = max(1, min(100, page_size))
         offset = (page - 1) * page_size
 
+        # Build WHERE clause with search, sector, and min/max filters
+        where = WhereClause()
+
+        if search:
+            where.add("(u.name ILIKE %s OR u.location ILIKE %s)",
+                       f"%{search}%", f"%{search}%")
+
+        if sector:
+            where.add("u.sector_type = %s", sector)
+
+        parse_filters(where, filter_dept)
+
         conn = get_db()
         try:
             with conn.cursor() as cur:
-                count_query, count_params = build_count_query(search, sector)
+                count_query, count_params = build_count_query(where, filter_dept)
                 cur.execute(count_query, count_params)
                 total = cur.fetchone()[0]
 
                 id_query, id_params = build_id_query(
-                    search, sector, sort, sort_dir, sort_dept, page_size, offset
+                    where, sort, sort_dir, sort_dept, filter_dept, page_size, offset
                 )
                 cur.execute(id_query, id_params)
                 ids = [row[0] for row in cur.fetchall()]
