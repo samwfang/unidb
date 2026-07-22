@@ -21,8 +21,8 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore, unive
   const isDark = colorMode === 'dark';
 
   // Parse scores or use defaults
-  const sat = parseInt(satScore || '0') || 0;
-  const act = parseInt(actScore || '0') || 0;
+  const sat = parseInt((satScore || '0').replace(/,/g, '')) || 0;
+  const act = parseInt((actScore || '0').replace(/,/g, '')) || 0;
   const hasSatData = satScore !== 'No Data' && satScore !== '';
   const hasActData = actScore !== 'No Data' && actScore !== '';
 
