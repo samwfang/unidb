@@ -9,7 +9,7 @@ export enum ColumnType {
   Location = "location",
   TotalStudents = "total_students",
   GraduationRate = "graduation_rate",
-  StudentFacultyRatio = "average_class_size",
+  StudentFacultyRatio = "student_faculty_ratio",
   SATScore = "sat_score",
   ACTScore = "act_score",
   AdmissionsRate = "admissions_rate",
@@ -135,7 +135,7 @@ export const getColumnData = (
       case ColumnType.GraduationRate:
         return dept.graduation_rate || 'No Info';
       case ColumnType.StudentFacultyRatio:
-        return dept.average_class_size || 'No Info';
+        return 'No Info';
       default:
         return 'Error'; // Some columns like Location can't be department-specific
     }
@@ -150,7 +150,7 @@ export const getColumnData = (
     case ColumnType.GraduationRate:
       return content?.general_content.graduation_rate || 'N/A';
     case ColumnType.StudentFacultyRatio:
-      return content?.general_content.average_class_size || 'N/A';
+      return (content as any)?.general_content?.studentFacultyRatio || 'N/A';
      case ColumnType.SATScore:
       // Type assertion since we already checked mode restriction, stop bothering us please
        return (content as any)?.general_content?.sat_score || 'N/A';

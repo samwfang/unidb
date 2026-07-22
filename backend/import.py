@@ -634,6 +634,8 @@ def insert_department(conn, university_id, cip_code, name):
     Uses ON CONFLICT (university_id, cip_code) to handle re-imports:
     if the department already exists, it updates the name and returns
     the existing id.
+
+    Returns department_id (int) for the inserted or existing department.
     """
     with conn.cursor() as cur:
         cur.execute(

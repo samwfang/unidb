@@ -60,7 +60,7 @@ SORT_MAP = {
     "admissions_rate": "us.admissions_rate",
     "sat_score": "us.sat_score",
     "act_score": "us.act_score",
-    "average_class_size": "us.student_faculty_ratio",
+    "average_class_size": "us.average_class_size",
     "student_faculty_ratio": "us.student_faculty_ratio",
     "avg_household_income": "us.avg_household_income",
     "tuition_in_state": "ca.tuition_in_state",
@@ -143,7 +143,7 @@ def parse_jsonb(value):
         return json.loads(value)
     return value
 
-
+# Checks request.args for min/max filters and adds them to the where conditions
 def _add_field_filters(where, fields):
     for field_name, (sql_col, cast_fn, transform) in fields.items():
         min_val = request.args.get(f"min_{field_name}", type=float)
@@ -200,6 +200,7 @@ def build_id_query(where, sort_col, sort_dir, sort_dept, filter_dept, limit, off
     sort_dept_join = ""
     sort_dept_param = None
 
+    #check if Sort is Department-Specific and if the sort column is in the DEPT_SORT_MAP
     if sort_dept and sort_col in DEPT_SORT_MAP:
         order = f"{DEPT_SORT_MAP[sort_col]} {sort_dir} NULLS LAST, u.id ASC"
         sort_dept_param = sort_dept
@@ -209,10 +210,13 @@ def build_id_query(where, sort_col, sort_dir, sort_dept, filter_dept, limit, off
             LEFT JOIN department_undergrad_statistics dus_sort
                 ON dus_sort.department_id = d_sort.id
         """
+    #this means sort is general and not department-specific, so we check if the sort column is in the SORT_MAP
     elif sort_col in SORT_MAP:
         order = f"{SORT_MAP[sort_col]} {sort_dir} NULLS LAST, u.id ASC"
 
     filter_join = ""
+
+    #if we are filtering by department-specific, we must join the departments and department_undergrad_statistics tables to filter by the department-specific fields
     if filter_dept:
         filter_join = """
             LEFT JOIN departments d_filter

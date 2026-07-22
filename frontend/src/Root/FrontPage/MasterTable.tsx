@@ -92,6 +92,9 @@ export interface GradContent {
 
     avg_household_income?: string;
     avg_household_income_percentile?: string;
+
+    studentFacultyRatio?: string;
+    studentFacultyRatioPercentile?: string;
   };
   demographics?: DemographicsData;
   dept_contents?: GradDeptContent[];
