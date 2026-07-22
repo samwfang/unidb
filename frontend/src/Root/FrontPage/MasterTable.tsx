@@ -171,11 +171,11 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
 
-  // Simulate API call for paginated data
-  // In Real API Call, I will also need to return data based on sortingParameter!
+  const API_BASE_URL = 'http://localhost:8000/api';
+
   const fetchPageData = async (
     page: number,
-    pageSize: number, // Add pageSize parameter
+    pageSize: number,
     sortingParameter: SortType,
     sortingDeptCID: string,
     sortingExtraParam: string,
@@ -185,146 +185,44 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     setExpandedIndex([]);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log(`Fetching page ${page} with size ${pageSize}, sort=${sortingParameter}`);
+      const params = new URLSearchParams();
 
-      const randomInRange = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-      const randomRate = () => randomInRange(5, 100);
-      const randomStudents = () => randomInRange(1000, 50000).toLocaleString();
-      const randomClassSize = () => randomInRange(10, 500);
-      const randomPercentile = () => randomInRange(10, 99);
-      const randomSAT = () => randomInRange(800, 1600);
-      const randomACT = () => randomInRange(16, 36);
-      const randomIncome = () => randomInRange(30000, 120000);
+      // Pagination (convert 0-indexed to 1-indexed)
+      params.set('page', String(page + 1));
+      params.set('pageSize', String(pageSize));
 
-      // Simulated API response
-      const simulatedData: UniversityData[] = Array.from({ length: pageSize }, (_, i) => {
-        const globalIndex = page * pageSize + i;
-        const gradRate = randomRate();
-        const totalStudents = randomStudents();
-        const admissionsRate = randomRate();
-        const satScore = randomSAT();
-        const actScore = randomACT();
-        const avgIncome = randomIncome();
+      // Search
+      if (searchQuery) {
+        params.set('search', searchQuery);
+      }
 
-        return {
-          id: globalIndex + 1,
-          name: `The University of the Number ${globalIndex + 1}`,
-          location: `Location ${globalIndex + 1}`,
-          studentFacultyRatio: `${10 + (globalIndex % 5)}:1`,
-          icon: 'FaUniversity',
-          isPublic: globalIndex % 2 === 0,
-          sectorScorecard: (globalIndex % 15) + 1,
-          content: {
-            undergrad_content: {
-              general_content: {
-                total_students: totalStudents,
-                total_student_percentile: randomPercentile().toString(),
-                graduation_rate: `${gradRate}`,
-                graduation_rate_percentile: randomPercentile().toString(),
-                admissions_rate: admissionsRate.toString(),
-                admissions_rate_percentile: randomPercentile().toString(),
-                sat_score: satScore.toString(),
-                act_score: actScore.toString(),
-                sat_score_percentile: randomPercentile().toString(),
-                act_score_percentile: randomPercentile().toString(),
-                studentFacultyRatio: `${10 + (globalIndex % 5)}:1`,
-                studentFacultyRatioPercentile: randomPercentile().toString(),
-                avg_household_income: avgIncome.toLocaleString(),
-                avg_household_income_percentile: randomPercentile().toString(),
-                average_class_size: randomClassSize().toString()
-              },
-              demographics: {
-                gender: [
-                  { name: 'Male', value: 48 },
-                  { name: 'Female', value: 50 },
-                  { name: 'Other', value: 2 },
-                ],
-                ethnicity: [
-                  { name: 'White', value: 30 },
-                  { name: 'Black', value: 20 },
-                  { name: 'Asian', value: 25 },
-                  { name: 'Hispanic', value: 15 },
-                  { name: 'Other', value: 10 },
-                ],
-                income: [
-                  { name: '<$30k', value: 20 },
-                  { name: '$30k-$60k', value: 30 },
-                  { name: '>$60k', value: 50 }
-                ]
-              },
-              dept_contents: [
-                {
-                  cip: "1107",
-                  department_name: "Computer Science",
-                  total_students: '2100',
-                  total_student_percentile: randomPercentile().toString(),
-                  graduation_rate: `${gradRate + 5}`,
-                  graduation_rate_percentile: randomPercentile().toString(),
-                  average_class_size: randomClassSize().toString(),
-                  content: `CS department info for University ${globalIndex + 1}`
-                },
-                {
-                  cip: "2601",
-                  department_name: "Biology",
-                  total_students: '1800',
-                  total_student_percentile: randomPercentile().toString(),
-                  graduation_rate: `${gradRate + 2}`,
-                  graduation_rate_percentile: randomPercentile().toString(),
-                  average_class_size: randomClassSize().toString(),
-                  content: `Biology department info for University ${globalIndex + 1}`
-                },
-                {
-                  cip: "0502",
-                  department_name: "Ethnic, Cultural Minority, Gender, and Group Studies",
-                  total_students: '500',
-                  total_student_percentile: randomPercentile().toString(),
-                  graduation_rate: `${gradRate + 8}`,
-                  graduation_rate_percentile: randomPercentile().toString(),
-                  average_class_size: randomClassSize().toString(),
-                  content: `Ethnic department info for University ${globalIndex + 1}`
-                }
-              ]
-            },
-            grad_content: {
-              general_content: {
-                total_students: '5,500',
-                total_student_percentile: randomPercentile().toString(),
-                graduation_rate: '92%',
-                average_class_size: '51'
-              },
-              demographics: {
-                gender: [
-                  { name: 'Male', value: 48 },
-                  { name: 'Female', value: 50 },
-                  { name: 'Other', value: 2 },
-                ],
-                ethnicity: [
-                  { name: 'White', value: 30 },
-                  { name: 'Black', value: 20 },
-                  { name: 'Asian', value: 25 },
-                  { name: 'Hispanic', value: 15 },
-                  { name: 'Other', value: 10 },
-                ],
-                income: [
-                  { name: '<$30k', value: 20 },
-                  { name: '$30k-$60k', value: 30 },
-                  { name: '>$60k', value: 50 }
-                ]
-              },
-              dept_contents: [
-                { cip: "1107", department_name: "Engineering", content: `Engineering grad program info for University ${globalIndex + 1}` },
-                { cip: "0607", department_name: "Business", content: `MBA program info for University ${globalIndex + 1}` }
-              ]
-            }
-          }
-        };
-      });
+      // Sort mapping
+      if (sortingParameter === ExtraSortType.Alphabetical) {
+        params.set('sort', 'name');
+        params.set('sortDir', 'asc');
+      } else if (sortingParameter === ExtraSortType.ReverseAlphabetical) {
+        params.set('sort', 'name');
+        params.set('sortDir', 'desc');
+      } else {
+        params.set('sort', sortingParameter as string);
+        params.set('sortDir', sortingExtraParam === 'least' ? 'asc' : 'desc');
+      }
 
-      const simulatedTotal = 1000; // Total number of items in the dataset
+      // Department-specific sort
+      if (sortingDeptCID && sortingDeptCID !== 'general') {
+        params.set('sortDept', sortingDeptCID);
+      }
 
-      setData(simulatedData);
-      setTotalItems(simulatedTotal);
+      const response = await fetch(`${API_BASE_URL}/universities?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setData(result.universities);
+      setTotalItems(result.total);
+    } catch (error) {
+      console.error('Failed to fetch page data:', error);
     } finally {
       setIsLoading(false);
     }

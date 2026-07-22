@@ -192,6 +192,8 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   const { colorMode } = useColorMode();
   const isDark = colorMode === 'dark';
 
+  const hasData = totalStudents !== 'No Data' && totalStudents !== '';
+
 
   const dataSets = [
     {
@@ -375,7 +377,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
               <g>
                 <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle"
                   style={{ fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 'bold' }} fill={isDark ? "white" : "black"} >
-                  {getCenterText(activeTab, totalStudents, avgHouseholdIncome)}
+                  {hasData ? getCenterText(activeTab, totalStudents, avgHouseholdIncome) : 'N/A'}
                 </text>
                 <text x="50%" y="60%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
                   {getCaption(activeTab)}
@@ -390,7 +392,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       <Flex justify="center" mt={-8} mb={1}>
         <Box width="120px">
           <PercentileBar
-            value={parseFloat(totalStudentsPercentile)}
+            value={hasData ? parseFloat(totalStudentsPercentile) || 0 : 0}
             name={universityName}
             type="total students"
             globalAvg="5,000"

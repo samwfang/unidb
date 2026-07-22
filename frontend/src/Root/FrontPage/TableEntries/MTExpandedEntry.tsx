@@ -182,11 +182,11 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
       <Grid templateColumns="repeat(2, 1fr)" gap={4}>
         <Box>
           <Text fontWeight="bold">Total Students:</Text>
-          <Text> {general?.general_content.total_students} </Text>
+          <Text> {general?.general_content.total_students || 'N/A'} </Text>
         </Box>
         <Box>
           <Text fontWeight="bold">Graduation Rate:</Text>
-          <Text> {general?.general_content.graduation_rate} </Text>
+          <Text> {general?.general_content.graduation_rate || 'N/A'} </Text>
         </Box>
       </Grid>
     </Box>
@@ -205,7 +205,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   const renderFilteredGroupedDepartments = () => {
     const groupedDepartments = groupDepartmentsByCIP(filteredDepts);
 
-    const groupedEntries = Object.entries(groupedDepartments);
+    const groupedEntries = Object.entries(groupedDepartments) as unknown as [string, (UGradDeptContent | GradDeptContent)[]][];
 
     // Calculate halfway point for splitting into two columns
     const midpoint = Math.ceil(groupedEntries.length / 2);

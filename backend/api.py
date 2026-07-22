@@ -120,19 +120,19 @@ def build_where(conditions):
 
 def format_number(value):
     if value is None:
-        return None
+        return ""
     return f"{int(value):,}"
 
 
 def format_decimal(value):
     if value is None:
-        return None
+        return ""
     return str(value)
 
 
 def format_rate(value):
     if value is None:
-        return None
+        return ""
     return str(int(round(value * 100)))
 
 
@@ -308,18 +308,18 @@ def format_university(rows):
     undergrad_content = {
         "general_content": {
             "total_students": format_number(first["total_students"]),
-            "total_student_percentile": None,
+            "total_student_percentile": "",
             "graduation_rate": format_rate(first["graduation_rate"]),
-            "graduation_rate_percentile": None,
+            "graduation_rate_percentile": "",
             "admissions_rate": format_rate(first["admissions_rate"]),
-            "admissions_rate_percentile": None,
+            "admissions_rate_percentile": "",
             "sat_score": format_number(first["sat_score"]),
-            "act_score": str(first["act_score"]) if first["act_score"] else None,
+            "act_score": str(first["act_score"]) if first["act_score"] else "",
             "studentFacultyRatio": format_decimal(first["student_faculty_ratio"]),
-            "studentFacultyRatioPercentile": None,
+            "studentFacultyRatioPercentile": "",
             "avg_household_income": format_number(first["avg_household_income"]),
-            "avg_household_income_percentile": None,
-            "average_class_size": None,
+            "avg_household_income_percentile": "",
+            "average_class_size": "",
         },
         "demographics": format_demographics(
             first["gender_data"], first["ethnicity_data"], first["income_data"]
@@ -330,15 +330,15 @@ def format_university(rows):
     grad_content = {
         "general_content": {
             "total_students": format_number(first["grad_total_students"]),
-            "total_student_percentile": None,
+            "total_student_percentile": "",
             "graduation_rate": format_rate(first["grad_graduation_rate"]),
-            "graduation_rate_percentile": None,
+            "graduation_rate_percentile": "",
             "admissions_rate": format_rate(first["grad_admissions_rate"]),
-            "admissions_rate_percentile": None,
+            "admissions_rate_percentile": "",
             "studentFacultyRatio": format_decimal(first["grad_student_faculty_ratio"]),
             "avg_household_income": format_number(first["grad_avg_household_income"]),
-            "avg_household_income_percentile": None,
-            "average_class_size": None,
+            "avg_household_income_percentile": "",
+            "average_class_size": "",
         },
         "demographics": format_demographics(
             first["grad_gender_data"],
@@ -358,10 +358,10 @@ def format_university(rows):
                 "department_name": row["dept_name"],
                 "content": "",
                 "total_students": format_number(row["dept_total_students"]),
-                "total_student_percentile": None,
-                "graduation_rate": None,
-                "graduation_rate_percentile": None,
-                "average_class_size": None,
+                "total_student_percentile": "",
+                "graduation_rate": "",
+                "graduation_rate_percentile": "",
+                "average_class_size": "",
             }
             undergrad_content["dept_contents"].append(dept)
             grad_content["dept_contents"].append(dept.copy())
@@ -373,7 +373,7 @@ def format_university(rows):
         "studentFacultyRatio": format_decimal(first["student_faculty_ratio"]),
         "icon": first["icon"],
         "isPublic": first["is_public"],
-        "sectorScorecard": None,
+        "sectorScorecard": "",
         "content": {
             "undergrad_content": undergrad_content,
             "grad_content": grad_content,

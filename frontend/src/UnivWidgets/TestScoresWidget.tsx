@@ -23,6 +23,8 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore, unive
   // Parse scores or use defaults
   const sat = parseInt(satScore || '0') || 0;
   const act = parseInt(actScore || '0') || 0;
+  const hasSatData = satScore !== 'No Data' && satScore !== '';
+  const hasActData = actScore !== 'No Data' && actScore !== '';
 
   const maxSat = 1600;
   const maxAct = 36;
@@ -107,7 +109,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore, unive
                 fill: color
               }}
             >
-              {currentScore}
+              {(activeTab === 'SAT' ? hasSatData : hasActData) ? currentScore : 'N/A'}
             </text>
             <text x="50%" y="80%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
               <tspan x="50%" dy="0">Avg. Score</tspan>
@@ -119,7 +121,9 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore, unive
 
       <Box mt={2}>
         <PercentileBar
-          value={activeTab === "SAT" ? parseFloat(satScorePercentile) : parseFloat(actScorePercentile)}
+          value={activeTab === "SAT" 
+            ? (hasSatData ? parseFloat(satScorePercentile) || 0 : 0)
+            : (hasActData ? parseFloat(actScorePercentile) || 0 : 0)}
           name={universityName}
           type={activeTab === "SAT" ? "SAT Score" : "ACT Score"}
         />

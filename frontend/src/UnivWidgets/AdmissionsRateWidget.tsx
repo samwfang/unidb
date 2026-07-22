@@ -16,6 +16,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
   const { colorMode } = useColorMode();
     const isDark = colorMode === 'dark';
 
+  const hasData = admissionsRate !== 'No Data' && admissionsRate !== '';
   const rate = parseFloat(admissionsRate) || 0;
   const remaining = 100 - rate;
 
@@ -77,7 +78,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
                 fill: color
               }}
             >
-              {admissionsRate}%
+              {hasData ? `${rate}%` : 'N/A'}
             </text>
             <text x="50%" y="80%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
               <tspan x="50%" dy="0">Of Applicants</tspan>
@@ -89,7 +90,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
 
       <Box mt={2}>
         <PercentileBar
-          value={parseFloat(admissionsRatePercentile)}
+          value={hasData ? parseFloat(admissionsRatePercentile) || 0 : 0}
           name={universityName}
           type="Admissions Rate"
           colorScheme="positive_only_inverted"

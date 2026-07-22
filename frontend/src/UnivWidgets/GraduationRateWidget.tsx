@@ -15,7 +15,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
   const { colorMode } = useColorMode();
   const isDark = colorMode === 'dark';
 
-
+  const hasData = graduationRate !== 'No Data' && graduationRate !== '';
   const rate = parseFloat(graduationRate) || 0;
   const remaining = 100 - rate;
 
@@ -79,7 +79,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
                 fill: color  // Match text color to gauge
               }}
             >
-              {graduationRate}%
+              {hasData ? `${rate}%` : 'N/A'}
             </text>
             <text x="50%" y="80%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(8px, 1.5vw, 12px)' }}>
               <tspan x="50%" dy="0">Graduated Within</tspan>
@@ -91,7 +91,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
 
       <Box mt={2}>
         <PercentileBar
-          value={parseFloat(graduationRatePercentile)}
+          value={hasData ? parseFloat(graduationRatePercentile) || 0 : 0}
           name={universityName}
           type="Graduation Rate"
         />

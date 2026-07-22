@@ -155,7 +155,7 @@ export const getColumnData = (
       // Type assertion since we already checked mode restriction, stop bothering us please
        return (content as any)?.general_content?.sat_score || 'N/A';
     case ColumnType.ACTScore:
-       return (content as any)?.general_content?.sat_score || 'N/A';
+       return (content as any)?.general_content?.act_score || 'N/A';
     case ColumnType.AdmissionsRate:
       return content?.general_content.admissions_rate || 'N/A';
     case ColumnType.HouseholdIncome:
