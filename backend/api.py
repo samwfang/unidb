@@ -98,22 +98,20 @@ DEPT_FILTER_FIELDS = {
 
 
 # ──────────────────────────────────────────────────────────────
-# WhereClause – accumulates SQL conditions + params
+# Where helpers – plain list of (sql, params) tuples
 # ──────────────────────────────────────────────────────────────
 
-class WhereClause:
-    def __init__(self):
-        self._conditions = []
-        self._params = []
+def add_condition(conditions, sql, *params):
+    conditions.append((sql, params))
 
-    def add(self, condition, *params):
-        self._conditions.append(condition)
-        self._params.extend(params)
 
-    def build(self):
-        if not self._conditions:
-            return "", []
-        return "WHERE " + " AND ".join(self._conditions), self._params
+def build_where(conditions):
+    if not conditions:
+        return "", []
+    return (
+        "WHERE " + " AND ".join(c for c, _ in conditions),
+        [p for _, params in conditions for p in params],
+    )
 
 
 # ──────────────────────────────────────────────────────────────
@@ -152,15 +150,15 @@ def _add_field_filters(where, fields):
         max_val = request.args.get(f"max_{field_name}", type=float)
 
         if min_val is not None or max_val is not None:
-            where.add(f"{sql_col} IS NOT NULL")
+            add_condition(where, f"{sql_col} IS NOT NULL")
 
         if min_val is not None:
             val = transform(min_val) if transform else min_val
-            where.add(f"{sql_col} >= %s", cast_fn(val))
+            add_condition(where, f"{sql_col} >= %s", cast_fn(val))
 
         if max_val is not None:
             val = transform(max_val) if transform else max_val
-            where.add(f"{sql_col} <= %s", cast_fn(val))
+            add_condition(where, f"{sql_col} <= %s", cast_fn(val))
 
 
 def parse_filters(where, filter_dept=""):
@@ -174,7 +172,7 @@ def parse_filters(where, filter_dept=""):
 # ──────────────────────────────────────────────────────────────
 
 def build_count_query(where, filter_dept=""):
-    where_sql, where_params = where.build()
+    where_sql, where_params = build_where(where)
     filter_join = ""
     if filter_dept:
         filter_join = (
@@ -196,13 +194,23 @@ def build_count_query(where, filter_dept=""):
 
 
 def build_id_query(where, sort_col, sort_dir, sort_dept, filter_dept, limit, offset):
-    where_sql, where_params = where.build()
+    where_sql, where_params = build_where(where)
 
     order = "u.name ASC"
+    sort_dept_join = ""
+    sort_dept_param = None
+
     if sort_dept and sort_col in DEPT_SORT_MAP:
-        order = f"{DEPT_SORT_MAP[sort_col]} {sort_dir} NULLS LAST"
+        order = f"{DEPT_SORT_MAP[sort_col]} {sort_dir} NULLS LAST, u.id ASC"
+        sort_dept_param = sort_dept
+        sort_dept_join = """
+            LEFT JOIN departments d_sort
+                ON d_sort.university_id = u.id AND d_sort.cip_code = %s
+            LEFT JOIN department_undergrad_statistics dus_sort
+                ON dus_sort.department_id = d_sort.id
+        """
     elif sort_col in SORT_MAP:
-        order = f"{SORT_MAP[sort_col]} {sort_dir} NULLS LAST"
+        order = f"{SORT_MAP[sort_col]} {sort_dir} NULLS LAST, u.id ASC"
 
     filter_join = ""
     if filter_dept:
@@ -218,17 +226,16 @@ def build_id_query(where, sort_col, sort_dir, sort_dept, filter_dept, limit, off
         FROM universities u
         LEFT JOIN university_undergrad_stats us ON us.university_id = u.id
         LEFT JOIN university_cost_aid ca ON ca.university_id = u.id
-        LEFT JOIN departments d_sort
-            ON d_sort.university_id = u.id AND d_sort.cip_code = %s
-        LEFT JOIN department_undergrad_statistics dus_sort
-            ON dus_sort.department_id = d_sort.id
+        {sort_dept_join}
         {filter_join}
         {where_sql}
         ORDER BY {order}
         LIMIT %s OFFSET %s
     """
 
-    params = [sort_dept or ""]
+    params = []
+    if sort_dept_param:
+        params.append(sort_dept_param)
     if filter_dept:
         params.append(filter_dept)
     params.extend(where_params)
@@ -271,9 +278,9 @@ def build_data_query(ids):
         LEFT JOIN departments d ON d.university_id = u.id
         LEFT JOIN department_undergrad_statistics dus ON dus.department_id = d.id
         WHERE u.id = ANY(%s)
-        ORDER BY u.id, d.cip_code
+        ORDER BY array_position(%s::int[], u.id), d.cip_code
     """
-    return query, [ids]
+    return query, [ids, ids]
 
 
 # ──────────────────────────────────────────────────────────────
@@ -442,14 +449,14 @@ class UniversityList(Resource):
         offset = (page - 1) * page_size
 
         # Build WHERE clause with search, sector, and min/max filters
-        where = WhereClause()
+        where = []
 
         if search:
-            where.add("(u.name ILIKE %s OR u.location ILIKE %s)",
+            add_condition(where, "(u.name ILIKE %s OR u.location ILIKE %s)",
                        f"%{search}%", f"%{search}%")
 
         if sector:
-            where.add("u.sector_type = %s", sector)
+            add_condition(where, "u.sector_type = %s", sector)
 
         parse_filters(where, filter_dept)
 
