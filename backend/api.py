@@ -48,6 +48,17 @@ def get_db():
     return psycopg2.connect(DB_URL)
 
 
+def jsonb_extract(jsonb_col, name_value):
+    return (
+        f"(SELECT (elem->>'value')::numeric "
+        f"FROM jsonb_array_elements("
+        f"  CASE WHEN jsonb_typeof({jsonb_col}) = 'array'"
+        f"    THEN {jsonb_col} ELSE '[]'::jsonb END"
+        f") AS elem "
+        f"WHERE elem->>'name' = '{name_value}')"
+    )
+
+
 # ──────────────────────────────────────────────────────────────
 # Sort & Filter Maps
 # ──────────────────────────────────────────────────────────────
@@ -66,6 +77,25 @@ SORT_MAP = {
     "tuition_in_state": "ca.tuition_in_state",
     "tuition_out_state": "ca.tuition_out_state",
     "avg_net_price_overall": "ca.avg_net_price_overall",
+    # Gender
+    "pct_male": jsonb_extract("ud.gender_data", "Male"),
+    "pct_female": jsonb_extract("ud.gender_data", "Female"),
+    # Ethnicity
+    "pct_white": jsonb_extract("ud.ethnicity_data", "White"),
+    "pct_black": jsonb_extract("ud.ethnicity_data", "Black"),
+    "pct_hispanic": jsonb_extract("ud.ethnicity_data", "Hispanic"),
+    "pct_asian": jsonb_extract("ud.ethnicity_data", "Asian"),
+    "pct_aian": jsonb_extract("ud.ethnicity_data", "American Indian"),
+    "pct_nhpi": jsonb_extract("ud.ethnicity_data", "Native Hawaiian/Pacific Islander"),
+    "pct_two_plus": jsonb_extract("ud.ethnicity_data", "Two or More Races"),
+    "pct_nra": jsonb_extract("ud.ethnicity_data", "Non-resident Alien"),
+    "pct_unknown": jsonb_extract("ud.ethnicity_data", "Unknown"),
+    # Income
+    "pct_income_low": jsonb_extract("ud.income_data", "< $30k"),
+    "pct_income_mid1": jsonb_extract("ud.income_data", "$30k - $48k"),
+    "pct_income_mid2": jsonb_extract("ud.income_data", "$48k - $75k"),
+    "pct_income_high1": jsonb_extract("ud.income_data", "$75k - $110k"),
+    "pct_income_high2": jsonb_extract("ud.income_data", "> $110k"),
 }
 
 DEPT_SORT_MAP = {
@@ -143,6 +173,7 @@ def parse_jsonb(value):
         return json.loads(value)
     return value
 
+
 # Checks request.args for min/max filters and adds them to the where conditions
 def _add_field_filters(where, fields):
     for field_name, (sql_col, cast_fn, transform) in fields.items():
@@ -185,6 +216,7 @@ def build_count_query(where, filter_dept=""):
         "SELECT COUNT(*) FROM universities u"
         " LEFT JOIN university_undergrad_stats us ON us.university_id = u.id"
         " LEFT JOIN university_cost_aid ca ON ca.university_id = u.id"
+        " LEFT JOIN university_undergrad_demographics ud ON ud.university_id = u.id"
         f" {filter_join}"
         f" {where_sql}"
     )
@@ -230,6 +262,7 @@ def build_id_query(where, sort_col, sort_dir, sort_dept, filter_dept, limit, off
         FROM universities u
         LEFT JOIN university_undergrad_stats us ON us.university_id = u.id
         LEFT JOIN university_cost_aid ca ON ca.university_id = u.id
+        LEFT JOIN university_undergrad_demographics ud ON ud.university_id = u.id
         {sort_dept_join}
         {filter_join}
         {where_sql}
