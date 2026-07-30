@@ -19,6 +19,7 @@ export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange 
       w={{ base: "100%", lg: "200px" }}
       mx="auto"
       p={4}
+      alignSelf="flex-start"
       position={{ base: "static", lg: "sticky" }}
       top={{ base: "auto", lg: "80px" }}
     >
