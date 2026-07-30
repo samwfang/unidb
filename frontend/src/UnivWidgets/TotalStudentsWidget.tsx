@@ -277,22 +277,24 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
             <Text fontSize="md" fontWeight="bold" mb={3}>
               {DATA_SET_NAMES[activeTab]} Distribution
             </Text>
-            <Flex direction="column" gap={2}>
-              {currentData.data.map((entry, index) => (
-                <Flex key={index} align="center" gap={3}>
-                  <Box
-                    w="12px"
-                    h="12px"
-                    borderRadius="2px"
-                    bg={COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length]}
-                    flexShrink={0}
-                  />
-                  <Text fontSize="sm">
-                    {entry.name.replace('\n', ' ')}: {(entry.value / currentDataSum * 100).toFixed(1)}%
-                  </Text>
-                </Flex>
-              ))}
-            </Flex>
+            <Box maxH="250px" overflowY="auto" pr={2}>
+              <Flex direction="column" gap={2}>
+                {currentData.data.map((entry, index) => (
+                  <Flex key={index} align="center" gap={3}>
+                    <Box
+                      w="12px"
+                      h="12px"
+                      borderRadius="2px"
+                      bg={COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length]}
+                      flexShrink={0}
+                    />
+                    <Text fontSize="sm">
+                      {entry.name.replace('\n', ' ')}: {(entry.value / currentDataSum * 100).toFixed(1)}%
+                    </Text>
+                  </Flex>
+                ))}
+              </Flex>
+            </Box>
           </PopoverBody>
         </PopoverContent>
       </Popover>
