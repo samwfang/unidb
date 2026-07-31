@@ -7,6 +7,7 @@ import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
 import GlassBox from 'src/containers/GlassBox';
 import { useResponsive } from 'src/containers/useResponsive';
+import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
 
 interface TotalStudentWidgetProps {
   universityName: string;
@@ -313,6 +314,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
       position="relative"
     >
       {renderLegendPopover()}
+      <DataInfoPopover top={3} right={10} isWarning={activeTab === DisplayMode.Department} />
       <Box>
         <Text fontSize={{ base: "sm", sm: "md", md: "lg" }} fontWeight="bold">Total Students:</Text>
         <Box height={{ base: "200px", md: "250px" }} position="relative" overflow="visible">

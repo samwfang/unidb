@@ -5,6 +5,7 @@ import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import GlassBox from 'src/containers/GlassBox';
 import WidgetBox from 'src/containers/WidgetBox';
 import { useResponsive } from 'src/containers/useResponsive';
+import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
 
 interface AdmissionsRateProps {
   universityName: string;
@@ -97,6 +98,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
         />
       </Box>
 
+      <DataInfoPopover />
     </WidgetBox>
   );
 };

@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
 import { useResponsive } from 'src/containers/useResponsive';
+import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
 
 interface TestScoresProps {
   satScore?: string;
@@ -129,6 +130,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore, unive
         />
       </Box>
 
+      <DataInfoPopover />
     </WidgetBox>
   );
 };

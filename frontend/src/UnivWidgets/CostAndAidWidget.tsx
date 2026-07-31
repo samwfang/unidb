@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Text, Tabs, TabList, Tab, Flex, Badge, useColorMode } from '@chakra-ui/react';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
+import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
 
 interface CostAndAidWidgetProps {
     inStateTuition?: string;
@@ -142,6 +143,8 @@ const CostAndAidWidget: React.FC<CostAndAidWidgetProps> = ({
 
                 {activeTab === CostAidTab.Cost && renderSecondaryTabs()}
             </Box>
+
+            <DataInfoPopover />
         </WidgetBox>
     );
 };

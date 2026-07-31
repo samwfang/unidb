@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Text, Flex, Circle, Badge, Grid, GridItem, useColorMode } from '@chakra-ui/react';
 import SmallAttributeBox from 'src/containers/SmallAttributesBox';
+import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
 
 interface UniversitySummaryWidgetProps {
     universityName: string;
@@ -64,10 +65,12 @@ const UniversitySummaryWidget: React.FC<UniversitySummaryWidgetProps> = ({ unive
             p={{ base: 3, md: 5 }}
             borderRadius="xl"
             mb={4}
+            position="relative"
             bg={isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)'}
             border="1px solid"
             borderColor={isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}
         >
+            <DataInfoPopover />
             <Flex alignItems="center" justifyContent="space-between" gap={4} flexDirection={{ base: "column", md: "row" }}>
                 <Flex alignItems="flex-start" gap={{ base: 3, md: 6 }}>
                     <Circle

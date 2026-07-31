@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
 import { useResponsive } from 'src/containers/useResponsive';
+import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
 
 interface GraduationRateWidgetProps {
   universityName: string;
@@ -97,6 +98,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
         />
       </Box>
 
+      <DataInfoPopover />
     </WidgetBox>
   );
 };
