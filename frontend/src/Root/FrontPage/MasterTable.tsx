@@ -404,6 +404,35 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       position="relative"
       p={{ base: 3, md: 5 }}
     >
+      {mode === ModeType.Grad ? (
+        <Flex
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          textAlign="center"
+          minH="300px"
+          py={8}
+          px={4}
+          gap={3}
+        >
+          <Circle
+            size="64px"
+            bg={isDark ? 'rgba(168, 85, 247, 0.12)' : 'rgba(168, 85, 247, 0.1)'}
+          >
+            <WarningIcon color={isDark ? 'purple.400' : 'purple.500'} boxSize={7} />
+          </Circle>
+          <Text fontSize="xl" fontWeight="600" color={isDark ? 'gray.100' : 'gray.800'}>
+            Graduate Mode is Under Construction
+          </Text>
+          <Text fontSize="sm" color={isDark ? 'gray.400' : 'gray.500'} maxW="420px" lineHeight="tall">
+            We're currently building graduate program data. Please check back soon, or explore undergraduate programs in the meantime.
+          </Text>
+          <Button mt={2} variant="primary" size="sm" onClick={toggleMode}>
+            Explore Undergraduate Mode
+          </Button>
+        </Flex>
+      ) : (
+        <>
       {/* Toolbar */}
       <Flex justifyContent="space-between" alignItems="center" mb={5} gap={3}>
         <Flex flex="1" maxWidth="500px">
@@ -695,6 +724,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           Next
         </Button>
       </Flex>
+        </>
+      )}
         </>
       )}
     </GlassBox>
