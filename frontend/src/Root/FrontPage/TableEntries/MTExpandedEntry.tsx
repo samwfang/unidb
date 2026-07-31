@@ -125,8 +125,8 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
                "students students costaid costaid"`
         }}
         gridTemplateColumns={{
-          base: "1fr 1fr",
-          md: "1fr 1fr 1fr 1fr"
+          base: "minmax(0, 1fr) minmax(0, 1fr)",
+          md: "minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)"
         }}
         gridTemplateRows={{
           base: "auto auto auto auto",
@@ -136,7 +136,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
         width="100%"
         alignItems="stretch"
       >
-        <Box gridArea="students" height="100%">
+        <Box gridArea="students" height="100%" minW="0">
           <TotalStudentsWidget
             universityName={item?.name || 'Unknown University'}
             totalStudentsPercentile={general?.general_content.total_student_percentile || 'No Data'}
@@ -144,22 +144,22 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             demographics={general?.demographics}
             departments={general?.dept_contents} />
         </Box>
-        <Box gridArea="costaid" height="100%">
+        <Box gridArea="costaid" height="100%" minW="0">
           <CostAndAidWidget />
         </Box>
-        <Box gridArea="rate" height="100%">
+        <Box gridArea="rate" height="100%" minW="0">
           <GraduationRateWidget
             universityName={item?.name || 'Unknown University'}
             graduationRate={general?.general_content.graduation_rate || 'No Data'}
             graduationRatePercentile={general?.general_content.graduation_rate_percentile || 'No Data'} />
         </Box>
-        <Box gridArea="admissions" height="100%">
+        <Box gridArea="admissions" height="100%" minW="0">
           <AdmissionsRateWidget
             universityName={item?.name || 'Unknown University'}
             admissionsRate={general?.general_content.admissions_rate || 'No Data'}
             admissionsRatePercentile={general?.general_content.admissions_rate_percentile || 'No Data'} />
         </Box>
-        <Box gridArea="testscores" height="100%">
+        <Box gridArea="testscores" height="100%" minW="0">
           <TestScoresWidget
             universityName={item?.name || 'Unknown University'}
             satScore={general?.general_content.sat_score || 'No Data'}
@@ -167,7 +167,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             satScorePercentile={general?.general_content.sat_score_percentile || 'No Data'}
             actScorePercentile={general?.general_content.act_score_percentile || 'No Data'} />
         </Box>
-        <Box gridArea="testscores2" height="100%">
+        <Box gridArea="testscores2" height="100%" minW="0">
           <TestScoresWidget
             universityName={item?.name || 'Unknown University'}
             satScore={"1440"} actScore={"34"}
@@ -215,7 +215,7 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
     const secondColumnGroups = groupedEntries.slice(midpoint);
 
     return (
-      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+      <Grid templateColumns="repeat(2, minmax(0, 1fr))" gap={6}>
         {[firstColumnGroups, secondColumnGroups].map((columnGroups, columnIndex) => (
           <Box key={columnIndex}>
             {columnGroups.map(([cip, depts]) => (
@@ -264,7 +264,18 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
   return (
     <AccordionPanel pb={4} px={{ base: 2, md: 3 }} borderTop="none">
       {isExpanded && (
-        <Tabs variant="default" index={activeTabIndex} isLazy onChange={setActiveTabIndex} overflowX="auto">
+        <Tabs
+          variant="default"
+          index={activeTabIndex}
+          isLazy
+          onChange={setActiveTabIndex}
+          overflowX="auto"
+          css={{
+            '&::-webkit-scrollbar': { display: 'none' },
+            '-ms-overflow-style': 'none',
+            'scrollbar-width': 'none',
+          }}
+        >
           <TabList
             flexWrap="wrap"
             minW="300px"
