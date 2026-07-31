@@ -2,7 +2,7 @@
     "compilerOptions": {
       "module": "esnext",
       "moduleResolution": "node", // Ensure this is set to 'node'
-      "target": "es5",
+      "target": "ES2022",
       "jsx": "react-jsx",
       "esModuleInterop": true,
       "skipLibCheck": true,

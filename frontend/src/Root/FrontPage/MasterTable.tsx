@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem, Menu, FormControl, Select, Badge } from '@chakra-ui/react';
+import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem, Menu, FormControl, Select, Badge, Circle } from '@chakra-ui/react';
 import { Popover, PopoverTrigger, PopoverContent, PopoverBody, Portal } from '@chakra-ui/react';
 import MasterTableRow from './TableEntries/MasterTableRow';
 import { ModeType } from "../../helpers/types";
 import { useSearchParams } from 'react-router-dom';
-import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, SearchIcon, WarningIcon } from '@chakra-ui/icons';
 import ReactSelect, { SingleValue } from 'react-select';
 import { ColumnType, ExtraSortType, SortType } from '../../helpers/DepartmentHelper';
 import ColumnPopover from '../../ReusableComponents/ColumnPopover';
@@ -132,6 +132,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   //Stores Expanded Indecies 
   const [expandedIndex, setExpandedIndex] = useState<number | number[]>([]);
 
@@ -183,6 +184,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   ) => {
     setIsLoading(true);
     setExpandedIndex([]);
+    setError(null);
 
     try {
       const params = new URLSearchParams();
@@ -221,8 +223,12 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       const result = await response.json();
       setData(result.universities);
       setTotalItems(result.total);
+      setError(null);
     } catch (error) {
       console.error('Failed to fetch page data:', error);
+      setError(error instanceof Error && error.message.startsWith('API error')
+        ? `The server returned an error (${error.message.replace('API error: ', '')}) while loading data.`
+        : 'Could not reach the server. The server could be down or overloaded. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -417,6 +423,39 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
         </Button>
       </Flex>
 
+      {error ? (
+        <Flex
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          textAlign="center"
+          minH="240px"
+          py={8}
+          gap={3}
+        >
+          <Circle
+            size="56px"
+            bg={isDark ? 'rgba(255, 99, 132, 0.12)' : 'rgba(245, 101, 101, 0.1)'}
+          >
+            <WarningIcon color={isDark ? 'red.400' : 'red.500'} boxSize={6} />
+          </Circle>
+          <Text fontSize="lg" fontWeight="600" color={isDark ? 'gray.100' : 'gray.800'}>
+            Couldn't load university data
+          </Text>
+          <Text fontSize="sm" color={isDark ? 'gray.400' : 'gray.500'} maxW="420px">
+            {error}
+          </Text>
+          <Button
+            mt={2}
+            variant="primary"
+            size="sm"
+            onClick={() => fetchPageData(currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery)}
+          >
+            Retry
+          </Button>
+        </Flex>
+      ) : (
+        <>
       {/* Table */}
       <Box
         overflowX={{ base: "auto", md: "hidden" }}
@@ -656,6 +695,8 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
           Next
         </Button>
       </Flex>
+        </>
+      )}
     </GlassBox>
   );
 };
