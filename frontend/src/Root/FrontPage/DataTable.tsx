@@ -75,6 +75,9 @@ export interface DataTableProps<T extends { id: number }, C, S extends string = 
   fetchPage: (params: FetchPageParams<S>) => Promise<FetchPageResult<T>>;
   RowComponent: React.ComponentType<DataRowProps<T, C>>;
   onExpand?: (id: number) => Promise<unknown>;
+  //When this value changes, the table refetches the current page (used by tables
+  //whose data lives in local state rather than the server, e.g. favorites).
+  refreshSignal?: unknown;
 }
 
 const DataTable = <T extends { id: number }, C, S extends string = string>({
@@ -88,6 +91,7 @@ const DataTable = <T extends { id: number }, C, S extends string = string>({
   fetchPage,
   RowComponent,
   onExpand,
+  refreshSignal,
 }: DataTableProps<T, C, S>) => {
   //Custom Parameters for App Styling Based on Theme
   const { colorMode, glassBg, glassBorder, modeColor, isDark } = useAppTheme();
@@ -190,9 +194,10 @@ const DataTable = <T extends { id: number }, C, S extends string = string>({
   // -New page is loaded
   // -Size of each page is altered (could be inefficient but IDGAF ;))
   // -Sorting Parameter Changes
+  // -refreshSignal changes (data external to the table changed, e.g. local favorites)
   useEffect(() => {
     fetchPageData(currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery);
-  }, [currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery]);
+  }, [currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery, refreshSignal]);
 
 
 

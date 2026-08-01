@@ -183,6 +183,11 @@ const DynamicColumnHeader: React.FC<ColumnHeaderContext<ColumnType, SortType>> =
   );
 };
 
+//Header slot for the favorites (heart) toggle column; no content.
+const HeartColumnHeader: React.FC<ColumnHeaderContext<ColumnType, SortType>> = () => {
+  return <GridItem />;
+};
+
 export const universityColumns: DataTableColumn<ColumnType, SortType>[] = [
   {
     id: 'score',
@@ -213,5 +218,11 @@ export const universityColumns: DataTableColumn<ColumnType, SortType>[] = [
     template: metricColumnTemplate,
     initial: { key: 'general', label: 'General', value: ColumnType.TotalStudents },
     header: DynamicColumnHeader,
+  },
+  {
+    id: 'favorites',
+    responsive: false,
+    template: { base: '28px', md: '36px' },
+    header: HeartColumnHeader,
   },
 ];

@@ -5,6 +5,8 @@ import GradModePlaceholder from './GradModePlaceholder';
 import { UniversityData, ModeType } from "../../helpers/types";
 import { ColumnType, ExtraSortType, SortType } from '../../helpers/DepartmentHelper';
 import { universityColumns } from './UniversityTableColumns';
+import { useFavorites } from '../../helpers/FavoritesContext';
+import { compareFavorites } from '../../helpers/FavoritesHelper';
 
 interface FavoritesTableProps {
   mode: ModeType;
@@ -13,9 +15,26 @@ interface FavoritesTableProps {
 }
 
 const FavoritesTable: React.FC<FavoritesTableProps> = ({ mode, toggleMode, pageSize = 10 }) => {
+  const { favorites } = useFavorites();
+
   const fetchPage = async (params: FetchPageParams<SortType>): Promise<FetchPageResult<UniversityData>> => {
-    // Favorites endpoint not implemented yet
-    throw new Error('API error: 501 (favorites endpoint not implemented yet)');
+    const search = (params.search ?? '').toLowerCase();
+    let filtered = favorites;
+    if (search) {
+      filtered = filtered.filter(
+        (f) => f.name.toLowerCase().includes(search) || f.location.toLowerCase().includes(search)
+      );
+    }
+
+    const sorted = [...filtered].sort((a, b) =>
+      compareFavorites(a, b, params.sort, params.sortDept, params.sortExtra, mode)
+    );
+
+    const start = params.page * params.pageSize;
+    return {
+      items: sorted.slice(start, start + params.pageSize),
+      total: sorted.length,
+    };
   };
 
   if (mode === ModeType.Grad) {
@@ -31,6 +50,7 @@ const FavoritesTable: React.FC<FavoritesTableProps> = ({ mode, toggleMode, pageS
       initialSortingCol={1}
       initialSortingParam={ExtraSortType.Alphabetical}
       fetchPage={fetchPage}
+      refreshSignal={favorites}
       RowComponent={MasterTableRow}
     />
   );

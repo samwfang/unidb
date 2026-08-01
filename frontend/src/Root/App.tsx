@@ -10,6 +10,7 @@ import UniChatPage from './Pages/UniChatPage';
 import FacultyDBPage from './Pages/FacultyDBPage';
 import AboutPage from './Pages/AboutPage';
 import { ModeType } from '../helpers/types';
+import { FavoritesProvider } from '../helpers/FavoritesContext';
 
 function App() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -57,21 +58,23 @@ function App() {
           colorMode={colorMode}
         />
 
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ExplorePage
-                mode={mode}
-                onModeChange={undergradGradToggle}
-              />
-            }
-          />
-          <Route path="/favorites" element={<FavoritesPage mode={mode} onModeChange={undergradGradToggle} />} />
-          <Route path="/chat" element={<UniChatPage />} />
-          <Route path="/facultydb" element={<FacultyDBPage />} />
-          <Route path="/about" element={<AboutPage />} />
-        </Routes>
+        <FavoritesProvider>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ExplorePage
+                  mode={mode}
+                  onModeChange={undergradGradToggle}
+                />
+              }
+            />
+            <Route path="/favorites" element={<FavoritesPage mode={mode} onModeChange={undergradGradToggle} />} />
+            <Route path="/chat" element={<UniChatPage />} />
+            <Route path="/facultydb" element={<FacultyDBPage />} />
+            <Route path="/about" element={<AboutPage />} />
+          </Routes>
+        </FavoritesProvider>
 
         <NavigationFooter mode={mode} />
       </Box>
