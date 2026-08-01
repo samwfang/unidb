@@ -1,25 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
-import MasterTable from './FrontPage/MasterTable'
-import TopHeader from '../ReusableComponents/TopHeader';
-import { MTControlPanel } from './FrontPage/MTControlPanel';
-import FrontPageInfo from './FrontPage/FrontPageInfo';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { useColorMode, useColorModeValue } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
+import TopHeader from '../ReusableComponents/TopHeader';
 import NavigationFooter from '../ReusableComponents/NavigationFooter';
-import { Box, Flex, Text } from '@chakra-ui/react';
-import ThankYouPage from './FrontPage/ThankYouPage';
+import ExplorePage from './Pages/ExplorePage';
+import FavoritesPage from './Pages/FavoritesPage';
+import UniChatPage from './Pages/UniChatPage';
+import FacultyDBPage from './Pages/FacultyDBPage';
+import AboutPage from './Pages/AboutPage';
 import { ModeType } from '../helpers/types';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<string>('explore');
   const { colorMode, toggleColorMode } = useColorMode();
   const [mode, setMode] = useState<ModeType>(ModeType.Undergrad);
-  const [pageSize, setPageSize] = useState<number>(10);
   const [showHeader, setShowHeader] = useState<boolean>(false);
-  const frontPageInfoRef = useRef<HTMLDivElement>(null);
-  const masterTableRef = useRef<HTMLDivElement>(null);
 
-  const scrollToMasterTable = () => {
-    masterTableRef.current?.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowHeader(window.scrollY > 40);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const undergradGradToggle = () => {
+    setMode((prevMode) => (prevMode === ModeType.Undergrad ? ModeType.Grad : ModeType.Undergrad));
   };
 
   const bgGradient = useColorModeValue(
@@ -30,22 +38,6 @@ function App() {
       ? "linear(160deg, #0a0e1a 0%, #0d1225 40%, #0f1117 70%, #111827 100%)"
       : "linear(160deg, #0f0a1a 0%, #120d25 40%, #0f1117 70%, #1a1025 100%)"
   );
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (frontPageInfoRef.current) {
-        const threshold = frontPageInfoRef.current.offsetHeight * 0.1;
-        setShowHeader(window.scrollY > threshold);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const undergradGradToggle = () => {
-    setMode((prevMode) => (prevMode === ModeType.Undergrad ? ModeType.Grad : ModeType.Undergrad));
-  };
 
   return (
     <div className="App">
@@ -65,59 +57,23 @@ function App() {
           colorMode={colorMode}
         />
 
-        <Flex
-          maxW="1100px"
-          w="100%"
-          px={{ base: 4, md: 8 }}
-          mx="auto"
-          ref={frontPageInfoRef}
-        >
-          <FrontPageInfo
-            mode={mode}
-            onModeChange={undergradGradToggle}
-            onFindCollegesClick={scrollToMasterTable}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ExplorePage
+                mode={mode}
+                onModeChange={undergradGradToggle}
+              />
+            }
           />
-        </Flex>
+          <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/chat" element={<UniChatPage />} />
+          <Route path="/facultydb" element={<FacultyDBPage />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Routes>
 
-        <Box ref={masterTableRef}>
-          <Flex
-            direction={{ base: "column", lg: "row" }}
-            gap={6}
-            mt={8}
-            maxW="1300px"
-            mx="auto"
-            w="100%"
-            px={{ base: 4, md: 8 }}
-            alignItems="flex-start"
-          >
-            <MTControlPanel
-              pageSize={pageSize}
-              onPageSizeChange={setPageSize}
-              mode={mode}
-              onModeChange={undergradGradToggle}
-            />
-
-            <Box flex={1} w="100%" minW={0}>
-              <MasterTable mode={mode} toggleMode={undergradGradToggle} pageSize={pageSize} />
-            </Box>
-          </Flex>
-
-          <Flex maxW="1100px" alignItems="center" mx="auto" px={{ base: 4, md: 8 }}>
-            <ThankYouPage mode={mode} onModeChange={undergradGradToggle} />
-          </Flex>
-        </Box>
-
-        <Box mt={12} py={6} textAlign="center">
-          <Text fontSize="xs" color="gray.400" fontWeight="400">
-            By Samuel Fang · Built with React & Chakra UI
-          </Text>
-        </Box>
-
-        <NavigationFooter
-          mode={mode}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
+        <NavigationFooter mode={mode} />
       </Box>
     </div>
   );
