@@ -2,6 +2,7 @@ import React from 'react';
 import DataTable, { FetchPageParams, FetchPageResult } from './DataTable';
 import MasterTableRow from './TableEntries/MasterTableRow';
 import GradModePlaceholder from './GradModePlaceholder';
+import EmptyFavoritesPlaceholder from './EmptyFavoritesPlaceholder';
 import { UniversityData, ModeType } from "../../helpers/types";
 import { ColumnType, ExtraSortType, SortType } from '../../helpers/DepartmentHelper';
 import { universityColumns } from './UniversityTableColumns';
@@ -39,6 +40,10 @@ const FavoritesTable: React.FC<FavoritesTableProps> = ({ mode, toggleMode, pageS
 
   if (mode === ModeType.Grad) {
     return <GradModePlaceholder toggleMode={toggleMode} />;
+  }
+
+  if (favorites.length === 0) {
+    return <EmptyFavoritesPlaceholder />;
   }
 
   return (
