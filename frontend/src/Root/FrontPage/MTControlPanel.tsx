@@ -10,11 +10,13 @@ interface MTControlPanelProps {
   onPageSizeChange: (size: number) => void;
   mode: ModeType;
   onModeChange: () => void;
+  //Some pages (e.g. FacultyDB) don't have distinct undergrad/grad modes.
+  showModeToggle?: boolean;
 }
 
 const MAX_FILTERS = 5;
 
-export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange }: MTControlPanelProps) => {
+export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange, showModeToggle = true }: MTControlPanelProps) => {
   const { colorMode } = useColorMode();
   const isDark = colorMode === 'dark';
   const [filters, setFilters] = useState<number[]>([]);
@@ -54,19 +56,21 @@ export const MTControlPanel = ({ pageSize, onPageSizeChange, mode, onModeChange 
           </Select>
         </Box>
 
-        <Box>
-          <Text
-            fontSize="xs"
-            fontWeight="600"
-            color={isDark ? 'gray.400' : 'gray.500'}
-            mb={2}
-            textTransform="uppercase"
-            letterSpacing="wider"
-          >
-            View Mode
-          </Text>
-          <UGradGradToggle mode={mode} onToggle={onModeChange} />
-        </Box>
+        {showModeToggle && (
+          <Box>
+            <Text
+              fontSize="xs"
+              fontWeight="600"
+              color={isDark ? 'gray.400' : 'gray.500'}
+              mb={2}
+              textTransform="uppercase"
+              letterSpacing="wider"
+            >
+              View Mode
+            </Text>
+            <UGradGradToggle mode={mode} onToggle={onModeChange} />
+          </Box>
+        )}
 
         <Box>
           <Text

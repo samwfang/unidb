@@ -71,7 +71,7 @@ function App() {
             />
             <Route path="/favorites" element={<FavoritesPage mode={mode} onModeChange={undergradGradToggle} />} />
             <Route path="/chat" element={<UniChatPage />} />
-            <Route path="/facultydb" element={<FacultyDBPage />} />
+            <Route path="/facultydb" element={<FacultyDBPage mode={mode} onModeChange={undergradGradToggle} />} />
             <Route path="/about" element={<AboutPage />} />
           </Routes>
         </FavoritesProvider>
