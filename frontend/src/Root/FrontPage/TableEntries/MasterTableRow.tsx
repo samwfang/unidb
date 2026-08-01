@@ -4,18 +4,18 @@ import MTExpandedEntry from './MTExpandedEntry';
 import { UniversityData } from "../../../helpers/types";
 import { ModeType } from "../../../helpers/types";
 import { ColumnType, getColumnData } from '../../../helpers/DepartmentHelper';
+import { TableColumnState } from '../DataTable';
 
 interface MasterTableRowProps {
   rank: number;
   item: UniversityData;
   mode: ModeType;
-  columnDepts: { value: string, label: string }[];
-  columnTypes: ColumnType[];
+  columnState: TableColumnState<ColumnType>[];
   toggleMode: () => void;
   onExpand: (id: number) => Promise<unknown>;
 }
 
-const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, columnDepts, columnTypes, toggleMode, onExpand }) => {
+const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, columnState, toggleMode, onExpand }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { colorMode } = useColorMode();
@@ -67,8 +67,8 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
           >
             <Grid
               templateColumns={{
-                base: `30px minmax(120px, 1fr) ${'minmax(60px, 1fr) '.repeat(columnDepts.length)}`,
-                md: "60px 2fr 1fr 1fr 1fr"
+                base: `30px minmax(120px, 1fr) ${'minmax(60px, 1fr) '.repeat(columnState.length)}`,
+                md: `60px 2fr ${'1fr '.repeat(columnState.length)}`
               }}
               gap={{ base: 2, md: 4 }}
               width="100%"
@@ -100,14 +100,14 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
               </GridItem>
 
               {/* Dynamic Columns */}
-              {columnDepts.map((dept, index) => (
+              {columnState.map((col, index) => (
                 <GridItem
                   key={index}
                   textAlign="center"
                   fontSize={{ base: "xs", md: "sm" }}
                   color={isDark ? 'gray.300' : 'gray.600'}
                 >
-                  {getColumnData(item, columnTypes[index], mode, dept.value)}
+                  {getColumnData(item, col.value, mode, col.key)}
                 </GridItem>
               ))}
             </Grid>

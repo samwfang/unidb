@@ -2,6 +2,8 @@ import React from 'react';
 import DataTable, { FetchPageParams, FetchPageResult } from './DataTable';
 import MasterTableRow from './TableEntries/MasterTableRow';
 import { UniversityData, ModeType } from "../../helpers/types";
+import { ColumnType } from '../../helpers/DepartmentHelper';
+import { universityColumns } from './UniversityTableColumns';
 
 interface FavoritesTableProps {
   mode: ModeType;
@@ -16,10 +18,11 @@ const FavoritesTable: React.FC<FavoritesTableProps> = ({ mode, toggleMode, pageS
   };
 
   return (
-    <DataTable<UniversityData>
+    <DataTable<UniversityData, ColumnType>
       mode={mode}
       toggleMode={toggleMode}
       pageSize={pageSize}
+      columns={universityColumns}
       fetchPage={fetchPage}
       RowComponent={MasterTableRow}
     />

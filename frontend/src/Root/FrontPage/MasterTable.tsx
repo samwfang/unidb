@@ -4,6 +4,8 @@ import MasterTableRow from './TableEntries/MasterTableRow';
 import { UniversityData, Content } from "../../helpers/types";
 import { ModeType } from "../../helpers/types";
 import { ExtraSortType } from '../../helpers/DepartmentHelper';
+import { ColumnType } from '../../helpers/DepartmentHelper';
+import { universityColumns } from './UniversityTableColumns';
 
 export interface MasterTableProps {
   mode: ModeType;
@@ -34,7 +36,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       query.set('sort', 'name');
       query.set('sortDir', 'desc');
     } else {
-      query.set('sort', params.sort as string);
+      query.set('sort', params.sort);
       query.set('sortDir', params.sortExtra === 'least' ? 'asc' : 'desc');
     }
 
@@ -75,10 +77,11 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
   };
 
   return (
-    <DataTable<UniversityData>
+    <DataTable<UniversityData, ColumnType>
       mode={mode}
       toggleMode={toggleMode}
       pageSize={pageSize}
+      columns={universityColumns}
       fetchPage={fetchPage}
       onExpand={fetchExpandedEntryContent}
       RowComponent={MasterTableRow}

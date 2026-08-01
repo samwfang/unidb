@@ -16,10 +16,10 @@ interface ColumnPopoverProps {
     onApply: (index: number, newCID: string, newName: string, newColumnType: ColumnType) => void;
     onApplyAndSort: (index: number, newCID: string, newDept: string, newColumnType: ColumnType, sortOption: string) => void;
     index: number;
-    sortedByCol: number;
+    isSorted: boolean;
 }
 
-const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, departmentName, columnType, onApply: onApply, onApplyAndSort: onApplyAndSort, sortedByCol }) => {
+const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, departmentName, columnType, onApply: onApply, onApplyAndSort: onApplyAndSort, isSorted }) => {
 
     const [sortExtraOption, setSortExtraOption] = useState<string>("greatest");
     const [currentField, setCurrentField] = useState<string>("General");
@@ -35,8 +35,6 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
         value: cipCode,
         label: name
     }));
-
-    const isSortedBy: boolean = sortedByCol - 2 === index ? true : false;
 
     const handlePopoverOpen = () => {
         setCurrentCID(departmentCID || "general");
@@ -134,7 +132,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                                 </Text>
                             )}
                             <ColumnPopoverButton
-                                isActivated={isSortedBy}
+                                isActivated={isSorted}
                                 isOpen={isOpen}
                             >
                                 {getColumnDisplayName(columnType)}
@@ -160,7 +158,7 @@ const ColumnPopover: React.FC<ColumnPopoverProps> = ({ index, departmentCID, dep
                             <GlassBox>
                                 <PopoverBody p={4}>
                                     <Text fontSize="xl" fontWeight="bold"> {getColumnDisplayName(columnType)}</Text>
-                                    {isSortedBy &&
+                                    {isSorted &&
                                         <Badge bg="green.200">Currently Sorted By</Badge>
                                     }
                                     <Text color="gray.600"> {getColumnDescription(columnType)} </Text>

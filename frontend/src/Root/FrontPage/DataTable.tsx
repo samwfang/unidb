@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, GridItem, FormControl, Badge, Circle } from '@chakra-ui/react';
-import { Popover, PopoverTrigger, PopoverContent, PopoverBody, Portal } from '@chakra-ui/react';
+import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, Circle } from '@chakra-ui/react';
 import { ModeType } from "../../helpers/types";
 import { WarningIcon } from '@chakra-ui/icons';
-import ReactSelect, { SingleValue } from 'react-select';
-import { ColumnType, ExtraSortType, SortType } from '../../helpers/DepartmentHelper';
-import ColumnPopover from '../../ReusableComponents/ColumnPopover';
 import SearchBar from '../../ReusableComponents/SearchBar';
 import { useAppTheme } from '../../containers/useTheme';
 import { useResponsive } from '../../containers/useResponsive';
 import GlassBox from '../../containers/GlassBox';
-import ColumnPopoverButton from 'src/containers/ColumnPopoverButton';
 
 export interface FetchPageParams {
   page: number;
   pageSize: number;
-  sort: SortType;
+  sort: string;
   sortDept: string;
   sortExtra: string;
   search?: string;
@@ -26,26 +21,71 @@ export interface FetchPageResult<T> {
   total: number;
 }
 
-export interface DataRowProps<T> {
+//Opaque per-column state held by the table and passed through to headers and rows.
+//The meaning of `value` (e.g. a column metric type) is defined by the table wrapper.
+export interface TableColumnState<C> {
+  key: string;
+  label: string;
+  value: C;
+}
+
+//Context handed to every header component. `index` is the column's position in the
+//full `columns` array (not the responsive-shown subset).
+export interface ColumnHeaderContext<C> {
+  mode: ModeType;
+  index: number;
+  isSorted: boolean;
+  state: TableColumnState<C> | null;
+  updateColumnState: (index: number, s: TableColumnState<C>) => void;
+  applySort: (index: number, sortKey: string, sortDept: string, sortExtra: string) => void;
+}
+
+//Defines a single header column. Headers render their own GridItem, so alignment,
+//popover UI and styling are all owned by the wrapper-provided header component.
+//`responsive: false` columns are always shown; responsive columns are sliced by
+//`visibleColumnCount` (in order) on smaller screens.
+export interface DataTableColumn<C> {
+  id: string;
+  responsive?: boolean;
+  initial?: TableColumnState<C>;
+  template: { base: string; md: string };
+  header: React.ComponentType<ColumnHeaderContext<C>>;
+}
+
+export interface DataRowProps<T, C> {
   rank: number;
   item: T;
   mode: ModeType;
-  columnDepts: { value: string, label: string }[];
-  columnTypes: ColumnType[];
+  columnState: TableColumnState<C>[];
   toggleMode: () => void;
   onExpand: (id: number) => Promise<unknown>;
 }
 
-export interface DataTableProps<T extends { id: number }> {
+export interface DataTableProps<T extends { id: number }, C> {
   mode: ModeType;
   toggleMode: () => void;
   pageSize: number;
+  columns: DataTableColumn<C>[];
+  searchPlaceholder?: string;
+  initialSortingCol?: number;
+  initialSortingParam?: string;
   fetchPage: (params: FetchPageParams) => Promise<FetchPageResult<T>>;
-  RowComponent: React.ComponentType<DataRowProps<T>>;
+  RowComponent: React.ComponentType<DataRowProps<T, C>>;
   onExpand?: (id: number) => Promise<unknown>;
 }
 
-const DataTable = <T extends { id: number },>({ mode, toggleMode, pageSize = 10, fetchPage, RowComponent, onExpand }: DataTableProps<T>) => {
+const DataTable = <T extends { id: number }, C>({
+  mode,
+  toggleMode,
+  pageSize = 10,
+  columns,
+  searchPlaceholder = "Search universities...",
+  initialSortingCol = 1,
+  initialSortingParam = "a-z",
+  fetchPage,
+  RowComponent,
+  onExpand,
+}: DataTableProps<T, C>) => {
   //Custom Parameters for App Styling Based on Theme
   const { colorMode, glassBg, glassBorder, modeColor, isDark } = useAppTheme();
 
@@ -70,19 +110,14 @@ const DataTable = <T extends { id: number },>({ mode, toggleMode, pageSize = 10,
   const { rowHeightEstimate, visibleColumnCount } = responsive;
   const calculatedMinHeight = pageSize * rowHeightEstimate;
 
-  //Selected Column Options
-  const [selectedNameSortingOption, setSelectedNameSortingOption] = useState<SingleValue<{ value: string; label: string }>>(null);
-  //Selected Column Types (Default: Location, Grad Rate, Total Students)
-  const [columnTypes, setColumnTypes] = useState<ColumnType[]>([ColumnType.Location, ColumnType.GraduationRate, ColumnType.TotalStudents]);
-  //Selected Department for Each Column
-  const [columnDepts, setColumnDepts] = useState<{ value: string, label: string }[]>([{ value: "general", label: "General" },
-  { value: "general", label: "General" }, { value: "general", label: "General" }]);
+  //Per-column state (parallel to the `columns` array; null for static columns)
+  const [columnState, setColumnState] = useState<(TableColumnState<C> | null)[]>(() => columns.map(c => c.initial ?? null));
   //Which column is sorted by
-  const [sortedByCol, setSortedByCol] = useState<number>(1);
+  const [sortedByCol, setSortedByCol] = useState<number>(initialSortingCol);
 
 
   //Current Parameter With Which To Sort Page Data With
-  const [sortingParam, setSortingParam] = useState<SortType>(ExtraSortType.Alphabetical);
+  const [sortingParam, setSortingParam] = useState<string>(initialSortingParam);
   const [sortingDeptCID, setSortingDeptCID] = useState<string>("general");
   const [sortingExtra, setSortingExtra] = useState<string>("greatest");
 
@@ -90,10 +125,34 @@ const DataTable = <T extends { id: number },>({ mode, toggleMode, pageSize = 10,
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
+  //Columns to display: static columns always show; responsive columns are sliced
+  //by the number that fits on the current screen.
+  const shownColumns: { col: DataTableColumn<C>; index: number }[] = [];
+  let responsiveShown = 0;
+  columns.forEach((col, index) => {
+    if (col.responsive === false) {
+      shownColumns.push({ col, index });
+      return;
+    }
+    if (responsiveShown < visibleColumnCount) {
+      shownColumns.push({ col, index });
+      responsiveShown++;
+    }
+  });
+
+  //Column state passed to rows: only the shown responsive (state-backed) columns
+  const shownState: TableColumnState<C>[] = [];
+  shownColumns.forEach(({ col, index }) => {
+    if (col.responsive !== false) {
+      const s = columnState[index];
+      if (s) shownState.push(s);
+    }
+  });
+
   const fetchPageData = async (
     page: number,
     pageSize: number,
-    sortingParameter: SortType,
+    sortingParameter: string,
     sortingDeptCID: string,
     sortingExtraParam: string,
     searchQuery?: string
@@ -147,64 +206,23 @@ const DataTable = <T extends { id: number },>({ mode, toggleMode, pageSize = 10,
 
 
 
-  //HARDCODED UNIVERSITY NAME SORTING OPTION
+  // SORTING AND COLUMN CHANGE OPERATIONS
 
-  // Change Preliminary Sorting Option Selected Under the University Name Popup (Hardcoded)
-  const onUniversityNameSelectChange = (option: SingleValue<{ value: string; label: string }>) => {
-    setSelectedNameSortingOption(option);
+  //Updates the state of a single column (e.g. selected department / metric)
+  const updateColumnState = (index: number, newState: TableColumnState<C>) => {
+    const updated = columnState.map((item, i) =>
+      i === index ? newState : item
+    );
+    setColumnState(updated);
   };
 
-  const applyAlphabeticalSort = () => {
-    if (selectedNameSortingOption) {
-      // Trust that you will always use a valid SortType as the value of a Sort Option
-      setSortingParam(selectedNameSortingOption.value as SortType);
-      setSortedByCol(1);
-      console.log('Selected option:', sortingParam);
-    } else {
-      console.log('No option selected.');
-    }
-  };
-
-  // SORTING AND COLUMN CHANGE OPERATIONS FOR OTHER COLUMNS
-
-  const handleApplySort = (index: number, newCID: string, newDept: string, newColumnType: ColumnType, sortOption: string) => {
-    // First Apply 
-    console.log("Applying sort:", sortOption);
-    const updatedItems = columnDepts.map((item, i) =>
-      i === index ? { value: newCID, label: newDept } : item
-    );
-    setColumnDepts(updatedItems)
-    const updatedColumnTypes = columnTypes.map((item, i) =>
-      i === index ? newColumnType : item
-    );
-    setColumnTypes(updatedColumnTypes)
-
-    //Then Set Sorting Parameters
-
-    //Set Base Sorting Param as the Column Type of the current Column
-    setSortingParam(newColumnType)
-
-    //Set Sorting Department as Department of current Column
-    setSortingDeptCID(newCID)
-
-    //Set Sorting Extra parameter
-    setSortingExtra(sortOption)
-
-    //Update
-    setSortedByCol(index + 2)
-
-  };
-
-  //Changes the Department Selection for a specific index
-  const handleApply = (index: number, newCID: string, newDept: string, newColumnType: ColumnType) => {
-    const updatedItems = columnDepts.map((item, i) =>
-      i === index ? { value: newCID, label: newDept } : item
-    );
-    setColumnDepts(updatedItems)
-    const updatedColumnTypes = columnTypes.map((item, i) =>
-      i === index ? newColumnType : item
-    );
-    setColumnTypes(updatedColumnTypes)
+  //Sets the table's active sort and marks the given column as the sorted one
+  const applySort = (index: number, sortKey: string, sortDept: string, sortExtra: string) => {
+    console.log("Applying sort:", sortExtra);
+    setSortingParam(sortKey);
+    setSortingDeptCID(sortDept);
+    setSortingExtra(sortExtra);
+    setSortedByCol(index);
   };
 
   // TABLE PAGINATION
@@ -300,7 +318,7 @@ const DataTable = <T extends { id: number },>({ mode, toggleMode, pageSize = 10,
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder="Search universities..."
+            placeholder={searchPlaceholder}
           />
         </Flex>
         <Button
@@ -365,8 +383,8 @@ const DataTable = <T extends { id: number },>({ mode, toggleMode, pageSize = 10,
               {/* Column Headers */}
               <Grid
                 templateColumns={{
-                  base: `50px minmax(100px, 1fr) ${'minmax(50px, 1fr) '.repeat(visibleColumnCount)}`,
-                  md: "60px 2fr 1fr 1fr 1fr"
+                  base: shownColumns.map(({ col }) => col.template.base).join(' '),
+                  md: shownColumns.map(({ col }) => col.template.md).join(' ')
                 }}
                 gap={{ base: 2, md: 4 }}
                 w="full"
@@ -377,130 +395,20 @@ const DataTable = <T extends { id: number },>({ mode, toggleMode, pageSize = 10,
                 borderBottom="1px solid"
                 borderColor={colorMode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}
               >
-                <GridItem textAlign="center">
-                  <Popover>
-                    {({ isOpen }) => (
-                      <>
-                        <PopoverTrigger>
-                          <ColumnPopoverButton isActivated={sortedByCol === 0} isOpen={isOpen}>
-                            Score
-                          </ColumnPopoverButton>
-                        </PopoverTrigger>
-                        {isOpen && (
-                          <Box
-                            position="absolute"
-                            top={0}
-                            left={0}
-                            right={0}
-                            bottom={0}
-                            backdropFilter="blur(12px)"
-                            bg="rgba(0, 0, 0, 0.1)"
-                            zIndex="overlay"
-                            borderRadius="xl"
-                            pointerEvents="none"
-                          />
-                        )}
-                        <Portal>
-                          <PopoverContent>
-                            <GlassBox p={4}>
-                              <Text fontSize="lg" fontWeight="600">Score</Text>
-                              <Badge variant="subtle" colorScheme="pink" ml={1} fontSize="2xs">WIP</Badge>
-                              {sortedByCol === 0 && <Badge colorScheme="green" ml={2} fontSize="2xs">Sorted</Badge>}
-                              <Text fontSize="sm" mt={2} color={colorMode === 'dark' ? 'gray.400' : 'gray.500'}>
-                                Custom scoring is currently in progress!
-                              </Text>
-                            </GlassBox>
-                          </PopoverContent>
-                        </Portal>
-                      </>
-                    )}
-                  </Popover>
-                </GridItem>
-                <GridItem textAlign="left">
-                  <Popover>
-                    {({ isOpen }) => (
-                      <>
-                        <PopoverTrigger>
-                          <ColumnPopoverButton isActivated={sortedByCol === 1} isOpen={isOpen} maxWidth="120px">
-                            Name
-                          </ColumnPopoverButton>
-                        </PopoverTrigger>
-                        {isOpen && (
-                          <Box
-                            position="absolute"
-                            top={0}
-                            left={0}
-                            right={0}
-                            bottom={0}
-                            backdropFilter="blur(12px)"
-                            bg="rgba(0, 0, 0, 0.1)"
-                            zIndex="overlay"
-                            borderRadius="xl"
-                            pointerEvents="none"
-                          />
-                        )}
-                        <Portal>
-                          <PopoverContent zIndex="popover">
-                            <GlassBox p={4}>
-                              <Text fontSize="lg" fontWeight="600">University Name</Text>
-                              {sortedByCol === 1 && <Badge colorScheme="green" ml={2} fontSize="2xs">Sorted</Badge>}
-                              <Text fontSize="sm" color={colorMode === 'dark' ? 'gray.400' : 'gray.500'} mt={1}>
-                                The most common name for each university.
-                              </Text>
-                              <Text fontWeight="600" fontSize="sm" mt={3}>Sort by:</Text>
-                              {isOpen && (
-                                <FormControl mt={2}>
-                                  <ReactSelect
-                                    value={selectedNameSortingOption}
-                                    options={[
-                                      { value: ExtraSortType.Alphabetical, label: 'Alphabetical A-Z' },
-                                      { value: ExtraSortType.ReverseAlphabetical, label: 'Alphabetical Z-A' }
-                                    ]}
-                                    placeholder="Select sort option"
-                                    styles={{
-                                      control: (base) => ({
-                                        ...base,
-                                        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'white',
-                                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
-                                        borderRadius: '8px',
-                                        minHeight: '36px',
-                                      }),
-                                      option: (base) => ({
-                                        ...base,
-                                        backgroundColor: isDark ? '#1a202c' : 'white',
-                                        color: isDark ? 'white' : 'black',
-                                        fontSize: '14px',
-                                      })
-                                    }}
-                                    onChange={onUniversityNameSelectChange}
-                                  />
-                                </FormControl>
-                              )}
-                              <Button mt={3} variant="primary" size="sm" onClick={applyAlphabeticalSort}>
-                                Apply Sort
-                              </Button>
-                            </GlassBox>
-                          </PopoverContent>
-                        </Portal>
-                      </>
-                    )}
-                  </Popover>
-                </GridItem>
-
-                {Array.from({ length: visibleColumnCount }).map((_, index) => (
-                  <GridItem key={index} textAlign="center" fontWeight="600" fontSize="sm"
-                    color={colorMode === 'dark' ? 'gray.300' : 'gray.500'}>
-                    <ColumnPopover
-                      departmentCID={columnDepts[index].value}
-                      sortedByCol={sortedByCol}
-                      departmentName={columnDepts[index].label}
-                      columnType={columnTypes[index]}
-                      onApply={handleApply}
-                      onApplyAndSort={handleApplySort}
+                {shownColumns.map(({ col, index }) => {
+                  const Header = col.header;
+                  return (
+                    <Header
+                      key={col.id}
+                      mode={mode}
                       index={index}
+                      isSorted={sortedByCol === index}
+                      state={columnState[index]}
+                      updateColumnState={updateColumnState}
+                      applySort={applySort}
                     />
-                  </GridItem>
-                ))}
+                  );
+                })}
               </Grid>
 
               {/* Table Rows */}
@@ -516,8 +424,7 @@ const DataTable = <T extends { id: number },>({ mode, toggleMode, pageSize = 10,
                     rank={(currentPage) * pageSize + index + 1}
                     item={item}
                     mode={mode}
-                    columnDepts={columnDepts.slice(0, visibleColumnCount)}
-                    columnTypes={columnTypes.slice(0, visibleColumnCount)}
+                    columnState={shownState}
                     toggleMode={toggleMode}
                     onExpand={onExpand || (async () => {})}
                   />
