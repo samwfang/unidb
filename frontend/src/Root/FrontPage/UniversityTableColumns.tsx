@@ -4,15 +4,18 @@ import { Popover, PopoverTrigger, PopoverContent, Portal } from '@chakra-ui/reac
 import ReactSelect, { SingleValue } from 'react-select';
 import ColumnPopover from '../../ReusableComponents/ColumnPopover';
 import GlassBox from '../../containers/GlassBox';
-import ColumnPopoverButton from 'src/containers/ColumnPopoverButton';
-import { ColumnType, ExtraSortType } from '../../helpers/DepartmentHelper';
+import ColumnPopoverButton from '../../containers/ColumnPopoverButton';
+import { ColumnType, ExtraSortType, SortType } from '../../helpers/DepartmentHelper';
 import { DataTableColumn, ColumnHeaderContext } from './DataTable';
 
 //University-specific header columns for the DataTable.
 //Score and Name are static (always shown); the rest are state-backed metric
 //columns that reuse the shared ColumnPopover (department + metric + sort).
 
-const ScoreColumnHeader: React.FC<ColumnHeaderContext<ColumnType>> = ({ isSorted }) => {
+//Shared template for the state-backed metric columns.
+const metricColumnTemplate = { base: 'minmax(50px, 1fr)', md: '1fr' };
+
+const ScoreColumnHeader: React.FC<ColumnHeaderContext<ColumnType, SortType>> = ({ isSorted }) => {
   const { colorMode } = useColorMode();
   const isDark = colorMode === 'dark';
 
@@ -59,15 +62,20 @@ const ScoreColumnHeader: React.FC<ColumnHeaderContext<ColumnType>> = ({ isSorted
   );
 };
 
-const NameColumnHeader: React.FC<ColumnHeaderContext<ColumnType>> = ({ index, isSorted, applySort }) => {
+const NameColumnHeader: React.FC<ColumnHeaderContext<ColumnType, SortType>> = ({ index, isSorted, applySort }) => {
   const { colorMode } = useColorMode();
   const isDark = colorMode === 'dark';
-  const [selectedNameSortingOption, setSelectedNameSortingOption] = useState<SingleValue<{ value: string; label: string }>>(null);
+  const [selectedNameSortingOption, setSelectedNameSortingOption] = useState<SingleValue<{ value: SortType; label: string }>>(null);
 
   // Change Preliminary Sorting Option Selected Under the University Name Popup (Hardcoded)
-  const onUniversityNameSelectChange = (option: SingleValue<{ value: string; label: string }>) => {
+  const onUniversityNameSelectChange = (option: SingleValue<{ value: SortType; label: string }>) => {
     setSelectedNameSortingOption(option);
   };
+
+  const nameSortOptions: { value: SortType; label: string }[] = [
+    { value: ExtraSortType.Alphabetical, label: 'Alphabetical A-Z' },
+    { value: ExtraSortType.ReverseAlphabetical, label: 'Alphabetical Z-A' },
+  ];
 
   const applyAlphabeticalSort = () => {
     if (selectedNameSortingOption) {
@@ -116,10 +124,7 @@ const NameColumnHeader: React.FC<ColumnHeaderContext<ColumnType>> = ({ index, is
                     <FormControl mt={2}>
                       <ReactSelect
                         value={selectedNameSortingOption}
-                        options={[
-                          { value: ExtraSortType.Alphabetical, label: 'Alphabetical A-Z' },
-                          { value: ExtraSortType.ReverseAlphabetical, label: 'Alphabetical Z-A' }
-                        ]}
+                        options={nameSortOptions}
                         placeholder="Select sort option"
                         styles={{
                           control: (base) => ({
@@ -153,7 +158,7 @@ const NameColumnHeader: React.FC<ColumnHeaderContext<ColumnType>> = ({ index, is
   );
 };
 
-const DynamicColumnHeader: React.FC<ColumnHeaderContext<ColumnType>> = ({ index, isSorted, state, updateColumnState, applySort }) => {
+const DynamicColumnHeader: React.FC<ColumnHeaderContext<ColumnType, SortType>> = ({ index, isSorted, state, updateColumnState, applySort }) => {
   const { colorMode } = useColorMode();
   const isDark = colorMode === 'dark';
 
@@ -178,7 +183,7 @@ const DynamicColumnHeader: React.FC<ColumnHeaderContext<ColumnType>> = ({ index,
   );
 };
 
-export const universityColumns: DataTableColumn<ColumnType>[] = [
+export const universityColumns: DataTableColumn<ColumnType, SortType>[] = [
   {
     id: 'score',
     responsive: false,
@@ -193,19 +198,19 @@ export const universityColumns: DataTableColumn<ColumnType>[] = [
   },
   {
     id: 'location',
-    template: { base: 'minmax(50px, 1fr)', md: '1fr' },
+    template: metricColumnTemplate,
     initial: { key: 'general', label: 'General', value: ColumnType.Location },
     header: DynamicColumnHeader,
   },
   {
     id: 'graduation-rate',
-    template: { base: 'minmax(50px, 1fr)', md: '1fr' },
+    template: metricColumnTemplate,
     initial: { key: 'general', label: 'General', value: ColumnType.GraduationRate },
     header: DynamicColumnHeader,
   },
   {
     id: 'total-students',
-    template: { base: 'minmax(50px, 1fr)', md: '1fr' },
+    template: metricColumnTemplate,
     initial: { key: 'general', label: 'General', value: ColumnType.TotalStudents },
     header: DynamicColumnHeader,
   },

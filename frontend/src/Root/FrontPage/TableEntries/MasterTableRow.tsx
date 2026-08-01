@@ -4,16 +4,9 @@ import MTExpandedEntry from './MTExpandedEntry';
 import { UniversityData } from "../../../helpers/types";
 import { ModeType } from "../../../helpers/types";
 import { ColumnType, getColumnData } from '../../../helpers/DepartmentHelper';
-import { TableColumnState } from '../DataTable';
+import { DataRowProps } from '../DataTable';
 
-interface MasterTableRowProps {
-  rank: number;
-  item: UniversityData;
-  mode: ModeType;
-  columnState: TableColumnState<ColumnType>[];
-  toggleMode: () => void;
-  onExpand: (id: number) => Promise<unknown>;
-}
+type MasterTableRowProps = DataRowProps<UniversityData, ColumnType>;
 
 const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, columnState, toggleMode, onExpand }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -107,7 +100,7 @@ const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, colum
                   fontSize={{ base: "xs", md: "sm" }}
                   color={isDark ? 'gray.300' : 'gray.600'}
                 >
-                  {getColumnData(item, col.value, mode, col.key)}
+                  {getColumnData(item, col?.value ?? ColumnType.Location, mode, col?.key ?? 'general')}
                 </GridItem>
               ))}
             </Grid>

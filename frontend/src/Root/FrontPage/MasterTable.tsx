@@ -1,10 +1,10 @@
 import React from 'react';
 import DataTable, { FetchPageParams, FetchPageResult } from './DataTable';
 import MasterTableRow from './TableEntries/MasterTableRow';
+import GradModePlaceholder from './GradModePlaceholder';
 import { UniversityData, Content } from "../../helpers/types";
 import { ModeType } from "../../helpers/types";
-import { ExtraSortType } from '../../helpers/DepartmentHelper';
-import { ColumnType } from '../../helpers/DepartmentHelper';
+import { ExtraSortType, ColumnType, SortType } from '../../helpers/DepartmentHelper';
 import { universityColumns } from './UniversityTableColumns';
 
 export interface MasterTableProps {
@@ -16,7 +16,7 @@ export interface MasterTableProps {
 const API_BASE_URL = 'http://localhost:8000/api';
 
 const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 10 }) => {
-  const fetchPage = async (params: FetchPageParams): Promise<FetchPageResult<UniversityData>> => {
+  const fetchPage = async (params: FetchPageParams<SortType>): Promise<FetchPageResult<UniversityData>> => {
     const query = new URLSearchParams();
 
     // Pagination (convert 0-indexed to 1-indexed)
@@ -76,12 +76,18 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
     });
   };
 
+  if (mode === ModeType.Grad) {
+    return <GradModePlaceholder toggleMode={toggleMode} />;
+  }
+
   return (
-    <DataTable<UniversityData, ColumnType>
+    <DataTable<UniversityData, ColumnType, SortType>
       mode={mode}
       toggleMode={toggleMode}
       pageSize={pageSize}
       columns={universityColumns}
+      initialSortingCol={1}
+      initialSortingParam={ExtraSortType.Alphabetical}
       fetchPage={fetchPage}
       onExpand={fetchExpandedEntryContent}
       RowComponent={MasterTableRow}

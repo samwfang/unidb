@@ -7,10 +7,10 @@ import { useAppTheme } from '../../containers/useTheme';
 import { useResponsive } from '../../containers/useResponsive';
 import GlassBox from '../../containers/GlassBox';
 
-export interface FetchPageParams {
+export interface FetchPageParams<S extends string = string> {
   page: number;
   pageSize: number;
-  sort: string;
+  sort: S;
   sortDept: string;
   sortExtra: string;
   search?: string;
@@ -30,62 +30,65 @@ export interface TableColumnState<C> {
 }
 
 //Context handed to every header component. `index` is the column's position in the
-//full `columns` array (not the responsive-shown subset).
-export interface ColumnHeaderContext<C> {
+//full `columns` array (not the responsive-shown subset). `S` is the type of the
+//table's sort keys (e.g. `SortType` for university tables).
+export interface ColumnHeaderContext<C, S extends string = string> {
   mode: ModeType;
   index: number;
   isSorted: boolean;
   state: TableColumnState<C> | null;
   updateColumnState: (index: number, s: TableColumnState<C>) => void;
-  applySort: (index: number, sortKey: string, sortDept: string, sortExtra: string) => void;
+  applySort: (index: number, sortKey: S, sortDept: string, sortExtra: string) => void;
 }
 
 //Defines a single header column. Headers render their own GridItem, so alignment,
 //popover UI and styling are all owned by the wrapper-provided header component.
 //`responsive: false` columns are always shown; responsive columns are sliced by
 //`visibleColumnCount` (in order) on smaller screens.
-export interface DataTableColumn<C> {
+export interface DataTableColumn<C, S extends string = string> {
   id: string;
   responsive?: boolean;
   initial?: TableColumnState<C>;
   template: { base: string; md: string };
-  header: React.ComponentType<ColumnHeaderContext<C>>;
+  header: React.ComponentType<ColumnHeaderContext<C, S>>;
 }
 
 export interface DataRowProps<T, C> {
   rank: number;
   item: T;
   mode: ModeType;
-  columnState: TableColumnState<C>[];
+  //One entry per shown responsive column (in order, `null` when the column has no
+  //state), so row cells always line up with the header columns.
+  columnState: (TableColumnState<C> | null)[];
   toggleMode: () => void;
   onExpand: (id: number) => Promise<unknown>;
 }
 
-export interface DataTableProps<T extends { id: number }, C> {
+export interface DataTableProps<T extends { id: number }, C, S extends string = string> {
   mode: ModeType;
   toggleMode: () => void;
   pageSize: number;
-  columns: DataTableColumn<C>[];
+  columns: DataTableColumn<C, S>[];
   searchPlaceholder?: string;
-  initialSortingCol?: number;
-  initialSortingParam?: string;
-  fetchPage: (params: FetchPageParams) => Promise<FetchPageResult<T>>;
+  initialSortingCol: number;
+  initialSortingParam: S;
+  fetchPage: (params: FetchPageParams<S>) => Promise<FetchPageResult<T>>;
   RowComponent: React.ComponentType<DataRowProps<T, C>>;
   onExpand?: (id: number) => Promise<unknown>;
 }
 
-const DataTable = <T extends { id: number }, C>({
+const DataTable = <T extends { id: number }, C, S extends string = string>({
   mode,
   toggleMode,
   pageSize = 10,
   columns,
   searchPlaceholder = "Search universities...",
-  initialSortingCol = 1,
-  initialSortingParam = "a-z",
+  initialSortingCol,
+  initialSortingParam,
   fetchPage,
   RowComponent,
   onExpand,
-}: DataTableProps<T, C>) => {
+}: DataTableProps<T, C, S>) => {
   //Custom Parameters for App Styling Based on Theme
   const { colorMode, glassBg, glassBorder, modeColor, isDark } = useAppTheme();
 
@@ -95,7 +98,7 @@ const DataTable = <T extends { id: number }, C>({
   const [totalItems, setTotalItems] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  //Stores Expanded Indecies 
+  //Stores Expanded Indices 
   const [expandedIndex, setExpandedIndex] = useState<number | number[]>([]);
 
   //What is in Page Input Input Box
@@ -117,7 +120,7 @@ const DataTable = <T extends { id: number }, C>({
 
 
   //Current Parameter With Which To Sort Page Data With
-  const [sortingParam, setSortingParam] = useState<string>(initialSortingParam);
+  const [sortingParam, setSortingParam] = useState<S>(initialSortingParam);
   const [sortingDeptCID, setSortingDeptCID] = useState<string>("general");
   const [sortingExtra, setSortingExtra] = useState<string>("greatest");
 
@@ -127,7 +130,7 @@ const DataTable = <T extends { id: number }, C>({
 
   //Columns to display: static columns always show; responsive columns are sliced
   //by the number that fits on the current screen.
-  const shownColumns: { col: DataTableColumn<C>; index: number }[] = [];
+  const shownColumns: { col: DataTableColumn<C, S>; index: number }[] = [];
   let responsiveShown = 0;
   columns.forEach((col, index) => {
     if (col.responsive === false) {
@@ -140,19 +143,19 @@ const DataTable = <T extends { id: number }, C>({
     }
   });
 
-  //Column state passed to rows: only the shown responsive (state-backed) columns
-  const shownState: TableColumnState<C>[] = [];
+  //Column state passed to rows: one entry per shown responsive column (in order),
+  //so row cells always line up with the header columns (null when no state exists).
+  const shownState: (TableColumnState<C> | null)[] = [];
   shownColumns.forEach(({ col, index }) => {
     if (col.responsive !== false) {
-      const s = columnState[index];
-      if (s) shownState.push(s);
+      shownState.push(columnState[index] ?? null);
     }
   });
 
   const fetchPageData = async (
     page: number,
     pageSize: number,
-    sortingParameter: string,
+    sortingParameter: S,
     sortingDeptCID: string,
     sortingExtraParam: string,
     searchQuery?: string
@@ -217,7 +220,7 @@ const DataTable = <T extends { id: number }, C>({
   };
 
   //Sets the table's active sort and marks the given column as the sorted one
-  const applySort = (index: number, sortKey: string, sortDept: string, sortExtra: string) => {
+  const applySort = (index: number, sortKey: S, sortDept: string, sortExtra: string) => {
     console.log("Applying sort:", sortExtra);
     setSortingParam(sortKey);
     setSortingDeptCID(sortDept);
@@ -283,35 +286,7 @@ const DataTable = <T extends { id: number }, C>({
       position="relative"
       p={{ base: 3, md: 5 }}
     >
-      {mode === ModeType.Grad ? (
-        <Flex
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          textAlign="center"
-          minH="300px"
-          py={8}
-          px={4}
-          gap={3}
-        >
-          <Circle
-            size="64px"
-            bg={isDark ? 'rgba(168, 85, 247, 0.12)' : 'rgba(168, 85, 247, 0.1)'}
-          >
-            <WarningIcon color={isDark ? 'purple.400' : 'purple.500'} boxSize={7} />
-          </Circle>
-          <Text fontSize="xl" fontWeight="600" color={isDark ? 'gray.100' : 'gray.800'}>
-            Graduate Mode is Under Construction
-          </Text>
-          <Text fontSize="sm" color={isDark ? 'gray.400' : 'gray.500'} maxW="420px" lineHeight="tall">
-            We're currently building graduate program data. Please check back soon, or explore undergraduate programs in the meantime.
-          </Text>
-          <Button mt={2} variant="primary" size="sm" onClick={toggleMode}>
-            Explore Undergraduate Mode
-          </Button>
-        </Flex>
-      ) : (
-        <>
+      <>
       {/* Toolbar */}
       <Flex justifyContent="space-between" alignItems="center" mb={5} gap={3}>
         <Flex flex="1" maxWidth="500px">
@@ -494,7 +469,6 @@ const DataTable = <T extends { id: number }, C>({
         </>
       )}
         </>
-      )}
     </GlassBox>
   );
 };
