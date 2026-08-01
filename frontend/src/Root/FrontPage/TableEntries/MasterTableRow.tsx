@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AccordionItem, AccordionButton, Box, Grid, GridItem, useColorMode } from '@chakra-ui/react';
 import MTExpandedEntry from './MTExpandedEntry';
-import { UniversityData, Content } from '../MasterTable';
+import { UniversityData } from "../../../helpers/types";
 import { ModeType } from "../../../helpers/types";
 import { ColumnType, getColumnData } from '../../../helpers/DepartmentHelper';
 
@@ -12,7 +12,7 @@ interface MasterTableRowProps {
   columnDepts: { value: string, label: string }[];
   columnTypes: ColumnType[];
   toggleMode: () => void;
-  onExpand: (id: number) => Promise<Content>;
+  onExpand: (id: number) => Promise<unknown>;
 }
 
 const MasterTableRow: React.FC<MasterTableRowProps> = ({ rank, item, mode, columnDepts, columnTypes, toggleMode, onExpand }) => {

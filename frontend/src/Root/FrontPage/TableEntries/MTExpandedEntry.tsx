@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AccordionPanel, TabList, TabPanels, TabPanel, Tab, Tabs, Box, Grid, Text, Select, Input, List, ListItem, useColorMode } from '@chakra-ui/react';
 import MasterTableRow from './MasterTableRow';
-import { Content, UndergradContent, UGradDeptContent, GradDeptContent, GradContent, UniversityData } from '../MasterTable';
+import { Content, UndergradContent, UGradDeptContent, GradDeptContent, GradContent, UniversityData } from "../../../helpers/types";
 import { ModeType } from "../../../helpers/types";
 import DepartmentContent from './MTDepartmentContent';
 import GraduationRateWidget from '../../../UnivWidgets/GraduationRateWidget';

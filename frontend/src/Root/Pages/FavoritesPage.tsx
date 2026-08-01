@@ -58,7 +58,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({ mode, onModeChange }) => 
                 />
 
                 <Box flex={1} w="100%" minW={0}>
-                    <FavoritesTable />
+                    <FavoritesTable mode={mode} toggleMode={onModeChange} pageSize={pageSize} />
                 </Box>
             </Flex>
         </>

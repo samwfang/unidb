@@ -23,7 +23,7 @@ const getScreenInfo = (width: number): Omit<ResponsiveInfo, 'width' | 'height'> 
       isDesktop: false,
       visibleColumnCount: 1,
       chartRadius: { inner: 40, outer: 55 },
-      rowHeightEstimate: 45,
+      rowHeightEstimate: 48,
     };
   }
   if (width < 768) {
@@ -34,7 +34,7 @@ const getScreenInfo = (width: number): Omit<ResponsiveInfo, 'width' | 'height'> 
       isDesktop: false,
       visibleColumnCount: 2,
       chartRadius: { inner: 50, outer: 65 },
-      rowHeightEstimate: 45,
+      rowHeightEstimate: 48,
     };
   }
   if (width < 992) {
@@ -45,7 +45,7 @@ const getScreenInfo = (width: number): Omit<ResponsiveInfo, 'width' | 'height'> 
       isDesktop: false,
       visibleColumnCount: 3,
       chartRadius: { inner: 50, outer: 65 },
-      rowHeightEstimate: 55,
+      rowHeightEstimate: 56,
     };
   }
   if (width < 1280) {
@@ -56,7 +56,7 @@ const getScreenInfo = (width: number): Omit<ResponsiveInfo, 'width' | 'height'> 
       isDesktop: true,
       visibleColumnCount: 3,
       chartRadius: { inner: 60, outer: 80 },
-      rowHeightEstimate: 61,
+      rowHeightEstimate: 56,
     };
   }
   return {
@@ -66,7 +66,7 @@ const getScreenInfo = (width: number): Omit<ResponsiveInfo, 'width' | 'height'> 
     isDesktop: true,
     visibleColumnCount: 3,
     chartRadius: { inner: 60, outer: 80 },
-    rowHeightEstimate: 61,
+    rowHeightEstimate: 56,
   };
 };
 

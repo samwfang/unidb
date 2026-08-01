@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Text, Alert, AlertIcon, Tabs, TabList, Tab, Flex, Modal, ModalOverlay, ModalContent, ModalCloseButton, ModalBody, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, useColorMode } from '@chakra-ui/react';
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { DemographicsData } from 'src/Root/FrontPage/MasterTable';
+import { DemographicsData } from 'src/helpers/types';
 import { HamburgerIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
