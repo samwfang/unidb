@@ -222,7 +222,7 @@ export const universityColumns: DataTableColumn<ColumnType, SortType>[] = [
   {
     id: 'favorites',
     responsive: false,
-    template: { base: '28px', md: '36px' },
+    template: { base: '30px', md: '38px' },
     header: HeartColumnHeader,
   },
 ];

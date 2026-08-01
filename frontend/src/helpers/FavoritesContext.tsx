@@ -3,10 +3,14 @@ import { UniversityData } from './types';
 
 const STORAGE_KEY = 'unidb.favorites';
 
+export const MAX_FAVORITES = 50;
+
+export type FavoriteToggleResult = 'added' | 'removed' | 'limit';
+
 interface FavoritesContextValue {
   favorites: UniversityData[];
   isFavorite: (id: number) => boolean;
-  toggleFavorite: (item: UniversityData) => void;
+  toggleFavorite: (item: UniversityData) => FavoriteToggleResult;
   removeFavorite: (id: number) => void;
 }
 
@@ -17,7 +21,7 @@ const loadFavorites = (): UniversityData[] => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.slice(0, MAX_FAVORITES) : [];
   } catch {
     return [];
   }
@@ -36,12 +40,16 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const isFavorite = (id: number) => favorites.some((f) => f.id === id);
 
-  const toggleFavorite = (item: UniversityData) => {
-    setFavorites((prev) =>
-      prev.some((f) => f.id === item.id)
-        ? prev.filter((f) => f.id !== item.id)
-        : [...prev, item]
-    );
+  const toggleFavorite = (item: UniversityData): FavoriteToggleResult => {
+    if (favorites.some((f) => f.id === item.id)) {
+      setFavorites((prev) => prev.filter((f) => f.id !== item.id));
+      return 'removed';
+    }
+    if (favorites.length >= MAX_FAVORITES) {
+      return 'limit';
+    }
+    setFavorites((prev) => [...prev, item]);
+    return 'added';
   };
 
   const removeFavorite = (id: number) => {
