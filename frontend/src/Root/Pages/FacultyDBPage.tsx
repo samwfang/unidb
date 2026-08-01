@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { MTControlPanel } from "../FrontPage/MTControlPanel";
 import FacultyDBPlaceholder from "../FrontPage/FacultyDBPlaceholder";
+import FilterSectionPlaceholder from "../../ReusableComponents/FilterSectionPlaceholder";
 import { ModeType } from "../../helpers/types";
 
 interface FacultyDBPageProps {
@@ -56,6 +57,7 @@ const FacultyDBPage: React.FC<FacultyDBPageProps> = ({ mode, onModeChange }) => 
                     mode={mode}
                     onModeChange={onModeChange}
                     showModeToggle={false}
+                    filterSection={<FilterSectionPlaceholder title="Faculty Filters" />}
                 />
 
                 <Box flex={1} w="100%" minW={0}>
