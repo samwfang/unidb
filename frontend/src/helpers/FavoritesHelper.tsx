@@ -49,7 +49,7 @@ const getRawValue = (
     case ColumnType.AdmissionsRate:
       return parseDisplayNumber(general?.admissions_rate);
     case ColumnType.HouseholdIncome:
-      return parseDisplayNumber(general?.avg_household_income);
+      return parseDisplayNumber(general?.avg_family_income_nslds);
     default:
       return null;
   }

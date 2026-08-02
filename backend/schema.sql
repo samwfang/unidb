@@ -18,6 +18,7 @@ CREATE TABLE universities (
         'private_nonprofit',
         'private_forprofit'
     )),
+    pred_deg    INT,
     icon        TEXT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -43,8 +44,8 @@ CREATE TABLE university_undergrad_stats (
     student_faculty_ratio           NUMERIC(4,1),
     student_faculty_ratio_percentile INT,
     average_class_size              INT,
-    avg_household_income            INT,
-    avg_household_income_percentile INT,
+    avg_family_income_nslds         INT,
+    avg_family_income_nslds_percentile INT,
     sat_score                       INT,
     sat_score_percentile            INT,
     act_score                       INT,
@@ -72,8 +73,8 @@ CREATE TABLE university_grad_stats (
     student_faculty_ratio           NUMERIC(4,1),
     student_faculty_ratio_percentile INT,
     average_class_size              INT,
-    avg_household_income            INT,
-    avg_household_income_percentile INT,
+    avg_family_income_nslds         INT,
+    avg_family_income_nslds_percentile INT,
     created_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at                      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -89,7 +90,8 @@ CREATE TABLE university_undergrad_demographics (
     university_id   INT NOT NULL UNIQUE REFERENCES universities(id),
     gender_data     JSONB,
     ethnicity_data  JSONB,
-    income_data     JSONB
+    income_data     JSONB,
+    median_hh_income INT
 );
 
 CREATE TABLE university_grad_demographics (

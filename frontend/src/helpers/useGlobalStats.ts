@@ -5,7 +5,7 @@ export interface GlobalStats {
   graduationRate: string;
   admissionsRate: string;
   studentFacultyRatio: string;
-  avgHouseholdIncome: string;
+  medianHouseholdIncome: string;
   satScore?: string;
   actScore?: string;
 }

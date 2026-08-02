@@ -26,6 +26,7 @@ export interface DemographicsData {
   gender: Array<{ name: string; value: number }>;
   ethnicity: Array<{ name: string; value: number }>;
   income: Array<{ name: string; value: number }>;
+  median_hh_income?: string;
 }
 
 //Content for Undergrad
@@ -48,8 +49,8 @@ export interface UndergradContent {
     studentFacultyRatio?: string;
     studentFacultyRatioPercentile?: string;
 
-    avg_household_income?: string;
-    avg_household_income_percentile?: string;
+    avg_family_income_nslds?: string;
+    avg_family_income_nslds_percentile?: string;
 
     average_class_size: string;
   };
@@ -80,8 +81,8 @@ export interface GradContent {
     admissions_rate_percentile?: string;
     average_class_size: string;
 
-    avg_household_income?: string;
-    avg_household_income_percentile?: string;
+    avg_family_income_nslds?: string;
+    avg_family_income_nslds_percentile?: string;
 
     studentFacultyRatio?: string;
     studentFacultyRatioPercentile?: string;

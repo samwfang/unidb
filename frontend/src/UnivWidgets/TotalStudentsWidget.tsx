@@ -14,7 +14,6 @@ interface TotalStudentWidgetProps {
   universityName: string;
   totalStudents: string;
   totalStudentsPercentile: string;
-  avgHouseholdIncome?: string;
   demographics?: DemographicsData;
   departments?: Array<{ department_name: string; total_students?: string }>;
 }
@@ -44,18 +43,48 @@ const COLORS_BY_CATEGORY: Record<string, string[]> = {
   [DisplayMode.Department]: ['#4E79A7', '#F28E2B', '#E15759', '#76B7B2', '#59A14F']
 };
 
-const getCenterText = (activeTab: DisplayMode, totalStudents: string, avgIncome?: string) => {
-  switch (activeTab) {
-    case DisplayMode.Income: return avgIncome || 'N/A';
-    default: return totalStudents;
+const getCenterText = (activeTab: DisplayMode, totalStudents: string, medianIncome?: string) => {
+  if (activeTab === DisplayMode.Income) {
+    if (!medianIncome) return 'N/A';
+    const parsed = Number(medianIncome.replace(/,/g, ''));
+    return isNaN(parsed) ? 'N/A' : `$${parsed.toLocaleString()}`;
   }
+  return totalStudents;
 };
 
 const getCaption = (activeTab: DisplayMode) => {
   switch (activeTab) {
-    case DisplayMode.Income: return "Avg. Income";
+    case DisplayMode.Income: return "Median Household\nIncome";
     default: return "Students";
   }
+};
+
+const INCOME_CAP = 100000;
+
+const colorThresholds = [
+  { threshold: 30, color: '#E15759' },    // Red
+  { threshold: 50, color: '#F28E2B' },    // Orange
+  { threshold: 70, color: '#EDC949' },    // Yellow
+  { threshold: 80, color: '#59A14F' },    // Green
+  { threshold: 90, color: '#4E79A7' },    // Blue
+  { threshold: 95, color: '#7D6EC8' },    // Blue-purple
+  { threshold: Infinity, color: '#9B59B6' } // Purple
+];
+
+const buildGaugeData = (medianIncome: string | undefined) => {
+  const medianNum = medianIncome ? Number(medianIncome.replace(/,/g, '')) : NaN;
+  const filled = isNaN(medianNum)
+    ? 0
+    : Math.min(100, Math.max(0, Math.round((medianNum / INCOME_CAP) * 100)));
+  const { color } = colorThresholds.find(({ threshold }) => filled <= threshold) ||
+    { color: '#F44336' };
+  return {
+    color,
+    data: [
+      { name: 'Filled', value: filled },
+      { name: 'Remaining', value: 100 - filled },
+    ],
+  };
 };
 
 
@@ -185,7 +214,7 @@ const processDepartmentData = (
   return topDepts;
 };
 
-const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents, avgHouseholdIncome,
+const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   totalStudentsPercentile, universityName, demographics, departments }) => {
 
   const [activeTab, setActiveTab] = useState<DisplayMode>(DisplayMode.Department);
@@ -225,6 +254,8 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   const { chartRadius } = useResponsive();
   const { inner: inner, outer } = chartRadius;
 
+  const gaugeData = buildGaugeData(demographics?.median_hh_income);
+
   if (!currentData) return <Alert status="error">Data not available</Alert>;
 
 
@@ -258,7 +289,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
   };
 
   const renderLegendPopover = () => {
-    if (!currentData.data.length) return null;
+    if (activeTab === DisplayMode.Income || !currentData.data.length) return null;
 
     const currentDataSum = currentData.data.reduce((sum, entry) => sum + entry.value, 0);
 
@@ -322,75 +353,106 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
         <Text fontSize={{ base: "sm", sm: "md", md: "lg" }} fontWeight="bold">Total Students:</Text>
         <Box height={{ base: "200px", md: "250px" }} position="relative" overflow="visible">
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Tooltip
-                content={({ payload }) => {
-                  if (payload && payload.length) {
-                    const data = payload[0].payload;
-                    const total = currentData.data.reduce((sum, entry) => sum + entry.value, 0);
-                    const percentage = ((data.value / total) * 100).toFixed(1);
-                    const index = currentData.data.findIndex(entry => entry.name === data.name);
-                    const color = COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length];
+            {activeTab === DisplayMode.Income ? (
+              <PieChart>
+                <Pie
+                  data={gaugeData.data}
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                  startAngle={90}
+                  endAngle={-270}
+                  innerRadius={inner}
+                  outerRadius={outer}
+                  cornerRadius={5}
+                  paddingAngle={5}
+                >
+                  <Cell fill={gaugeData.color} stroke={isDark ? 'rgba(20,24,36,0.5)' : 'white'} strokeWidth={1} />
+                  <Cell fill={isDark ? 'rgba(255,255,255,0.06)' : '#EDF2F7'} stroke={isDark ? 'rgba(20,24,36,0.5)' : 'white'} strokeWidth={1} />
+                </Pie>
+                <g>
+                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle"
+                    style={{ fontSize: 'clamp(18px, 3vw, 28px)', fontWeight: 'bold' }} fill={isDark ? "white" : "black"} >
+                    {getCenterText(activeTab, totalStudents, demographics?.median_hh_income)}
+                  </text>
+                  <text x="50%" y="59%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(9px, 1.8vw, 12px)' }}>
+                    {getCaption(activeTab).split('\n').map((line, i) => (
+                      <tspan key={i} x="50%" dy={i === 0 ? 0 : 13}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </PieChart>
+            ) : (
+              <PieChart>
+                <Tooltip
+                  content={({ payload }) => {
+                    if (payload && payload.length) {
+                      const data = payload[0].payload;
+                      const total = currentData.data.reduce((sum, entry) => sum + entry.value, 0);
+                      const percentage = ((data.value / total) * 100).toFixed(1);
+                      const index = currentData.data.findIndex(entry => entry.name === data.name);
+                      const color = COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length];
 
-                    return (
-                      <WidgetBox
-                        p={3}
-                        border="1px solid"
-                        borderColor="gray.200"
-                        borderRadius="md"
-                        boxShadow="sm"
-                        fontSize="sm"
-                        minWidth="140px"
-                      >
-                        <Flex align="center" gap={2} mb={2}>
-                          <Box
-                            w="12px"
-                            h="12px"
-                            borderRadius="2px"
-                            bg={color}
-                            flexShrink={0}
-                          />
-                          <Text fontWeight="bold" color={isDark ? "gray.100" : "gray.800"} >
-                            {data.name.replace('\n', ' ')}
+                      return (
+                        <WidgetBox
+                          p={3}
+                          border="1px solid"
+                          borderColor="gray.200"
+                          borderRadius="md"
+                          boxShadow="sm"
+                          fontSize="sm"
+                          minWidth="140px"
+                        >
+                          <Flex align="center" gap={2} mb={2}>
+                            <Box
+                              w="12px"
+                              h="12px"
+                              borderRadius="2px"
+                              bg={color}
+                              flexShrink={0}
+                            />
+                            <Text fontWeight="bold" color={isDark ? "gray.100" : "gray.800"} >
+                              {data.name.replace('\n', ' ')}
+                            </Text>
+                          </Flex>
+                          <Text color={isDark ? "gray.300" : "gray.600"} fontSize="sm">
+                            {percentage}% of Total
                           </Text>
-                        </Flex>
-                        <Text color={isDark ? "gray.300" : "gray.600"} fontSize="sm">
-                          {percentage}% of Total
-                        </Text>
-                      </WidgetBox>
-                    );
-                  }
-                  return null;
-                }}
-                animationDuration={0}
-              />
-              <Pie
-                data={currentData.data}
-                cx="50%"
-                cy="50%"
-                innerRadius={inner}
-                outerRadius={outer}
-                paddingAngle={5}
-                cornerRadius={5}
-                dataKey="value"
-              >
-                {currentData.data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length]}
-                  />
-                ))}
-              </Pie>
-              <g>
-                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle"
-                  style={{ fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 'bold' }} fill={isDark ? "white" : "black"} >
-                  {hasData ? getCenterText(activeTab, totalStudents, avgHouseholdIncome) : 'N/A'}
-                </text>
-                <text x="50%" y="60%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
-                  {getCaption(activeTab)}
-                </text>
-              </g>
-            </PieChart>
+                        </WidgetBox>
+                      );
+                    }
+                    return null;
+                  }}
+                  animationDuration={0}
+                />
+                <Pie
+                  data={currentData.data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={inner}
+                  outerRadius={outer}
+                  paddingAngle={5}
+                  cornerRadius={5}
+                  dataKey="value"
+                >
+                  {currentData.data.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS_BY_CATEGORY[activeTab][index % COLORS_BY_CATEGORY[activeTab].length]}
+                    />
+                  ))}
+                </Pie>
+                <g>
+                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle"
+                    style={{ fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 'bold' }} fill={isDark ? "white" : "black"} >
+                    {hasData ? getCenterText(activeTab, totalStudents) : 'N/A'}
+                  </text>
+                  <text x="50%" y="60%" textAnchor="middle" fill={isDark ? "#d1d5db" : "#4b5563"} style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
+                    {getCaption(activeTab)}
+                  </text>
+                </g>
+              </PieChart>
+            )}
           </ResponsiveContainer>
         </Box>
       </Box>

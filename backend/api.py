@@ -73,7 +73,7 @@ SORT_MAP = {
     "act_score": "us.act_score",
     "average_class_size": "us.average_class_size",
     "student_faculty_ratio": "us.student_faculty_ratio",
-    "avg_household_income": "us.avg_household_income",
+    "avg_family_income_nslds": "us.avg_family_income_nslds",
     "tuition_in_state": "ca.tuition_in_state",
     "tuition_out_state": "ca.tuition_out_state",
     "avg_net_price_overall": "ca.avg_net_price_overall",
@@ -114,7 +114,7 @@ FILTER_FIELDS = {
     "sat_score":            ("us.sat_score",            int,   None),
     "act_score":            ("us.act_score",            int,   None),
     "student_faculty_ratio":("us.student_faculty_ratio",float, None),
-    "avg_household_income": ("us.avg_household_income", int,   None),
+    "avg_family_income_nslds": ("us.avg_family_income_nslds", int, None),
     "tuition_in_state":     ("ca.tuition_in_state",     int,   None),
     "tuition_out_state":    ("ca.tuition_out_state",    int,   None),
     "avg_net_price_overall":("ca.avg_net_price_overall",int,   None),
@@ -309,24 +309,24 @@ def build_data_query(ids):
             u.id, u.unit_id, u.name, u.location, u.website,
             u.is_public, u.sector_type, u.icon,
             us.total_students, us.graduation_rate, us.graduation_rate_reliable,
-            us.admissions_rate, us.student_faculty_ratio, us.avg_household_income,
+            us.admissions_rate, us.student_faculty_ratio, us.avg_family_income_nslds,
             us.sat_score, us.act_score,
             us.total_students_percentile, us.graduation_rate_percentile,
             us.admissions_rate_percentile, us.student_faculty_ratio_percentile,
-            us.avg_household_income_percentile, us.sat_score_percentile,
+            us.avg_family_income_nslds_percentile, us.sat_score_percentile,
             us.act_score_percentile,
             gs.total_students AS grad_total_students,
             gs.graduation_rate AS grad_graduation_rate,
             gs.graduation_rate_reliable AS grad_graduation_rate_reliable,
             gs.admissions_rate AS grad_admissions_rate,
             gs.student_faculty_ratio AS grad_student_faculty_ratio,
-            gs.avg_household_income AS grad_avg_household_income,
+            gs.avg_family_income_nslds AS grad_avg_family_income_nslds,
             gs.total_students_percentile AS grad_total_students_percentile,
             gs.graduation_rate_percentile AS grad_graduation_rate_percentile,
             gs.admissions_rate_percentile AS grad_admissions_rate_percentile,
             gs.student_faculty_ratio_percentile AS grad_student_faculty_ratio_percentile,
-            gs.avg_household_income_percentile AS grad_avg_household_income_percentile,
-            ud.gender_data, ud.ethnicity_data, ud.income_data,
+            gs.avg_family_income_nslds_percentile AS grad_avg_family_income_nslds_percentile,
+            ud.gender_data, ud.ethnicity_data, ud.income_data, ud.median_hh_income,
             gd.gender_data  AS grad_gender_data,
             gd.ethnicity_data AS grad_ethnicity_data,
             gd.income_data  AS grad_income_data,
@@ -356,11 +356,12 @@ def build_data_query(ids):
 # Response Formatting
 # ──────────────────────────────────────────────────────────────
 
-def format_demographics(gender_data, ethnicity_data, income_data):
+def format_demographics(gender_data, ethnicity_data, income_data, median_hh_income):
     return {
         "gender": parse_jsonb(gender_data) or [],
         "ethnicity": parse_jsonb(ethnicity_data) or [],
         "income": parse_jsonb(income_data) or [],
+        "median_hh_income": format_number(median_hh_income),
     }
 
 
@@ -384,12 +385,12 @@ def format_university(rows):
             "act_score_percentile": format_decimal(first["act_score_percentile"]),
             "studentFacultyRatio": format_decimal(first["student_faculty_ratio"]),
             "studentFacultyRatioPercentile": format_decimal(first["student_faculty_ratio_percentile"]),
-            "avg_household_income": format_number(first["avg_household_income"]),
-            "avg_household_income_percentile": format_decimal(first["avg_household_income_percentile"]),
+            "avg_family_income_nslds": format_number(first["avg_family_income_nslds"]),
+            "avg_family_income_nslds_percentile": format_decimal(first["avg_family_income_nslds_percentile"]),
             "average_class_size": "",
         },
         "demographics": format_demographics(
-            first["gender_data"], first["ethnicity_data"], first["income_data"]
+            first["gender_data"], first["ethnicity_data"], first["income_data"], first["median_hh_income"]
         ),
         "dept_contents": [],
     }
@@ -404,14 +405,15 @@ def format_university(rows):
             "admissions_rate_percentile": format_decimal(first["grad_admissions_rate_percentile"]),
             "studentFacultyRatio": format_decimal(first["grad_student_faculty_ratio"]),
             "studentFacultyRatioPercentile": format_decimal(first["grad_student_faculty_ratio_percentile"]),
-            "avg_household_income": format_number(first["grad_avg_household_income"]),
-            "avg_household_income_percentile": format_decimal(first["grad_avg_household_income_percentile"]),
+            "avg_family_income_nslds": format_number(first["grad_avg_family_income_nslds"]),
+            "avg_family_income_nslds_percentile": format_decimal(first["grad_avg_family_income_nslds_percentile"]),
             "average_class_size": "",
         },
         "demographics": format_demographics(
             first["grad_gender_data"],
             first["grad_ethnicity_data"],
             first["grad_income_data"],
+            first["median_hh_income"],
         ),
         "dept_contents": [],
     }
@@ -485,8 +487,8 @@ class UniversityList(Resource):
             "max_act_score": {"description": "Maximum ACT score"},
             "min_student_faculty_ratio": {"description": "Minimum student-to-faculty ratio"},
             "max_student_faculty_ratio": {"description": "Maximum student-to-faculty ratio"},
-            "min_avg_household_income": {"description": "Minimum average household income"},
-            "max_avg_household_income": {"description": "Maximum average household income"},
+            "min_avg_family_income_nslds": {"description": "Minimum average family income (NSLDS)"},
+            "max_avg_family_income_nslds": {"description": "Maximum average family income (NSLDS)"},
             "min_tuition_in_state": {"description": "Minimum in-state tuition"},
             "max_tuition_in_state": {"description": "Maximum in-state tuition"},
             "min_tuition_out_state": {"description": "Minimum out-of-state tuition"},
@@ -635,14 +637,15 @@ class StatsAggregates(Resource):
                 cur.execute(
                     """
                     SELECT
-                        ROUND(AVG(total_students))::int AS total_students,
-                        AVG(graduation_rate) AS graduation_rate,
-                        AVG(admissions_rate) AS admissions_rate,
-                        AVG(student_faculty_ratio) AS student_faculty_ratio,
-                        ROUND(AVG(avg_household_income))::int AS avg_household_income,
-                        ROUND(AVG(sat_score))::int AS sat_score,
-                        ROUND(AVG(act_score))::int AS act_score
-                    FROM university_undergrad_stats
+                        ROUND(AVG(us.total_students))::int AS total_students,
+                        AVG(us.graduation_rate) AS graduation_rate,
+                        AVG(us.admissions_rate) AS admissions_rate,
+                        AVG(us.student_faculty_ratio) AS student_faculty_ratio,
+                        ROUND(AVG(us.sat_score))::int AS sat_score,
+                        ROUND(AVG(us.act_score))::int AS act_score
+                    FROM university_undergrad_stats us
+                    JOIN universities u ON u.id = us.university_id
+                    WHERE u.pred_deg = 3
                     """
                 )
                 ug_columns = [desc[0] for desc in cur.description]
@@ -651,16 +654,27 @@ class StatsAggregates(Resource):
                 cur.execute(
                     """
                     SELECT
-                        ROUND(AVG(total_students))::int AS total_students,
-                        AVG(graduation_rate) AS graduation_rate,
-                        AVG(admissions_rate) AS admissions_rate,
-                        AVG(student_faculty_ratio) AS student_faculty_ratio,
-                        ROUND(AVG(avg_household_income))::int AS avg_household_income
-                    FROM university_grad_stats
+                        ROUND(AVG(gs.total_students))::int AS total_students,
+                        AVG(gs.graduation_rate) AS graduation_rate,
+                        AVG(gs.admissions_rate) AS admissions_rate,
+                        AVG(gs.student_faculty_ratio) AS student_faculty_ratio
+                    FROM university_grad_stats gs
+                    JOIN universities u ON u.id = gs.university_id
+                    WHERE u.pred_deg = 3
                     """
                 )
                 gr_columns = [desc[0] for desc in cur.description]
                 gr = dict(zip(gr_columns, cur.fetchone()))
+
+                cur.execute(
+                    """
+                    SELECT ROUND(AVG(ud.median_hh_income))::int AS median_hh_income
+                    FROM university_undergrad_demographics ud
+                    JOIN universities u ON u.id = ud.university_id
+                    WHERE u.pred_deg = 3 AND ud.median_hh_income IS NOT NULL
+                    """
+                )
+                median_hh_income = cur.fetchone()[0]
 
             return {
                 "undergrad": {
@@ -671,7 +685,7 @@ class StatsAggregates(Resource):
                         f"{ug['student_faculty_ratio']:.1f}:1"
                         if ug["student_faculty_ratio"] is not None else ""
                     ),
-                    "avgHouseholdIncome": format_currency(ug["avg_household_income"]),
+                    "medianHouseholdIncome": format_currency(median_hh_income),
                     "satScore": format_number(ug["sat_score"]),
                     "actScore": format_number(ug["act_score"]),
                 },
@@ -683,7 +697,7 @@ class StatsAggregates(Resource):
                         f"{gr['student_faculty_ratio']:.1f}:1"
                         if gr["student_faculty_ratio"] is not None else ""
                     ),
-                    "avgHouseholdIncome": format_currency(gr["avg_household_income"]),
+                    "medianHouseholdIncome": format_currency(median_hh_income),
                 },
             }
         finally:

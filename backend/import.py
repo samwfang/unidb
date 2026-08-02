@@ -92,13 +92,14 @@ def map_row(row):
         "website": row.get("INSTURL") or None,
         "is_public": control == "1",
         "sector_type": CONTROL_MAP.get(control),
+        "pred_deg": parse_int(row.get("PREDDEG")),
     }
 
     # --- shared institution-level values ---
     admissions_rate = parse_float(row.get("ADM_RATE")) or parse_float(row.get("ADM_RATE_SUPP"))
     student_faculty_ratio = parse_float(row.get("STUFACR"))
-    avg_household_income = parse_float(row.get("FAMINC"))
-    avg_household_income_int = int(avg_household_income) if avg_household_income is not None else None
+    avg_family_income_nslds = parse_float(row.get("FAMINC"))
+    avg_family_income_nslds_int = int(avg_family_income_nslds) if avg_family_income_nslds is not None else None
 
     # SAT is verbal + math midpoints summed
     sat_vr = parse_float(row.get("SATVRMID"))
@@ -121,7 +122,7 @@ def map_row(row):
         "admissions_rate": admissions_rate,
         "student_faculty_ratio": student_faculty_ratio,
         "average_class_size": None,
-        "avg_household_income": avg_household_income_int,
+        "avg_family_income_nslds": avg_family_income_nslds_int,
         "sat_score": sat_score,
         "act_score": parse_int(row.get("ACTCM50")),
     }
@@ -137,7 +138,7 @@ def map_row(row):
         "admissions_rate": admissions_rate,
         "student_faculty_ratio": student_faculty_ratio,
         "average_class_size": None,
-        "avg_household_income": avg_household_income_int,
+        "avg_family_income_nslds": avg_family_income_nslds_int,
     }
 
     # --- undergrad_demographics ---
@@ -181,6 +182,7 @@ def map_row(row):
         "gender_data": gender_data,
         "ethnicity_data": ethnicity_data,
         "income_data": income_data,
+        "median_hh_income": parse_int(row.get("MEDIAN_HH_INC")),
     }
 
     # --- grad_demographics ---
@@ -220,22 +222,23 @@ def map_row(row):
 def insert_university(conn, data):
     """Insert into universities table.
 
-    Columns: id, unit_id, name, location, website, is_public, sector_type, icon,
-             created_at, updated_at
+    Columns: id, unit_id, name, location, website, is_public, sector_type, pred_deg,
+             icon, created_at, updated_at
     
     Return the id of the inserted or updated university.
     """
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO universities (unit_id, name, location, website, is_public, sector_type)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO universities (unit_id, name, location, website, is_public, sector_type, pred_deg)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (unit_id) DO UPDATE SET
                 name        = EXCLUDED.name,
                 location    = EXCLUDED.location,
                 website     = EXCLUDED.website,
                 is_public   = EXCLUDED.is_public,
                 sector_type = EXCLUDED.sector_type,
+                pred_deg    = EXCLUDED.pred_deg,
                 updated_at  = now()
             RETURNING id
             """,
@@ -246,6 +249,7 @@ def insert_university(conn, data):
                 data["website"],
                 data["is_public"],
                 data["sector_type"],
+                data["pred_deg"],
             ),
         )
         return cur.fetchone()[0]
@@ -259,7 +263,7 @@ def insert_undergrad_stats(conn, university_id, data):
              graduation_rate_percentile, admissions_rate,
              admissions_rate_percentile, student_faculty_ratio,
              student_faculty_ratio_percentile, average_class_size,
-             avg_household_income, avg_household_income_percentile,
+             avg_family_income_nslds, avg_family_income_nslds_percentile,
              sat_score, sat_score_percentile, act_score, act_score_percentile,
              created_at, updated_at
     """
@@ -270,7 +274,7 @@ def insert_undergrad_stats(conn, university_id, data):
                 (university_id, total_students, graduation_rate,
                  graduation_rate_extended, graduation_rate_reliable,
                  admissions_rate, student_faculty_ratio, average_class_size,
-                 avg_household_income, sat_score, act_score)
+                 avg_family_income_nslds, sat_score, act_score)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (university_id) DO UPDATE SET
                 total_students            = EXCLUDED.total_students,
@@ -280,7 +284,7 @@ def insert_undergrad_stats(conn, university_id, data):
                 admissions_rate           = EXCLUDED.admissions_rate,
                 student_faculty_ratio     = EXCLUDED.student_faculty_ratio,
                 average_class_size        = EXCLUDED.average_class_size,
-                avg_household_income      = EXCLUDED.avg_household_income,
+                avg_family_income_nslds   = EXCLUDED.avg_family_income_nslds,
                 sat_score                 = EXCLUDED.sat_score,
                 act_score                 = EXCLUDED.act_score,
                 updated_at                = now()
@@ -294,7 +298,7 @@ def insert_undergrad_stats(conn, university_id, data):
                 data["admissions_rate"],
                 data["student_faculty_ratio"],
                 data["average_class_size"],
-                data["avg_household_income"],
+                data["avg_family_income_nslds"],
                 data["sat_score"],
                 data["act_score"],
             ),
@@ -309,7 +313,7 @@ def insert_grad_stats(conn, university_id, data):
              graduation_rate_percentile, admissions_rate,
              admissions_rate_percentile, student_faculty_ratio,
              student_faculty_ratio_percentile, average_class_size,
-             avg_household_income, avg_household_income_percentile,
+             avg_family_income_nslds, avg_family_income_nslds_percentile,
              created_at, updated_at
     """
     with conn.cursor() as cur:
@@ -319,7 +323,7 @@ def insert_grad_stats(conn, university_id, data):
                 (university_id, total_students, graduation_rate,
                  graduation_rate_extended, graduation_rate_reliable,
                  admissions_rate, student_faculty_ratio, average_class_size,
-                 avg_household_income)
+                 avg_family_income_nslds)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (university_id) DO UPDATE SET
                 total_students            = EXCLUDED.total_students,
@@ -329,7 +333,7 @@ def insert_grad_stats(conn, university_id, data):
                 admissions_rate           = EXCLUDED.admissions_rate,
                 student_faculty_ratio     = EXCLUDED.student_faculty_ratio,
                 average_class_size        = EXCLUDED.average_class_size,
-                avg_household_income      = EXCLUDED.avg_household_income,
+                avg_family_income_nslds   = EXCLUDED.avg_family_income_nslds,
                 updated_at                = now()
             """,
             (
@@ -341,7 +345,7 @@ def insert_grad_stats(conn, university_id, data):
                 data["admissions_rate"],
                 data["student_faculty_ratio"],
                 data["average_class_size"],
-                data["avg_household_income"],
+                data["avg_family_income_nslds"],
             ),
         )
 
@@ -350,24 +354,26 @@ def insert_undergrad_demographics(conn, university_id, data):
     """Insert into university_undergrad_demographics table.
 
     Columns: id, university_id, gender_data (JSONB), ethnicity_data (JSONB),
-             income_data (JSONB)
+             income_data (JSONB), median_hh_income
     """
     with conn.cursor() as cur:
         cur.execute(
             """
             INSERT INTO university_undergrad_demographics
-                (university_id, gender_data, ethnicity_data, income_data)
-            VALUES (%s, %s::jsonb, %s::jsonb, %s::jsonb)
+                (university_id, gender_data, ethnicity_data, income_data, median_hh_income)
+            VALUES (%s, %s::jsonb, %s::jsonb, %s::jsonb, %s)
             ON CONFLICT (university_id) DO UPDATE SET
-                gender_data    = EXCLUDED.gender_data,
-                ethnicity_data = EXCLUDED.ethnicity_data,
-                income_data    = EXCLUDED.income_data
+                gender_data      = EXCLUDED.gender_data,
+                ethnicity_data   = EXCLUDED.ethnicity_data,
+                income_data      = EXCLUDED.income_data,
+                median_hh_income = EXCLUDED.median_hh_income
             """,
             (
                 university_id,
                 json.dumps(data["gender_data"]),
                 json.dumps(data["ethnicity_data"]),
                 json.dumps(data["income_data"]),
+                data["median_hh_income"],
             ),
         )
 
@@ -687,10 +693,11 @@ def insert_department_statistics(conn, department_id, data):
 # Percentiles
 #
 # Percentiles are computed AFTER all institutions are imported, so
-# they reflect the full population. For each metric column, every
-# non-NULL value is ranked with percent_rank() (fraction of rows
-# strictly below the value) and stored as an integer 0-100.
-# Rows whose metric is NULL keep a NULL percentile.
+# they reflect the population of 4-year institutions (PREDDEG = 3)
+# — the same population used for global averages. For each metric
+# column, every non-NULL value is ranked with percent_rank()
+# (fraction of rows strictly below the value) and stored as an
+# integer 0-100. Rows whose metric is NULL keep a NULL percentile.
 # ──────────────────────────────────────────────────────────────
 
 PERCENTILE_COLUMNS = {
@@ -699,7 +706,7 @@ PERCENTILE_COLUMNS = {
         "graduation_rate",
         "admissions_rate",
         "student_faculty_ratio",
-        "avg_household_income",
+        "avg_family_income_nslds",
         "sat_score",
         "act_score",
     ],
@@ -708,13 +715,17 @@ PERCENTILE_COLUMNS = {
         "graduation_rate",
         "admissions_rate",
         "student_faculty_ratio",
-        "avg_household_income",
+        "avg_family_income_nslds",
     ],
 }
 
 
 def compute_percentiles(conn):
-    """Compute and store the percentile for each metric in both stats tables."""
+    """Compute and store the percentile for each metric in both stats tables.
+
+    Rankings only include 4-year institutions (PREDDEG = 3), matching the
+    population used for global averages.
+    """
     for table, metrics in PERCENTILE_COLUMNS.items():
         with conn.cursor() as cur:
             for metric in metrics:
@@ -724,11 +735,12 @@ def compute_percentiles(conn):
                     UPDATE {table} s
                     SET {percentile_col} = p.percentile
                     FROM (
-                        SELECT university_id,
-                               ROUND(percent_rank() OVER (ORDER BY {metric}) * 100)::int
+                        SELECT st.university_id,
+                               ROUND(percent_rank() OVER (ORDER BY st.{metric}) * 100)::int
                                    AS percentile
-                        FROM {table}
-                        WHERE {metric} IS NOT NULL
+                        FROM {table} st
+                        JOIN universities u ON u.id = st.university_id
+                        WHERE u.pred_deg = 3 AND st.{metric} IS NOT NULL
                     ) p
                     WHERE s.university_id = p.university_id
                     """

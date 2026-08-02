@@ -35,8 +35,8 @@ Each Scorecard variable is listed with its CSV column name, a plain-language des
 | `STUFACR` | Undergraduate student-to-instructional-faculty ratio | `student_faculty_ratio` | `student_faculty_ratio` |
 | — | *Computed at import time* | `student_faculty_ratio_percentile` | `student_faculty_ratio_percentile` |
 | — | *Not available in Scorecard data* | `average_class_size` | `average_class_size` |
-| `FAMINC` | Average family income of students | `avg_household_income` | `avg_household_income` |
-| — | *Computed at import time* | `avg_household_income_percentile` | `avg_household_income_percentile` |
+| `FAMINC` | Average family income of aided students (NSLDS, discontinued) | `avg_family_income_nslds` | `avg_family_income_nslds` |
+| — | *Computed at import time* | `avg_family_income_nslds_percentile` | `avg_family_income_nslds_percentile` |
 | `SATVRMID` + `SATMTMID` | 50th percentile of SAT scores (critical reading + math), summed | `sat_score` | `sat_score` |
 | — | *Computed at import time* | `sat_score_percentile` | `sat_score_percentile` |
 | `ACTCM50` | 50th percentile of the ACT cumulative score | `act_score` | `act_score` |
@@ -63,8 +63,8 @@ Each Scorecard variable is listed with its CSV column name, a plain-language des
 | `STUFACR` | Student-to-faculty ratio (institution-level, shared with undergrad) | `student_faculty_ratio` | `student_faculty_ratio` |
 | — | *Computed at import time* | `student_faculty_ratio_percentile` | `student_faculty_ratio_percentile` |
 | — | *Not available in Scorecard data* | `average_class_size` | `average_class_size` |
-| `MD_FAMINC` or `FAMINC` | Median or average family income | `avg_household_income` | `avg_household_income` |
-| — | *Computed at import time* | `avg_household_income_percentile` | `avg_household_income_percentile` |
+| `MD_FAMINC` or `FAMINC` | Median or average family income of aided students | `avg_family_income_nslds` | `avg_family_income_nslds` |
+| — | *Computed at import time* | `avg_family_income_nslds_percentile` | `avg_family_income_nslds_percentile` |
 
 **Notes:**
 - Scorecard does not have separate grad-only admissions rates or student-faculty ratios — these are institution-level. If both undergrad and grad stats share the same value, import the same number into both tables.
@@ -254,7 +254,7 @@ These Scorecard variables are not currently in the schema but could be added as 
 
 | CSV Column | Description | Python Var |
 |---|---|---|
-| `MEDIAN_HH_INC` | Median household income (students' zip codes) | `median_hh_income_zip` |
+| `MEDIAN_HH_INC` | Median household income (Treasury, students' zip codes) | `median_hh_income` |
 | `POVERTY_RATE` | Poverty rate (students' zip codes) | `poverty_rate_zip` |
 | `UNEMP_RATE` | Unemployment rate (students' zip codes) | `unemployment_rate_zip` |
 | `PCT_WHITE` | % White population in students' zip codes | `zip_pct_white` |

@@ -13,7 +13,7 @@ export enum ColumnType {
   SATScore = "sat_score",
   ACTScore = "act_score",
   AdmissionsRate = "admissions_rate",
-  HouseholdIncome = "avg_household_income"
+  HouseholdIncome = "avg_family_income_nslds"
 }
 
 export enum ExtraSortType {
@@ -75,7 +75,7 @@ export const ColumnMetadataMap: Record<ColumnType, ColumnMetadata> = {
   [ColumnType.HouseholdIncome]: {
     displayName: "Avg. Income",
     departmentSpecificAllowed: false,
-    description: "The average household income of students."
+    description: "The average family income of aided students (NSLDS)."
   }
   // ... other columns
 };
@@ -159,7 +159,7 @@ export const getColumnData = (
     case ColumnType.AdmissionsRate:
       return content?.general_content.admissions_rate || 'N/A';
     case ColumnType.HouseholdIncome:
-      return content?.general_content.avg_household_income || 'N/A';
+      return content?.general_content.avg_family_income_nslds || 'N/A';
     default:
       return 'N/A';
   }
