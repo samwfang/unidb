@@ -12,6 +12,7 @@ import UniversitySummaryWidget from '../../../UnivWidgets/UniversitySummaryWidge
 import AdmissionsRateWidget from '../../../UnivWidgets/AdmissionsRateWidget';
 import TestScoresWidget from '../../../UnivWidgets/TestScoresWidget';
 import CostAndAidWidget from '../../../UnivWidgets/CostAndAidWidget';
+import StudentTeacherRatioWidget from '../../../UnivWidgets/StudentTeacherRatioWidget';
 
 /*
 Expanded Entries: Rendering The Graphics Which Show when User Clicks An Entry in the Master Table
@@ -117,10 +118,10 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
       <Grid
         templateAreas={{
           base: `"rate admissions"
-                 "testscores testscores2"
+                 "testscores ratio"
                  "students students"
                   "costaid costaid"`,
-          md: `"rate admissions testscores testscores2"
+          md: `"rate admissions testscores ratio"
                "students students costaid costaid"
                "students students costaid costaid"`
         }}
@@ -167,11 +168,11 @@ const MTExpandedEntry: React.FC<MTExpandedEntryProps> = ({ item, content, rank, 
             satScorePercentile={general?.general_content.sat_score_percentile || 'No Data'}
             actScorePercentile={general?.general_content.act_score_percentile || 'No Data'} />
         </Box>
-        <Box gridArea="testscores2" height="100%" minW="0">
-          <TestScoresWidget
+        <Box gridArea="ratio" height="100%" minW="0">
+          <StudentTeacherRatioWidget
             universityName={item?.name || 'Unknown University'}
-            satScore={"1440"} actScore={"34"}
-            satScorePercentile={"96"} actScorePercentile={"85"} />
+            studentFacultyRatio={general?.general_content.studentFacultyRatio || 'No Data'}
+            studentFacultyRatioPercentile={general?.general_content.studentFacultyRatioPercentile || 'No Data'} />
         </Box>
       </Grid>
     </Box>
