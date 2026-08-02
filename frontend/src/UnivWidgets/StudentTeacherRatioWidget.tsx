@@ -5,6 +5,7 @@ import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
 import { useResponsive } from 'src/containers/useResponsive';
 import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
+import { useGlobalStats } from 'src/helpers/useGlobalStats';
 
 interface StudentTeacherRatioWidgetProps {
   universityName: string;
@@ -40,6 +41,7 @@ const StudentTeacherRatioWidget: React.FC<StudentTeacherRatioWidgetProps> = ({ u
 
   const { chartRadius } = useResponsive();
   const { inner, outer } = chartRadius;
+  const globalStats = useGlobalStats();
 
   return (
     <WidgetBox
@@ -93,6 +95,7 @@ const StudentTeacherRatioWidget: React.FC<StudentTeacherRatioWidgetProps> = ({ u
           name={universityName}
           type="Student-Faculty Ratio"
           colorScheme="inverted"
+          globalAvg={globalStats?.undergrad.studentFacultyRatio}
         />
       </Box>
 

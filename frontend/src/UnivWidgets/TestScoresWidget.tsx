@@ -5,6 +5,7 @@ import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
 import { useResponsive } from 'src/containers/useResponsive';
 import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
+import { useGlobalStats } from 'src/helpers/useGlobalStats';
 
 interface TestScoresProps {
   satScore?: string;
@@ -60,6 +61,7 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore, unive
 
   const { chartRadius } = useResponsive();
   const { inner, outer } = chartRadius;
+  const globalStats = useGlobalStats();
 
 
   return (
@@ -127,6 +129,9 @@ const TestScoresWidget: React.FC<TestScoresProps> = ({ satScore, actScore, unive
             : (hasActData ? parseFloat(actScorePercentile) || 0 : 0)}
           name={universityName}
           type={activeTab === "SAT" ? "SAT Score" : "ACT Score"}
+          globalAvg={globalStats && (activeTab === "SAT"
+            ? globalStats.undergrad.satScore
+            : globalStats.undergrad.actScore)}
         />
       </Box>
 

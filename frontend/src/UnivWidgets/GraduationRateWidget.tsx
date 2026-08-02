@@ -5,6 +5,7 @@ import PercentileBar from 'src/ReusableComponents/PercentileBar';
 import WidgetBox from 'src/containers/WidgetBox';
 import { useResponsive } from 'src/containers/useResponsive';
 import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
+import { useGlobalStats } from 'src/helpers/useGlobalStats';
 
 interface GraduationRateWidgetProps {
   universityName: string;
@@ -42,6 +43,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
 
   const { chartRadius } = useResponsive();
   const { inner, outer } = chartRadius;
+  const globalStats = useGlobalStats();
 
 
   return (
@@ -95,6 +97,7 @@ const GraduationRateWidget: React.FC<GraduationRateWidgetProps> = ({ universityN
           value={hasData ? parseFloat(graduationRatePercentile) || 0 : 0}
           name={universityName}
           type="Graduation Rate"
+          globalAvg={globalStats?.undergrad.graduationRate}
         />
       </Box>
 

@@ -684,6 +684,74 @@ def insert_department_statistics(conn, department_id, data):
 
 
 # ──────────────────────────────────────────────────────────────
+# Percentiles
+#
+# Percentiles are computed AFTER all institutions are imported, so
+# they reflect the full population. For each metric column, every
+# non-NULL value is ranked with percent_rank() (fraction of rows
+# strictly below the value) and stored as an integer 0-100.
+# Rows whose metric is NULL keep a NULL percentile.
+# ──────────────────────────────────────────────────────────────
+
+PERCENTILE_COLUMNS = {
+    "university_undergrad_stats": [
+        "total_students",
+        "graduation_rate",
+        "admissions_rate",
+        "student_faculty_ratio",
+        "avg_household_income",
+        "sat_score",
+        "act_score",
+    ],
+    "university_grad_stats": [
+        "total_students",
+        "graduation_rate",
+        "admissions_rate",
+        "student_faculty_ratio",
+        "avg_household_income",
+    ],
+}
+
+
+def compute_percentiles(conn):
+    """Compute and store the percentile for each metric in both stats tables."""
+    for table, metrics in PERCENTILE_COLUMNS.items():
+        with conn.cursor() as cur:
+            for metric in metrics:
+                percentile_col = f"{metric}_percentile"
+                cur.execute(
+                    f"""
+                    UPDATE {table} s
+                    SET {percentile_col} = p.percentile
+                    FROM (
+                        SELECT university_id,
+                               ROUND(percent_rank() OVER (ORDER BY {metric}) * 100)::int
+                                   AS percentile
+                        FROM {table}
+                        WHERE {metric} IS NOT NULL
+                    ) p
+                    WHERE s.university_id = p.university_id
+                    """
+                )
+                print(f"  {table}.{percentile_col}: {cur.rowcount} rows updated")
+
+
+def recompute_percentiles(db_url):
+    """Recompute percentiles without re-importing institution data."""
+    conn = get_connection(db_url)
+    try:
+        compute_percentiles(conn)
+        conn.commit()
+        print("Successfully recomputed percentiles.")
+    except Exception as e:
+        conn.rollback()
+        print(f"Error: {e}")
+        sys.exit(1)
+    finally:
+        conn.close()
+
+
+# ──────────────────────────────────────────────────────────────
 # Main
 # ──────────────────────────────────────────────────────────────
 
@@ -717,6 +785,9 @@ def import_institution_csv(csv_path, db_url, dry_run=False):
 
                 if (i + 1) % 100 == 0:
                     print(f"  Imported {i + 1}/{len(rows)}...")
+
+            print("Computing percentiles...")
+            compute_percentiles(conn)
 
             conn.commit()
             print(f"Successfully imported {len(rows)} universities.")
@@ -830,6 +901,9 @@ def main():
     fos_parser.add_argument("--dry-run", action="store_true",
                             help="Compute estimates without writing to the database")
 
+    # percentiles subcommand
+    subparsers.add_parser("percentiles", help="Recompute percentiles from existing data")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -842,6 +916,8 @@ def main():
         import_institution_csv(args.csv_path, db_url, dry_run=args.dry_run)
     elif args.command == "fos":
         import_fos_csv(args.csv_path, db_url, dry_run=args.dry_run)
+    elif args.command == "percentiles":
+        recompute_percentiles(db_url)
 
 
 if __name__ == "__main__":

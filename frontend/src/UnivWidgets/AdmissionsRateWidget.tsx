@@ -6,6 +6,7 @@ import GlassBox from 'src/containers/GlassBox';
 import WidgetBox from 'src/containers/WidgetBox';
 import { useResponsive } from 'src/containers/useResponsive';
 import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
+import { useGlobalStats } from 'src/helpers/useGlobalStats';
 
 interface AdmissionsRateProps {
   universityName: string;
@@ -42,6 +43,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
   // DYNAMICALLY ADJUST PIE CHART SIZE ACCORDING TO WINDOW HEIGHT (SINCE RECHARTS DOESNT SUPPORT THIS GRRR)
   const { chartRadius } = useResponsive();
   const { inner, outer } = chartRadius;
+  const globalStats = useGlobalStats();
 
   return (
     <WidgetBox
@@ -95,6 +97,7 @@ const AdmissionsRateWidget: React.FC<AdmissionsRateProps> = ({ universityName, a
           name={universityName}
           type="Admissions Rate"
           colorScheme="positive_only_inverted"
+          globalAvg={globalStats?.undergrad.admissionsRate}
         />
       </Box>
 

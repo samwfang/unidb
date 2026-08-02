@@ -8,6 +8,7 @@ import WidgetBox from 'src/containers/WidgetBox';
 import GlassBox from 'src/containers/GlassBox';
 import { useResponsive } from 'src/containers/useResponsive';
 import DataInfoPopover from 'src/ReusableComponents/DataInfoPopover';
+import { useGlobalStats } from 'src/helpers/useGlobalStats';
 
 interface TotalStudentWidgetProps {
   universityName: string;
@@ -192,6 +193,8 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
 
   const { colorMode } = useColorMode();
   const isDark = colorMode === 'dark';
+
+  const globalStats = useGlobalStats();
 
   const hasData = totalStudents !== 'No Data' && totalStudents !== '';
 
@@ -399,7 +402,7 @@ const TotalStudentsWidget: React.FC<TotalStudentWidgetProps> = ({ totalStudents,
             value={hasData ? parseFloat(totalStudentsPercentile) || 0 : 0}
             name={universityName}
             type="total students"
-            globalAvg="5,000"
+            globalAvg={globalStats?.undergrad.totalStudents}
           />
         </Box>
       </Flex>

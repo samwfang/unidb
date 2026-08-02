@@ -177,6 +177,12 @@ def format_decimal(value):
     return str(value)
 
 
+def format_currency(value):
+    if value is None:
+        return ""
+    return f"${int(value):,}"
+
+
 def format_rate(value):
     if value is None:
         return ""
@@ -305,12 +311,21 @@ def build_data_query(ids):
             us.total_students, us.graduation_rate, us.graduation_rate_reliable,
             us.admissions_rate, us.student_faculty_ratio, us.avg_household_income,
             us.sat_score, us.act_score,
+            us.total_students_percentile, us.graduation_rate_percentile,
+            us.admissions_rate_percentile, us.student_faculty_ratio_percentile,
+            us.avg_household_income_percentile, us.sat_score_percentile,
+            us.act_score_percentile,
             gs.total_students AS grad_total_students,
             gs.graduation_rate AS grad_graduation_rate,
             gs.graduation_rate_reliable AS grad_graduation_rate_reliable,
             gs.admissions_rate AS grad_admissions_rate,
             gs.student_faculty_ratio AS grad_student_faculty_ratio,
             gs.avg_household_income AS grad_avg_household_income,
+            gs.total_students_percentile AS grad_total_students_percentile,
+            gs.graduation_rate_percentile AS grad_graduation_rate_percentile,
+            gs.admissions_rate_percentile AS grad_admissions_rate_percentile,
+            gs.student_faculty_ratio_percentile AS grad_student_faculty_ratio_percentile,
+            gs.avg_household_income_percentile AS grad_avg_household_income_percentile,
             ud.gender_data, ud.ethnicity_data, ud.income_data,
             gd.gender_data  AS grad_gender_data,
             gd.ethnicity_data AS grad_ethnicity_data,
@@ -358,17 +373,19 @@ def format_university(rows):
     undergrad_content = {
         "general_content": {
             "total_students": format_number(first["total_students"]),
-            "total_student_percentile": "",
+            "total_student_percentile": format_decimal(first["total_students_percentile"]),
             "graduation_rate": format_rate(first["graduation_rate"]),
-            "graduation_rate_percentile": "",
+            "graduation_rate_percentile": format_decimal(first["graduation_rate_percentile"]),
             "admissions_rate": format_rate(first["admissions_rate"]),
-            "admissions_rate_percentile": "",
+            "admissions_rate_percentile": format_decimal(first["admissions_rate_percentile"]),
             "sat_score": format_number(first["sat_score"]),
             "act_score": str(first["act_score"]) if first["act_score"] else "",
+            "sat_score_percentile": format_decimal(first["sat_score_percentile"]),
+            "act_score_percentile": format_decimal(first["act_score_percentile"]),
             "studentFacultyRatio": format_decimal(first["student_faculty_ratio"]),
-            "studentFacultyRatioPercentile": "",
+            "studentFacultyRatioPercentile": format_decimal(first["student_faculty_ratio_percentile"]),
             "avg_household_income": format_number(first["avg_household_income"]),
-            "avg_household_income_percentile": "",
+            "avg_household_income_percentile": format_decimal(first["avg_household_income_percentile"]),
             "average_class_size": "",
         },
         "demographics": format_demographics(
@@ -380,14 +397,15 @@ def format_university(rows):
     grad_content = {
         "general_content": {
             "total_students": format_number(first["grad_total_students"]),
-            "total_student_percentile": "",
+            "total_student_percentile": format_decimal(first["grad_total_students_percentile"]),
             "graduation_rate": format_rate(first["grad_graduation_rate"]),
-            "graduation_rate_percentile": "",
+            "graduation_rate_percentile": format_decimal(first["grad_graduation_rate_percentile"]),
             "admissions_rate": format_rate(first["grad_admissions_rate"]),
-            "admissions_rate_percentile": "",
+            "admissions_rate_percentile": format_decimal(first["grad_admissions_rate_percentile"]),
             "studentFacultyRatio": format_decimal(first["grad_student_faculty_ratio"]),
+            "studentFacultyRatioPercentile": format_decimal(first["grad_student_faculty_ratio_percentile"]),
             "avg_household_income": format_number(first["grad_avg_household_income"]),
-            "avg_household_income_percentile": "",
+            "avg_household_income_percentile": format_decimal(first["grad_avg_household_income_percentile"]),
             "average_class_size": "",
         },
         "demographics": format_demographics(
@@ -602,6 +620,72 @@ class UniversityDetail(Resource):
                 return {"error": "University not found"}, 404
 
             return format_university(rows)
+        finally:
+            conn.close()
+
+
+@ns.route("/stats/aggregates")
+class StatsAggregates(Resource):
+    @ns.doc(description="Global averages across all universities in the database")
+    def get(self):
+        """Return national averages for each metric, formatted for display."""
+        conn = get_db()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT
+                        ROUND(AVG(total_students))::int AS total_students,
+                        AVG(graduation_rate) AS graduation_rate,
+                        AVG(admissions_rate) AS admissions_rate,
+                        AVG(student_faculty_ratio) AS student_faculty_ratio,
+                        ROUND(AVG(avg_household_income))::int AS avg_household_income,
+                        ROUND(AVG(sat_score))::int AS sat_score,
+                        ROUND(AVG(act_score))::int AS act_score
+                    FROM university_undergrad_stats
+                    """
+                )
+                ug_columns = [desc[0] for desc in cur.description]
+                ug = dict(zip(ug_columns, cur.fetchone()))
+
+                cur.execute(
+                    """
+                    SELECT
+                        ROUND(AVG(total_students))::int AS total_students,
+                        AVG(graduation_rate) AS graduation_rate,
+                        AVG(admissions_rate) AS admissions_rate,
+                        AVG(student_faculty_ratio) AS student_faculty_ratio,
+                        ROUND(AVG(avg_household_income))::int AS avg_household_income
+                    FROM university_grad_stats
+                    """
+                )
+                gr_columns = [desc[0] for desc in cur.description]
+                gr = dict(zip(gr_columns, cur.fetchone()))
+
+            return {
+                "undergrad": {
+                    "totalStudents": format_number(ug["total_students"]),
+                    "graduationRate": f"{format_rate(ug['graduation_rate'])}%",
+                    "admissionsRate": f"{format_rate(ug['admissions_rate'])}%",
+                    "studentFacultyRatio": (
+                        f"{ug['student_faculty_ratio']:.1f}:1"
+                        if ug["student_faculty_ratio"] is not None else ""
+                    ),
+                    "avgHouseholdIncome": format_currency(ug["avg_household_income"]),
+                    "satScore": format_number(ug["sat_score"]),
+                    "actScore": format_number(ug["act_score"]),
+                },
+                "grad": {
+                    "totalStudents": format_number(gr["total_students"]),
+                    "graduationRate": f"{format_rate(gr['graduation_rate'])}%",
+                    "admissionsRate": f"{format_rate(gr['admissions_rate'])}%",
+                    "studentFacultyRatio": (
+                        f"{gr['student_faculty_ratio']:.1f}:1"
+                        if gr["student_faculty_ratio"] is not None else ""
+                    ),
+                    "avgHouseholdIncome": format_currency(gr["avg_household_income"]),
+                },
+            }
         finally:
             conn.close()
 
