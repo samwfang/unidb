@@ -57,6 +57,7 @@ const FavoritesTable: React.FC<FavoritesTableProps> = ({ mode, toggleMode, pageS
       fetchPage={fetchPage}
       refreshSignal={favorites}
       RowComponent={MasterTableRow}
+      stateKey="favorites"
     />
   );
 };

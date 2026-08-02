@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import MasterTable from '../FrontPage/MasterTable';
 import { MTControlPanel } from '../FrontPage/MTControlPanel';
 import FrontPageInfo from '../FrontPage/FrontPageInfo';
 import ThankYouPage from '../FrontPage/ThankYouPage';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { ModeType } from '../../helpers/types';
+import usePersistentState from '../../helpers/usePersistentState';
 
 interface ExplorePageProps {
     mode: ModeType;
@@ -12,7 +13,7 @@ interface ExplorePageProps {
 }
 
 const ExplorePage: React.FC<ExplorePageProps> = ({ mode, onModeChange }) => {
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize, setPageSize] = usePersistentState<number>("pageSize.explore", 10);
     const frontPageInfoRef = useRef<HTMLDivElement>(null);
     const masterTableRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +37,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ mode, onModeChange }) => {
                 />
             </Flex>
 
-            <Box ref={masterTableRef}>
+            <Box ref={masterTableRef} scrollMarginTop="80px">
                 <Flex
                     direction={{ base: "column", lg: "row" }}
                     gap={6}

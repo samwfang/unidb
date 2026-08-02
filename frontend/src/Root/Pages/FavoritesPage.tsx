@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { Box, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { MTControlPanel } from "../FrontPage/MTControlPanel";
 import FavoritesTable from "../FrontPage/FavoritesTable";
 import { ModeType } from "../../helpers/types";
+import usePersistentState from "../../helpers/usePersistentState";
 
 interface FavoritesPageProps {
     mode: ModeType;
@@ -12,7 +12,7 @@ interface FavoritesPageProps {
 const FavoritesPage: React.FC<FavoritesPageProps> = ({ mode, onModeChange }) => {
     const { colorMode } = useColorMode();
     const isDark = colorMode === 'dark';
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize, setPageSize] = usePersistentState<number>("pageSize.favorites", 10);
 
     return (
         <>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Accordion, Button, Flex, Text, Spinner, Input, Tooltip, Grid, Circle } from '@chakra-ui/react';
 import { ModeType } from "../../helpers/types";
 import { WarningIcon } from '@chakra-ui/icons';
+import usePersistentState from '../../helpers/usePersistentState';
 import SearchBar from '../../ReusableComponents/SearchBar';
 import { useAppTheme } from '../../containers/useTheme';
 import { useResponsive } from '../../containers/useResponsive';
@@ -78,6 +79,10 @@ export interface DataTableProps<T extends { id: number }, C, S extends string = 
   //When this value changes, the table refetches the current page (used by tables
   //whose data lives in local state rather than the server, e.g. favorites).
   refreshSignal?: unknown;
+  //When provided, the table's view state (current page, sorting, search, column
+  //selections) is persisted to localStorage under this key, so it survives
+  //navigation to other pages and full page reloads.
+  stateKey?: string;
 }
 
 const DataTable = <T extends { id: number }, C, S extends string = string>({
@@ -92,13 +97,14 @@ const DataTable = <T extends { id: number }, C, S extends string = string>({
   RowComponent,
   onExpand,
   refreshSignal,
+  stateKey,
 }: DataTableProps<T, C, S>) => {
   //Custom Parameters for App Styling Based on Theme
   const { colorMode, glassBg, glassBorder, modeColor, isDark } = useAppTheme();
 
   //Raw Data for Page
   const [data, setData] = useState<T[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = usePersistentState<number>(stateKey ? `${stateKey}.page` : null, 0);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -118,18 +124,21 @@ const DataTable = <T extends { id: number }, C, S extends string = string>({
   const calculatedMinHeight = pageSize * rowHeightEstimate;
 
   //Per-column state (parallel to the `columns` array; null for static columns)
-  const [columnState, setColumnState] = useState<(TableColumnState<C> | null)[]>(() => columns.map(c => c.initial ?? null));
+  const [columnState, setColumnState] = usePersistentState<(TableColumnState<C> | null)[]>(
+    stateKey ? `${stateKey}.columnState` : null,
+    () => columns.map(c => c.initial ?? null)
+  );
   //Which column is sorted by
-  const [sortedByCol, setSortedByCol] = useState<number>(initialSortingCol);
+  const [sortedByCol, setSortedByCol] = usePersistentState<number>(stateKey ? `${stateKey}.sortedByCol` : null, initialSortingCol);
 
 
   //Current Parameter With Which To Sort Page Data With
-  const [sortingParam, setSortingParam] = useState<S>(initialSortingParam);
-  const [sortingDeptCID, setSortingDeptCID] = useState<string>("general");
-  const [sortingExtra, setSortingExtra] = useState<string>("greatest");
+  const [sortingParam, setSortingParam] = usePersistentState<S>(stateKey ? `${stateKey}.sortParam` : null, initialSortingParam);
+  const [sortingDeptCID, setSortingDeptCID] = usePersistentState<string>(stateKey ? `${stateKey}.sortDept` : null, "general");
+  const [sortingExtra, setSortingExtra] = usePersistentState<string>(stateKey ? `${stateKey}.sortExtra` : null, "greatest");
 
   //Search Queries for Search Bar Functionality
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = usePersistentState<string>(stateKey ? `${stateKey}.search` : null, "");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
   //Columns to display: static columns always show; responsive columns are sliced
@@ -198,6 +207,16 @@ const DataTable = <T extends { id: number }, C, S extends string = string>({
   useEffect(() => {
     fetchPageData(currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery);
   }, [currentPage, pageSize, sortingParam, sortingDeptCID, sortingExtra, debouncedSearchQuery, refreshSignal]);
+
+  // Keep the current page in range when the dataset shrinks (e.g. favorites were
+  // removed or a stored page is stale). Ignore while nothing has loaded yet.
+  useEffect(() => {
+    if (totalItems === 0) return;
+    const maxPage = Math.max(0, Math.ceil(totalItems / pageSize) - 1);
+    if (currentPage > maxPage) {
+      setCurrentPage(maxPage);
+    }
+  }, [totalItems, pageSize, currentPage]);
 
 
 

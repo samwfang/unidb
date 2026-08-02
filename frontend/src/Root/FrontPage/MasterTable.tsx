@@ -91,6 +91,7 @@ const MasterTable: React.FC<MasterTableProps> = ({ mode, toggleMode, pageSize = 
       fetchPage={fetchPage}
       onExpand={fetchExpandedEntryContent}
       RowComponent={MasterTableRow}
+      stateKey="explore"
     />
   );
 };
